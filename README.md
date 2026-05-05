@@ -1,7 +1,31 @@
 # PI Aventure
 
+## COMMANDES GIT POUR AIDER
+```
+# Avant de développer
+git pull
+# A la fin du développement
+git add. #pour ajouter tous les fichiers du répertoire courant dans le commit
+git commit -m "Message de commit"
+git push
+```
 
+Pour voir quels fichiers sont compris dans votre commit
+```
+git status
+```
 
+Si il y a conflit, voici les différents cas possibles :
+Pour reset votre git actuel sur le dernier commit fait (en gros pour forcer le pull)
+```
+git reset --hard HEAD 
+
+```
+Pour corriger chaque ligne (avec VSCode)
+```
+git fetch ? (à modifier)
+
+```
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
