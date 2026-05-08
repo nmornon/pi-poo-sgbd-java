@@ -1,0 +1,152 @@
+// j'ai copié collé ceux du basic 
+
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 1;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = false;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_TOKEN_MANAGER = false;
+  ERROR_REPORTING = true;
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = false;
+  IGNORE_CASE = false;
+  USER_TOKEN_MANAGER = false;
+  USER_CHAR_STREAM = false;
+  BUILD_PARSER = true;
+  BUILD_TOKEN_MANAGER = true;
+  SANITY_CHECK = true;
+  FORCE_LA_CHECK = true;
+}
+
+PARSER_BEGIN(AnalyseurSyntaxique)
+package fr.insarouen.iti.compilation.sgbd.analyseurs;
+
+import fr.insarouen.iti.compilation.sgbd.commandes.*;
+import fr.insarouen.iti.compilation.sgbd.moteur.*;
+import fr.insarouen.iti.compilation.sgbd.conditions*;
+
+
+public class AnalyseurSyntaxique{}
+
+PARSER_END(AnalyseurSyntaxique)
+
+SKIP : {
+    " " 
+    | "\t" 
+    | "\r"
+    | "\n"
+}
+
+TOKEN:{
+    <CREATE : "CREATE" >
+  | <TABLE : "TABLE" >
+  | <INSERT : "INSERT" >
+  | <INTO : "INTO" >
+  | <VALUES : "VALUES" >
+  | <SELECT : "SELECT" >
+  | <FROM : "FROM" >
+  | <WHERE : "WHERE" >
+  | <DELETE : "DELETE" >
+  | <DROP : "DROP" >
+  | <TABLES : "TABLES" >
+  | <EXIT : "EXIT" >
+  | <QUIT : "QUIT" >
+  | <AS : "AS" >
+  | <AND : "AND">
+  | <OR : "OR" >
+  | <INT : "INT" >
+  | <SERIAL : "SERIAL" >
+  | <VARCHAR : "VARCHAR" >
+  | <EGAL : "=" >
+  | <SUPERIEUR : ">" >
+  | <INFERIEUR : "<" >
+  | <VIRGULE : "," >
+  | <POINTVIRGULE : ";" >
+  | ETOILE : "*" >
+  | <PARENTHESE_OUVRANTE : "(">
+  | <PARENTHESE_FERMANTE : ")">
+  | <NUMBER : (["0"-"9"])+ >
+  | <ID:["A"-"Z","a"-"z","_"](["A"-"Z","a"-"z","_","0"-"9"])*> 
+  | <STRING : "\""(~["\""])*"\"" >
+}
+
+
+Commande commande():
+{
+    Commande cmd;
+}
+{
+    (
+        cmd=commandeCreate()
+      | cmd=commandeInsert()
+      | cmd=commandeSelect()
+      | cmd=commandeDelete()
+      | cmd=commandeDrop()
+      | cmd=commandeTables()
+      | cmd=commandeExit()
+    )
+
+    <POINTVIRGULE>
+
+    {
+        return cmd;
+    }
+}
+
+Commande commandeCreate():
+{}
+{}
+
+Commande commandeInsert():
+{}
+{}
+
+Commande commandeSelect():
+{}
+{}
+
+Commande commandeDelete():
+{}
+{}
+
+Commande commandeDrop():
+{}
+{}
+
+Commande commandeTables():
+{}
+{}
+
+Commande commandeExit():
+{}
+{}
+
+ExpressionLogique ExpressionLogique():
+{}
+{}
+
+OperateurLogique OperateurLogique():
+{}
+{}
+
+ConditionSimple ConditionSimple():
+{}
+{}
+
+Comparateur comparateur() :
+{}
+{}
+
+Operande operande():
+{}
+{}
+
+OperandeAttribut OperandeAttribut():
+{}
+{}
+
+OperandeValeur OperandeValeur():
+{}
+{}
