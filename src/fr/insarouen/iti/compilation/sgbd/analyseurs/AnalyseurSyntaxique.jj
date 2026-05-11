@@ -64,7 +64,7 @@ TOKEN:{
   | <INFERIEUR : "<" >
   | <VIRGULE : "," >
   | <POINTVIRGULE : ";" >
-  | ETOILE : "*" >
+  | <ETOILE : "*" >
   | <PARENTHESE_OUVRANTE : "(">
   | <PARENTHESE_FERMANTE : ")">
   | <NUMBER : (["0"-"9"])+ >
@@ -72,7 +72,7 @@ TOKEN:{
   | <STRING : "\""(~["\""])*"\"" >
 }
 
-
+//Pour l'instant on oublie cette méthode
 Commande commande():
 {
     Commande cmd;
@@ -95,45 +95,242 @@ Commande commande():
     }
 }
 
-Commande commandeCreate():
-{}
-{}
+void commandeCreate():
+{
+    Collection<Attribut> listeAttributs = new ArrayList<>();
+    Attribut attr,attr2;
+    Token t;
+}
+{
+    <CREATE> <TABLE> t = <ID> <PARENTHESE_OUVRANTE>
+    attr = attribut() {listeAttributs.add(attr);}
+    (<VIRGULE> attr2 = attribut() {listeAttributs.add(attr2);})*
+    <PARENTHESE_FERMANTE>
+    <POINTVIRGULE>
 
-Commande commandeInsert():
-{}
-{}
-
-Commande commandeSelect():
-{}
-{}
-
-Commande commandeDelete():
-{}
-{}
+    {
+        //Il faut récupérer la base de données à aquelle on applique la commande
+        baseDeDonnees.createTable(new Identifiant(t.image), listeAttributs);
+    }
+}
 
 Commande commandeDrop():
-{}
-{}
+{
+    Token t;
+}
+{
+    <DROP> <TABLE> t = <ID>
+    <POINTVIRGULE>
+    {baseDeDonnees.dropTable(new Identifiant(t.image));}
+}
 
-Commande commandeTables():
-{}
-{}
+void commandeInsert():
+{
+    Token id_table, id_attr, id_attr2;
+    Collection<Identifiant> listeId = new ArrayList<>();
+    Collection<Valeur> listeVal = new ArrayList<>();
+    Valeur val;
+    Tuple tuple = new Tuple();
+}
+{
+    <INSERT> <INTO> id_table = <ID>
 
-Commande commandeExit():
-{}
-{}
+    <PARENTHESE_OUVRANTE>
+    id_attr = <ID> {listeId.add(new Identifiant(id_attr.image));}
+    (
+        <VIRGULE> id_attr2 = <ID> {listeId.add(new Identifiant(id_attr2.image));}
+    )*
+    <PARENTHESE_FERMANTE>
 
-ExpressionLogique ExpressionLogique():
+    <VALUES> <PARENTHESE_OUVRANTE> val = valeur() {listeVal.add(val);}
+    (
+        <VIRGULE> val = valeur() {listeVal.add(val);}
+    )*
+    <PARENTHESE_FERMANTE>
+    <POINTVIRGULE>
+
+    {
+        if (listeId.size() == listeVal.size()){
+            for(int i=0; i<listeId.size(); i++){
+                tuple.setValeur(listeId.get(i),listeVal.get(i));
+            }
+            //Il faut récupérer la base de données
+            baseDeDonnees.getTable().inserer(tuple);
+        }
+    }
+}
+
+void commandeDelete():
+{
+    Token t;
+    ExpressionLogique exp;
+    boolean hasWhere = false;
+}
+{
+    <DELETE> <FROM> t = <ID>
+    (
+        <WHERE> exp = expressionLogique() {hasWhere = true;}
+    )?
+    <POINTVIRGULE>
+
+    {
+        if (hasWhere){
+            baseDeDonnees.getTable().supprimer(exp);
+        }
+        else {
+            //methode supprimer(sans param) permet de supprimer tous les tuples
+            baseDeDonnees.getTable().supprimer();
+        }
+    }
+}
+
+void commandeSelect():
+//relation.selectionner(collection(attributs))
+{
+    Token t_select;
+    Collection<Identifiant> listeId = new ArrayList<>();
+    Collection<Identifiant> listeId2 = new ArrayList<>();
+    Relation relation;
+    ExpressionLogique exp;
+    boolean hasEtoile = false;
+    Map<Identifiant,Identifiant> alias = new HashMap<>();
+}
+{
+    <SELECT> t_select = <ETOILE> {hasEtoile = true;}
+    | t_select = <ID> {listeId.add(new Identifiant(t_select.image));}
+    (
+        <VIRGULE> t_select = <ID> {listeId.add(new Identifiant(t_select.image));}
+    )*
+
+    <FROM> relation = source() 
+    (
+        <VIRGULE> source = source() {relation = relation.produitCartesien(source);}
+    )*
+
+    (
+        <WHERE> exp = expressionLogique()
+    )?
+
+    {
+        relation = relation.projeter(exp);
+        if (!hasEtoile){
+            for(Identifiant id : listeId){
+                if (alias.contains(id)){
+                    listeId2.add(alias.get(id));
+                }
+                else {
+                    listeId2.add(id);
+                }
+
+            }
+            relation = relation.selectionner(listeId2);
+        }
+        relation.afficher();
+    }
+}
+
+void commandeTables(): //afficher Tables
 {}
+{
+    <TABLES> 
+    {
+        baseDeDonnees.afficherTables();
+    }
+}
+
+void commandeExit(): //main va avoir une instance de la base
+{
+    GestionnairePersistance gest = new GestionnairePersistance();
+}
+{
+    t = <EXIT>
+    | t = <QUIT>
+    {gest.sauvegarder(baseDeDonnees);}
+}
+
+
+Attribut attribut();
+{
+    Type type;
+    Token t;
+}
+{
+    t = <ID> type = type()
+    {return new Attribut(new Identifiant(t.image),type);}
+}
+
+Type type();
+{
+    Token t;
+}
+{
+    t = <INT> {return new Type.INT;}
+    | t = <VARCHAR> {return new Type.VARCHAR;}
+    | t = <SERIAL> {return new Type.SERIAL;}
+}
+
+Valeur valeur();
+{
+    Token t;
+}
+{
+    t = <NUMBER> {return new Valeur(t.image,new Type.INT);}
+    | t = <STRING> {return new Valeur(t.image, new Type.VARCHAR);}
+}
+
+Relation source();
+{
+    Token t;
+}
+{
+    t = <ID>
+    (
+        (<AS>)?
+        t2 = <ID> {alias.put(t2,t);}
+    )?
+
+    {
+        return baseDeDonnees.getTable(t);
+    }
+}
+
+ExpressionLogique expressionLogique(): //ENCOURS
 {}
+{
+    conditionSimple = conditionSimple()
+    (
+        (t = <AND>
+        | <OR>)
+        conditionSimple = conditionSimple()
+    )*
+}
+
+ConditionSimple conditionSimple(): //ENCOURS
+{
+    Token t;
+    Comparateur comparateur;
+    Operande opG, opD;
+}
+{
+    t = <ID> {opG = operande()}
+    (t2 = <EGAL>
+    | <SUP>
+    | <INF>
+    )
+    (t3 = valeur()
+    | <ID>
+    )
+
+    {
+        return new ConditionsSimple(opG, opD, comparateur)
+    }
+}
 
 OperateurLogique OperateurLogique():
 {}
 {}
 
-ConditionSimple ConditionSimple():
-{}
-{}
+
 
 Comparateur comparateur() :
 {}
