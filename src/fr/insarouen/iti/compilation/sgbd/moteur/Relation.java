@@ -7,9 +7,9 @@ import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
  */
 class Relation {
     /** La liste des attriuts de la relation */
-    private List<Attribut> attributs;
+    private Collection<Attribut> attributs;
     /** La liste des tuples de la relation */
-    private final List<Tuple> tuples = new ArrayList<>();
+    private final Collection<Tuple> tuples = new ArrayList<>();
 
     /**
      * Construit une relation à partir de la liste d'attributs spécifiée et de
@@ -21,7 +21,7 @@ class Relation {
      * @throws TypeInvalideException si au moins un tuple ne correspond pas aux
      *                       attributs
      */
-    public Relation(List<Attribut> attributs, List<Tuple> tuples) throws TypeInvalideException {
+    public Relation(Collection<Attribut> attributs, Collection<Tuple> tuples) throws TypeInvalideException {
         this.attributs = attributs;
 
         for (Tuple tuple : tuples) {
@@ -30,11 +30,29 @@ class Relation {
         }
     }
 
-    public List<Attribut> getAttributs() {
+    public boolean hasAttribut(Identifiant identifiantAttribut) {
+        for (Attribut attribut : this.getAttributs()) {
+            if (attribut.getIdentifiant().equals(identifiantAttribut)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean getAttribut(Identifiant identifiantAttribut) {
+        for (Attribut attribut : this.getAttributs()) {
+            if (attribut.getIdentifiant().equals(identifiantAttribut)) {
+                return attribut;
+            }
+        }
+        return null;
+    }
+
+    public Collection<Attribut> getAttributs() {
         return this.attributs;
     }
 
-    public List<Tuple> getTuples() {
+    public Collection<Tuple> getTuples() {
         return this.tuples;
     }
 
@@ -47,6 +65,17 @@ class Relation {
      * @throws TypeInvalideException si le tuple spécifié est invalide
      */
     protected void verifierTuple(Tuple tuple) throws TypeInvalideException {
+        for (Attribut attribut : this.getAttributs()) {
+            if (tuple.hasIdentifiant(attribut.getIdentifiant())) {
+                Valeur valeur = tuple.get(attribut.getIdentifiant());
+
+                if (attribut.getType() != valeur.getType()) {
+                    throw new TypeInvalideException("Mauvais type");
+                }
+            } else if (attribut.getType() != Type.SERIAL) {
+                throw new TypeInvalideException("Attribut inexistant");
+            }
+        }
     }
 
     /**
@@ -55,8 +84,18 @@ class Relation {
      * @param attributs la liste attributs à sélectionner
      * @return la nouvelle relation
      */
-    public Relation selectionner(List<Attribut> attributs) {
-        return null;
+    public Relation selectionner(Collection<Attribut> attributs) {
+        Collection<Tuple> tuples = new ArrayList<>();
+
+        for (Tuple tuple : this.getTuples()) {
+            Tuple nouveauTuple = new Tuple();
+
+            for (Attribut attribut : attributs) {
+                nouveauTuple.set(attribut.getIdentifiant(), tuple.get(attribut.getIdentifiant()));
+            }
+            tuples.add(nouveauTuple);
+        }
+        return new Relation(attributs, tuples);
     }
 
     /**
@@ -80,6 +119,7 @@ class Relation {
      * @return la nouvelle relation
      */
     public Relation joindre(Relation relation, Attribut attribut1, Attribut attribut2) {
+
     }
 
     /**
@@ -90,6 +130,41 @@ class Relation {
      * @return la nouvelle relation
      */
     public Relation produitCartesien(Relation relation) {
-        return null;
+        Collection<Tuple> tuples = new ArrayList<>();
+        Collection<Attribut> attributs = this.concatenerAttributs(this.getAttributs(), relation.getAttributs());
+
+        for (Tuple tuple1 : this.getTuples()) {
+            for (Tuple tuple2 : relation.getTuples()) {
+                tuples.add(this.concatenerTuple(tuple1, tuple2));
+            }
+        }
+        return new Relation(attributs, tuples);
+    }
+
+    private Collection<Tuple> concatenerTuples(Tuples tuple1, Tuple tuple2) {
+        Tuple tuple = new Tuple();
+
+        for (Map.Entry entry : tuple1.getValeurs().entrySet()) {
+            tuple.setValeur(entry.getKey(), entry.getType());
+        }
+        for (Map.Entry entry : tuple2.getValeurs().entrySet()) {
+            tuple.setValeur(entry.getKey(), entry.getType());
+        }
+        return tuple;
+    }
+
+    private Collection<Attribut> concatenerAttribut(
+        Collection<Attribut> attributs1,
+        Collection<Attribut> attributs2
+    ) {
+        Collection<Attribut> attributs = new ArrayList<>();
+
+        for (Attribut attribut : attributs1) {
+            attributs.add(attribut);
+        }
+        for (Attribut attribut : attributs2) {
+            attributs.add(attribut);
+        }
+        return attributs;
     }
 }
