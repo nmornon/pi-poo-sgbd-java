@@ -12,7 +12,17 @@ public class Identifiant {
         return this.nom;
     }
 
-    public Boolean equals(Identifiant autre) {
-        return this.getNom().equals(autre.getNom());
+    public boolean equals(Object obj) {
+        
+        if (!(obj instanceof Identifiant)){
+            return false;
+        }
+
+        Identifiant autre =(Identifiant) obj;
+        return this.nom.equals(autre.nom);
+    }
+
+    public int hashCode(){
+        return this.nom.hashCode();
     }
 }
