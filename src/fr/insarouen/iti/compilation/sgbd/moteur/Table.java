@@ -2,6 +2,7 @@ package fr.insarouen.iti.compilation.sgbd.moteur;
 
 import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
+import java.util.Collection;
 
 
 class Table extends Relation {
@@ -16,10 +17,6 @@ class Table extends Relation {
      */
     public Table(Identifiant identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) throws TypeInvalideException {
         super(identifiant, attributs, tuples);
-    }
-
-    public Identifiant getIdentifiant(){
-        return this.identifiant;
     }
 
     /**
@@ -54,8 +51,12 @@ class Table extends Relation {
      * @param condition condition à appliquer pour supprimer certains tuples (~filtre)
      * @return le nombre de tuples qui a été supprimé avec la condition
      */
-    public int supprimer(ExpressionLogique condition){
+    public int supprimer(ExpressionLogique condition) {
         // this.getTuples().delete()
         return 0;
+    }
+
+    public int supprimer() {
+        this.getTuples().clear();
     }
 }
