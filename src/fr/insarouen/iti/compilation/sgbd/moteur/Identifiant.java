@@ -12,12 +12,21 @@ public class Identifiant {
     }
 
     @Override
-    public Boolean equals(Identifiant autre) {
-        return this.getNom().equals(autre.getNom());
+    public boolean equals(Object autre) {
+        if (autre == null) {
+            return false;
+        }
+        if (autre == this) {
+            return true;
+        }
+        if (!(autre instanceof Identifiant identifiant)) {
+            return false;
+        }
+        return this.getNom().equals(identifiant.getNom());
     }
 
     @Override
-    public boolean hashCode() {
+    public int hashCode() {
         return this.getNom().hashCode();
     }
 }
