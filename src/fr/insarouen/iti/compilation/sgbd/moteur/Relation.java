@@ -195,4 +195,32 @@ class Relation {
         }
         return attributs;
     }
+
+    /**
+     * Affiche toutes les informations de la relation.
+     */
+    public void afficher() {
+        System.out.println("> Table: %s", this.getIdentifiant());
+        System.out.print("| ");
+
+        for (Attribut attribut : this.getAttributs()) {
+            System.out.printf(" %15s |", attribut.getIdentifiant());
+        }
+        System.out.print("\n|");
+
+        for (int i = 0; i < this.getAttributs().size(); i++) {
+            System.out.printf("%-17s|", "-");
+        }
+        System.out.print("\n|");
+
+        for (Tuple tuple : this.getTuples()) {
+            System.out.print("| ");
+
+            for (Map.Entry entry : this.getTuples()) {
+                Valeur valeur = entry.getValue();
+                System.out.printf(" %15s |", valeur);
+            }
+            System.out.println();
+        }
+    }
 }

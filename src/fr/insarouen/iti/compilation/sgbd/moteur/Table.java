@@ -5,7 +5,6 @@ import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
 
 
 class Table extends Relation {
-    private Identifiant identifiant;
 
     /**
      * Constructeur de la classe Table
@@ -15,9 +14,8 @@ class Table extends Relation {
      * 
      * @throws TypeInvalideException
      */
-    public Table(Identifiant identifiant, List<Attribut> attributs, List<Tuple> tuples) throws TypeInvalideException {
-        this.identifiant = identifiant;
-        super(attributs, tuples);
+    public Table(Identifiant identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) throws TypeInvalideException {
+        super(identifiant, attributs, tuples);
     }
 
     public Identifiant getIdentifiant(){
@@ -42,7 +40,7 @@ class Table extends Relation {
      * 
      * @param tuples tableau de tuples
      */
-    public void inserer(List<Tuple> tuples) throws TypeInvalideException {
+    public void inserer(Collection<Tuple> tuples) throws TypeInvalideException {
         for(Tuple tuple : tuples){
             this.verifierTuple(tuple);
         }
@@ -60,6 +58,4 @@ class Table extends Relation {
         // this.getTuples().delete()
         return 0;
     }
-
-
 }
