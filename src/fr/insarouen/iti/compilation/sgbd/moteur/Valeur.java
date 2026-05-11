@@ -1,6 +1,8 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
-public interface Valeur<T> {
+public interface Valeur {
 
-    public T getValeur();
+    public Object getValeur();
+
+    public Type getType();
 }

@@ -5,9 +5,9 @@ import java.util.HashMap;
 public class Attribut {
 
     private Identifiant id;
-    private Class<? extends Valeur<?>> type;
+    private Type type;
 
-    public Attribut(Identifiant id, Class<? extends Valeur<?>> type) {
+    public Attribut(Identifiant id, Type type) {
         this.id = id;
         this.type = type;
     }
