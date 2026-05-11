@@ -13,6 +13,6 @@ public class Identifiant {
     }
 
     public Boolean equals(Identifiant autre) {
-        return this.getNom() == autre.getNom();
+        return this.getNom().equals(autre.getNom());
     }
 }
