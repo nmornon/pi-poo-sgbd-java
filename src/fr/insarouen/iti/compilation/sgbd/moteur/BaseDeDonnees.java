@@ -1,21 +1,21 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
 
-import java.util.Arraylist;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import fr.insarouen.iti.compilation.sgbd.moteur.Identifiant;
 import fr.insarouen.iti.compilation.sgbd.moteur.Table;
-import fr.insarouen.iti.compilation.sgbd.moteur.Colonne;
+import fr.insarouen.iti.compilation.sgbd.moteur.Attribut;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
 
 public class BaseDeDonnees {
     private Identifiant identifiant;
     private long nbLignes;
-    private Collection<Table> tables = new Arraylist();
+    private Collection<Table> tables = new ArrayList();
     
 
-    public BaseDeDonnees(Identifiant id, Collection<Table> tabs, long ligne) {
+    public BaseDeDonnees(Identifiant id, Collection<Table> tabs, long ligne){
         this.identifiant = id;
         boolean b = true;
         b = this.tables.addAll(tabs);
@@ -31,7 +31,7 @@ public class BaseDeDonnees {
     }
 
     public long getCle() {
-        return this.nbCle;
+        return this.nbLignes;
     }
 
     public Collection<Table> getTables() {
@@ -46,7 +46,7 @@ public class BaseDeDonnees {
         this.nbLignes = ligne;
     } 
 
-    public Table getTable(Identifiant id) {
+    public Table getTable(Identifiant id) throws TableInexistanteException{
         for (Table o : this.tables) {
             if (o.getIdentifiant.equals(id)) {
                 return o;
@@ -55,7 +55,7 @@ public class BaseDeDonnees {
         throw new TableInexistanteException("La table n'est pas présente dans la base de donnees");
     }
 
-    public Table creerTable(Identifiant id, Collection<Colonne> donnees) {
+    public Table creerTable(Identifiant id, Collection<Attribut> donnees) {
         Table table = new Table(id, donnees);
         boolean b = true;
         b = this.tables.add(table);
@@ -65,7 +65,7 @@ public class BaseDeDonnees {
         return table;
     }
 
-    public void supprimerTable(Identifiant id) {
+    public void supprimerTable(Identifiant id)  throws TableInexistanteException{
         for (Table o : this.tables) {
             if (o.getIdentifiant.equals(id)) {
                 boolean b = true;
