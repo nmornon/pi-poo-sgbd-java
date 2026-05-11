@@ -30,18 +30,31 @@ class Relation {
         }
     }
 
-    public boolean hasAttribut(Identifiant identifiantAttribut) {
+    /**
+     * Détermine si la relation a un attribut avec l'identifiant spécifié.
+     * 
+     * @param l'identifiant de l'attribut à vérifier
+     * @return true si l'attribut est dans la relation, false sinon
+     */
+    public boolean hasAttribut(Identifiant identifiant) {
         for (Attribut attribut : this.getAttributs()) {
-            if (attribut.getIdentifiant().equals(identifiantAttribut)) {
+            if (attribut.getIdentifiant().equals(identifiant)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean getAttribut(Identifiant identifiantAttribut) {
+    /**
+     * Renvoie l'attribut avec l'identiant spécifié, s'il n'existe pas, renvoie
+     * null.
+     * 
+     * @param l'identifiant de l'attribut à recherché
+     * @return l'attribut recherché ou null
+     */
+    public boolean getAttribut(Identifiant identiant) {
         for (Attribut attribut : this.getAttributs()) {
-            if (attribut.getIdentifiant().equals(identifiantAttribut)) {
+            if (attribut.getIdentifiant().equals(identiant)) {
                 return attribut;
             }
         }
@@ -70,7 +83,7 @@ class Relation {
                 Valeur valeur = tuple.get(attribut.getIdentifiant());
 
                 if (attribut.getType() != valeur.getType()) {
-                    throw new TypeInvalideException("Mauvais type");
+                    throw new TypeInvalideException("Type invalide");
                 }
             } else if (attribut.getType() != Type.SERIAL) {
                 throw new TypeInvalideException("Attribut inexistant");
@@ -119,7 +132,7 @@ class Relation {
      * @return la nouvelle relation
      */
     public Relation joindre(Relation relation, Attribut attribut1, Attribut attribut2) {
-
+        return null;
     }
 
     /**
@@ -141,6 +154,13 @@ class Relation {
         return new Relation(attributs, tuples);
     }
 
+    /**
+     * Renvoie un tuple contenant la concaténation des deux tuples spécifiés.
+     * 
+     * @param tuple1 le premier tuple à concaténer
+     * @param tuple2 le second tuple à concaténer
+     * @return le tuple concaténé
+     */
     private Collection<Tuple> concatenerTuples(Tuples tuple1, Tuple tuple2) {
         Tuple tuple = new Tuple();
 
@@ -153,6 +173,14 @@ class Relation {
         return tuple;
     }
 
+    /**
+     * Renvoie une collection d'attribut contenant la concaténation des deux
+     * collections d'attributs spécifiées.
+     * 
+     * @param attributs1 la première liste d'attribut à concaténer
+     * @param attributs1 la seconde liste d'attribut à concaténer
+     * @return la collection d'attribut concaténée
+     */
     private Collection<Attribut> concatenerAttribut(
         Collection<Attribut> attributs1,
         Collection<Attribut> attributs2
