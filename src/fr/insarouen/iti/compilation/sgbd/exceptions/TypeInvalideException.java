@@ -1,6 +1,6 @@
 package fr.insarouen.iti.compilation.sgbd.exceptions;
 
-public class TypeInvalideException extends ITIAventureException {
+public class TypeInvalideException extends PIAventureException {
 
     public TypeInvalideException(String message) {
         super(message);

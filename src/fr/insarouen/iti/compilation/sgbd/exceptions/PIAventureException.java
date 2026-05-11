@@ -1,4 +1,4 @@
-package fr.insarouen.iti.prog.aventure;
+package fr.insarouen.iti.compilation.sgbd.exceptions;
 
 public class PIAventureException extends Exception{
 
