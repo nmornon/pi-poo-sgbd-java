@@ -15,18 +15,8 @@ class Table extends Relation {
      * 
      * @throws TypeInvalideException
      */
-    public Table(Identifiant identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) throws TypeInvalideException {
+    public Table(Identifiant identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
         super(identifiant, attributs, tuples);
-    }
-
-    /**
-     * Méthode permettant d'insérer un seul tuple dans la table
-     * @param tuple tuple à insérer
-     */
-    public void inserer(Tuple tuple) throws TypeInvalideException {
-        this.verifierTuple(tuple);
-        this.getTuples().add(tuple);
-
     }
 
     /**
@@ -47,16 +37,24 @@ class Table extends Relation {
     }
 
     /**
+     * Supprime tous les tuple de la relation
+     * 
+     * @return le nombre de tuples qui ont été supprimés
+     */
+    public int supprimer() {
+        int nbLigneSupprimes = this.getTuples().size();
+        this.getTuples().clear();
+        return nbLigneSupprimes;
+    }
+
+    /**
      * Méthode permettant de supprimer des tuples de la table selon une expression logique
+     * 
      * @param condition condition à appliquer pour supprimer certains tuples (~filtre)
      * @return le nombre de tuples qui a été supprimé avec la condition
      */
     public int supprimer(ExpressionLogique condition) {
         // this.getTuples().delete()
         return 0;
-    }
-
-    public int supprimer() {
-        this.getTuples().clear();
     }
 }

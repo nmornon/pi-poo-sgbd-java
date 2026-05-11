@@ -22,11 +22,8 @@ class Relation {
      * Construit une relation à partir de la liste d'attributs spécifiée.
      * 
      * @param attributs la liste des attributs
-     * 
-     * @throws TypeInvalideException si au moins un tuple ne correspond pas aux
-     *                       attributs
      */
-    public Relation(Identifiant identifiant, Collection<Attribut> attributs) throws TypeInvalideException {
+    public Relation(Identifiant identifiant, Collection<Attribut> attributs) {
         this(identifiant, attributs, new ArrayList<>());
     }
 
@@ -40,7 +37,7 @@ class Relation {
      * @throws TypeInvalideException si au moins un tuple ne correspond pas aux
      *                       attributs
      */
-    public Relation(Identifiant identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) throws TypeInvalideException {
+    public Relation(Identifiant identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
         this.identifiant = identifiant;
         this.attributs = attributs;
 
@@ -101,10 +98,10 @@ class Relation {
      * 
      * @throws TypeInvalideException si le tuple spécifié est invalide
      */
-    protected void verifierTuple(Tuple tuple) throws TypeInvalideException {
+    protected void verifierTuple(Tuple tuple) {
         for (Attribut attribut : this.getAttributs()) {
             if (tuple.hasIdentifiant(attribut.getIdentifiant())) {
-                Valeur valeur = tuple.get(attribut.getIdentifiant());
+                Valeur valeur = tuple.getValeur(attribut.getIdentifiant());
 
                 if (attribut.getType() != valeur.getType()) {
                     throw new TypeInvalideException("Type invalide");
@@ -128,7 +125,9 @@ class Relation {
             Tuple nouveauTuple = new Tuple();
 
             for (Attribut attribut : attributs) {
-                nouveauTuple.set(attribut.getIdentifiant(), tuple.get(attribut.getIdentifiant()));
+                Identifiant identifiant = attribut.getIdentifiant();
+                Valeur valeur = tuple.getValeur(attribut.getIdentifiant());
+                nouveauTuple.setValeur(identifiant, valeur);
             }
             tuples.add(nouveauTuple);
         }
@@ -166,7 +165,7 @@ class Relation {
      * @param relation la relation
      * @return la nouvelle relation
      */
-    public Relation produitCartesien(Relation relation) throws TypeInvalideException {
+    public Relation produitCartesien(Relation relation) {
         Collection<Tuple> tuples = new ArrayList<>();
         Collection<Attribut> attributs = this.concatenerAttributs(this.getAttributs(), relation.getAttributs());
 
@@ -190,10 +189,10 @@ class Relation {
         Tuple tuple = new Tuple();
 
         for (Map.Entry<Identifiant, Valeur> entry : tuple1.getValeurs().entrySet()) {
-            tuple.setValeur(entry.getKey(), entry.getType());
+            tuple.setValeur(entry.getKey(), entry.getValue());
         }
         for (Map.Entry<Identifiant, Valeur> entry : tuple2.getValeurs().entrySet()) {
-            tuple.setValeur(entry.getKey(), entry.getType());
+            tuple.setValeur(entry.getKey(), entry.getValue());
         }
         return tuple;
     }
@@ -241,7 +240,7 @@ class Relation {
         for (Tuple tuple : this.getTuples()) {
             System.out.print("| ");
 
-            for (Map.Entry entry : this.getTuples()) {
+            for (Map.Entry<Identifiant, Valeur> entry : tuple.getValeurs().entrySet()) {
                 Valeur valeur = entry.getValue();
                 System.out.printf(" %15s |", valeur);
             }

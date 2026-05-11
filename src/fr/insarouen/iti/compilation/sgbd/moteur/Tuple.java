@@ -1,21 +1,29 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Tuple {
-
-    private HashMap<Identifiant, Valeur> valeurs;
+    private Map<Identifiant, Valeur> valeurs;
 
     public Tuple() {
         this.valeurs = new HashMap<>();
     }
 
-    public Valeur get(Identifiant id) {
-        return this.valeurs.get(id);
+    public boolean hasIdentifiant(Identifiant identifiant) {
+        return this.valeurs.containsKey(identifiant);
     }
 
-    public Tuple set(Identifiant id, Valeur valeur) {
-        this.valeurs.put(id, valeur);
+    public Map<Identifiant, Valeur> getValeurs() {
+        return this.valeurs;
+    }
+
+    public Valeur getValeur(Identifiant identifiant) {
+        return this.valeurs.get(identifiant);
+    }
+
+    public Tuple setValeur(Identifiant Identifiant, Valeur valeur) {
+        this.valeurs.put(Identifiant, valeur);
         return this;
     }
 }

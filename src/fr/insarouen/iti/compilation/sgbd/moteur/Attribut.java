@@ -1,14 +1,19 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
-import java.util.HashMap;
-
 public class Attribut {
-
-    private Identifiant id;
+    private Identifiant identifiant;
     private Type type;
 
-    public Attribut(Identifiant id, Type type) {
-        this.id = id;
+    public Attribut(Identifiant identifiant, Type type) {
+        this.identifiant = identifiant;
         this.type = type;
+    }
+
+    public Identifiant getIdentifiant() {
+        return this.identifiant;
+    }
+
+    public Type getType() {
+        return this.type;
     }
 }
