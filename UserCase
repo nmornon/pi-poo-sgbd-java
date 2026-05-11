@@ -1,0 +1,40 @@
+@startuml
+left to right direction
+actor "Technicien Batcave" as tb
+
+package "Manipulation de la structure" {
+  usecase "Créer une table" as UC1
+  usecase "Supprimer une table" as UC2
+  usecase "Voir les tables" as UC3
+}
+
+package "Gestion des données" {
+  usecase "Ajouter des informations" as UC4
+  usecase "Supprimer des lignes" as UC5
+}
+
+package "Consultation et analyse" {
+  usecase "Rechercher des informations (SELECT)" as UC6
+  usecase "Filtrer (WHERE)" as UC7
+  usecase "Croiser (jointures)" as UC8
+}
+
+package "Sécurité et Persistance" {
+  usecase "Rejoindre la dernière session" as UC9
+  usecase "Quitter le programme" as UC10
+  usecase "Sauvegarder la session" as UC11
+}
+
+tb --> UC1
+tb --> UC2
+tb --> UC3
+tb --> UC4
+tb --> UC5
+tb --> UC6
+UC6 .> UC7 : extends
+UC6 .> UC8 : extends
+tb --> UC9
+tb --> UC10
+UC10 .> UC11 : include
+
+@enduml

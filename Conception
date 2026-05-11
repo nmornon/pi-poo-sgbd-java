@@ -1,0 +1,186 @@
+@startuml
+title SGBD - Conception
+
+package application {
+  class Main {
+    + {static} main(args : String[])
+  }
+}
+
+package persistance {
+  class GestionnairePersistance {
+    + charger(): BaseDeDonnees
+    + sauvegarder(BaseDeDonnees)
+  }
+}
+
+package analyseurs {
+  class AnalyseurSyntaxique {
+    + interpreter(String): Commande
+  }
+
+  interface Commande {
+    + executer(BaseDeDonnees)
+  }
+}
+
+package exception {
+  class TableInexistanteException {}
+
+  class TypeException {}
+}
+
+package moteur {
+  class BaseDeDonnees {
+    - identifiant: Identifiant
+    - {static} nbCle: Number
+    + getTable(Identifiant): Table
+    + creerTable(Identifiant, Attribut[]): Table
+    + supprimerTable(Identifiant)
+    + afficherTable(Table)
+  }
+
+  class Table {
+    - identifiant : Identifiant
+    + inserer(Tuple)
+    + inserer(Tuple[])
+    + supprimer(ExpressionLogique)
+  }
+
+  class Relation {
+    - tuples: List<Tuple>
+    - attributs: List<Attribut>
+    + selectionner(List<Attribut>): Relation
+    + projeter(ExpressionLogique): Relation
+    + joindre(Relation, Attribut, Attribut): Relation
+    + produitCartesien(Relation): Relation
+  }
+
+  class Identifiant {
+    - String nom
+    + Identifiant(String)
+    + equals(Identifiant): boolean
+  }
+
+  enum Type {
+    INT
+    SERIAL
+    VARCHAR
+  }
+
+  class Attribut {
+    - identifiant: Identifiant
+    - type: Type
+  }
+
+  class Tuple {
+    - valeurs: HashMap<Identifiant, Valeur>
+    + Tuple()
+    + hasIdentifiant() : Identifiant
+    + getValeur(Identifiant): Valeur
+    + getValeurs(): Valeur[]
+    + set(Identifiant, Valeur): Tuple
+  }
+
+  interface Valeur {
+    {abstract} getValeur(): Object
+    {abstract} getType(): Type
+  }
+
+  class Cle {
+    - valeur: Number
+    - type: Type
+    + Cle(Number)
+    + getValeur(): Number
+    + getType(): Type
+  }
+
+  class Chaine {
+    - valeur: String
+    - type: Type
+    + Chaine(String)
+    + getValeur(): String
+    + getType(): Type
+  }
+
+  class Nombre {
+    - valeur: Number
+    - type: Type
+    + Nombre(Number)
+    + getValeur(): Number
+    + getType(): Type
+  }
+}
+
+package conditions {
+
+  class ExpressionLogique {
+    - conditions : List<ConditionSimple>
+    - connecteurs : List<OperateurLogique>
+
+    + evaluer(contexte : Map<String, Tuple>) : boolean
+  }
+
+  class ConditionSimple {
+    - gauche : Operande
+    - droite : Operande
+    - operateur : Comparateur
+
+    + evaluer(contexte : Map<String, Tuple>) : boolean
+  }
+
+  abstract class Operande {
+    + {abstract} evaluer(contexte : Map<String, Tuple>) : Object
+  }
+
+  class OperandeAttribut {
+    - nomTableOuAlias : String
+    - nomAttribut : String
+  }
+
+  class OperandeValeur {
+    - contenu : Object
+  }
+
+  enum OperateurLogique {
+    AND
+    OR
+  }
+
+  enum Comparateur {
+    EGAL
+    SUPERIEUR
+    INFERIEUR
+  }
+}
+
+Operande <|-- OperandeAttribut
+Operande <|-- OperandeValeur
+
+
+
+
+Main ..> GestionnairePersistance
+Main ..> AnalyseurSyntaxique
+
+
+GestionnairePersistance --> BaseDeDonnees
+
+BaseDeDonnees "1" *-- "*" Table
+Relation <|-- Table
+Relation "1"  o-- "*" Tuple
+Relation "1" *-- "*" Attribut
+
+Attribut *-- Valeur
+
+Valeur <|.. Cle
+Valeur <|.. Chaine
+Valeur <|.. Nombre
+
+ExpressionLogique "1" *-- "*" ConditionSimple
+ExpressionLogique --> OperateurLogique
+
+ConditionSimple --> Operande
+ConditionSimple --> Comparateur
+@enduml
+
