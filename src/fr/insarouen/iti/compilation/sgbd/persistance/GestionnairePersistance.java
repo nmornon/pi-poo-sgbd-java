@@ -8,5 +8,5 @@ public class GestionnairePersistance {
         return null;
     }
     
-    public void sauvegarder() {}
+    public void sauvegarder(BaseDeDonnees baseDeDonnees) {}
 }
