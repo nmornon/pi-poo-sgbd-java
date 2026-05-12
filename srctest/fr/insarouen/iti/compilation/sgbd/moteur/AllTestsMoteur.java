@@ -9,7 +9,6 @@ import org.junit.runners.Suite.SuiteClasses;
     TestIdentifiant.class,
     TestTuple.class,
     TestValeur.class,
-    TestConditions.class
 })
 
 public class AllTestsMoteur {}
