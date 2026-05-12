@@ -12,16 +12,12 @@ import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
 public class BaseDeDonnees {
     private Identifiant identifiant;
     private long nbLignes;
-    private Collection<Table> tables = new ArrayList();
+    private Collection<Table> tables = new ArrayList<>();
     
 
     public BaseDeDonnees(Identifiant id, Collection<Table> tabs, long ligne){
         this.identifiant = id;
-        boolean b = true;
-        b = this.tables.addAll(tabs);
-        if (!b) {
-            throw new Error("Impossible de creer une nouvelle avec ces tables");
-        }
+        this.tables.addAll(tabs);
         this.nbLignes = ligne;
         
     }
@@ -30,7 +26,7 @@ public class BaseDeDonnees {
         return this.identifiant;
     }
 
-    public long getCle() {
+    public long getNbLignes() {
         return this.nbLignes;
     }
 
@@ -48,7 +44,7 @@ public class BaseDeDonnees {
 
     public Table getTable(Identifiant id) throws TableInexistanteException{
         for (Table o : this.tables) {
-            if (o.getIdentifiant.equals(id)) {
+            if (o.getIdentifiant().equals(id)) {
                 return o;
             }
         }
@@ -57,23 +53,24 @@ public class BaseDeDonnees {
 
     public Table creerTable(Identifiant id, Collection<Attribut> donnees) {
         Table table = new Table(id, donnees);
-        boolean b = true;
-        b = this.tables.add(table);
-        if (!b) {
-            throw new Error("Impossible d'ajouter la table");
-        }
+        this.tables.add(table);
+        return table;
+    }
+
+    public Table creerTable(Identifiant id, Collection<Attribut> donnees, Collection<Tuple> tuples) {
+        Table table = new Table(id, donnees, tuples);
+        this.tables.add(table);
         return table;
     }
 
     public void supprimerTable(Identifiant id)  throws TableInexistanteException{
-        for (Table o : this.tables) {
-            if (o.getIdentifiant.equals(id)) {
-                boolean b = true;
-                b = this.tables.remove(o);
-                if (!b) {
-                    throw new Error("Ne peut pas être supprimer");
-                }
-                break;
+        Iterator<Table> it = this.tables.iterator();
+        while (it.hasNext()) {
+            Table o = it.next();
+
+            if (o.getIdentifiant().equals(id)) {
+                it.remove();
+                return;
             }
         }
         throw new TableInexistanteException("La table n'est pas présente dans la base de donnees");
@@ -87,7 +84,15 @@ public class BaseDeDonnees {
     }
 
     public Boolean equals(Identifiant id) {
-        return this.identifiant == id;
+
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof BaseDeDonnees)){
+            return false;
+        } 
+        BaseDeDonnees autre = (BaseDeDonnees) obj;
+        return this.identifiant.equals(autre.identifiant);
     }
 
 }
