@@ -12,7 +12,7 @@ import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
  */
 class Relation {
     /** L'identifiant de la relation */
-    private Identifiant identifiant;
+    private String identifiant;
     /** La liste des attriuts de la relation */
     private Collection<Attribut> attributs;
     /** La liste des tuples de la relation */
@@ -23,7 +23,7 @@ class Relation {
      * 
      * @param attributs la liste des attributs
      */
-    public Relation(Identifiant identifiant, Collection<Attribut> attributs) {
+    public Relation(String identifiant, Collection<Attribut> attributs) {
         this(identifiant, attributs, new ArrayList<>());
     }
 
@@ -37,7 +37,7 @@ class Relation {
      * @throws TypeInvalideException si au moins un tuple ne correspond pas aux
      *                       attributs
      */
-    public Relation(Identifiant identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
+    public Relation(String identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
         this.identifiant = identifiant;
         this.attributs = attributs;
 
@@ -47,17 +47,17 @@ class Relation {
         }
     }
 
-    public Identifiant getIdentifiant(){
+    public String getIdentifiant(){
         return this.identifiant;
     }
 
     /**
      * Détermine si la relation a un attribut avec l'identifiant spécifié.
      * 
-     * @param l'identifiant de l'attribut à vérifier
+     * @param identifiant l'identifiant de l'attribut à vérifier
      * @return true si l'attribut est dans la relation, false sinon
      */
-    public boolean hasAttribut(Identifiant identifiant) {
+    public boolean hasAttribut(String identifiant) {
         for (Attribut attribut : this.getAttributs()) {
             if (attribut.getIdentifiant().equals(identifiant)) {
                 return true;
@@ -70,10 +70,10 @@ class Relation {
      * Renvoie l'attribut avec l'identiant spécifié, s'il n'existe pas, renvoie
      * null.
      * 
-     * @param l'identifiant de l'attribut à recherché
+     * @param identifiant l'identifiant de l'attribut à recherché
      * @return l'attribut recherché ou null
      */
-    public Attribut getAttribut(Identifiant identiant) {
+    public Attribut getAttribut(String identiant) {
         for (Attribut attribut : this.getAttributs()) {
             if (attribut.getIdentifiant().equals(identiant)) {
                 return attribut;
@@ -125,7 +125,7 @@ class Relation {
             Tuple nouveauTuple = new Tuple();
 
             for (Attribut attribut : attributs) {
-                Identifiant identifiant = attribut.getIdentifiant();
+                String identifiant = attribut.getIdentifiant();
                 Valeur valeur = tuple.getValeur(attribut.getIdentifiant());
                 nouveauTuple.setValeur(identifiant, valeur);
             }
@@ -174,7 +174,7 @@ class Relation {
                 tuples.add(this.concatenerTuples(tuple1, tuple2));
             }
         }
-        Identifiant identifiant = this.concatenerIdentifiants(this.getIdentifiant(), relation.getIdentifiant());
+        String identifiant = this.concatenerIdentifiants(this.getIdentifiant(), relation.getIdentifiant());
         return new Relation(identifiant, attributs, tuples);
     }
 
@@ -188,10 +188,10 @@ class Relation {
     private Tuple concatenerTuples(Tuple tuple1, Tuple tuple2) {
         Tuple tuple = new Tuple();
 
-        for (Map.Entry<Identifiant, Valeur> entry : tuple1.getValeurs().entrySet()) {
+        for (Map.Entry<String, Valeur> entry : tuple1.getValeurs().entrySet()) {
             tuple.setValeur(entry.getKey(), entry.getValue());
         }
-        for (Map.Entry<Identifiant, Valeur> entry : tuple2.getValeurs().entrySet()) {
+        for (Map.Entry<String, Valeur> entry : tuple2.getValeurs().entrySet()) {
             tuple.setValeur(entry.getKey(), entry.getValue());
         }
         return tuple;
@@ -240,7 +240,7 @@ class Relation {
         for (Tuple tuple : this.getTuples()) {
             System.out.print("| ");
 
-            for (Map.Entry<Identifiant, Valeur> entry : tuple.getValeurs().entrySet()) {
+            for (Map.Entry<String, Valeur> entry : tuple.getValeurs().entrySet()) {
                 Valeur valeur = entry.getValue();
                 System.out.printf(" %15s |", valeur);
             }
@@ -248,12 +248,7 @@ class Relation {
         }
     }
 
-    private Identifiant concatenerIdentifiants(Identifiant identifiant1, Identifiant identifiant2) {
-        String nom = String.format(
-            "%s_%s",
-            identifiant1.getNom(),
-            identifiant2.getNom()
-        );
-        return new Identifiant(nom);
+    private String concatenerIdentifiants(String identifiant1, String identifiant2) {
+        return String.format("%s_%s", identifiant1, identifiant2);
     }
 }

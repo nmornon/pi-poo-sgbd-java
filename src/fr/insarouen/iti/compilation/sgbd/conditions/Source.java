@@ -1,22 +1,19 @@
 package fr.insarouen.iti.compilation.sgbd.conditions;
 
-import java.util.Map;
-import fr.insarouen.iti.compilation.sgbd.moteur.Identifiant;
-
 public class Source{
-    private Identifiant nomTable;
-    private Identifiant alias;
+    private String nomTable;
+    private String alias;
 
-    public Source(Identifiant nomTable, Identifiant alias){
+    public Source(String nomTable, String alias){
         this.nomTable=nomTable;
         this.alias=alias;
     }
 
-    public Identifiant getNomTable(){
+    public String getNomTable(){
         return this.nomTable;
     }
 
-    public Identifiant getAlias(){
+    public String getAlias(){
         return this.alias;
     }
 
@@ -24,13 +21,11 @@ public class Source{
         return this.alias != null;
     }
 
-    public Identifiant getNomUtilise(){
+    public String getNomUtilise(){
         if (aAlias()){
             return this.alias;
         }
         return this.nomTable;
     }
-
-
 }
 

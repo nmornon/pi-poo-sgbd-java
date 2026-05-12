@@ -3,22 +3,21 @@ package fr.insarouen.iti.compilation.sgbd.conditions;
 import java.util.Map;
 import fr.insarouen.iti.compilation.sgbd.moteur.Tuple;
 import fr.insarouen.iti.compilation.sgbd.moteur.Valeur;
-import fr.insarouen.iti.compilation.sgbd.moteur.Identifiant;
 
 public class OperandeAttribut extends Operande {
 
-    private Identifiant nomTableOuAlias;
-    private Identifiant nomAttribut;
+    private String nomTableOuAlias;
+    private String nomAttribut;
 
-    public OperandeAttribut(Identifiant nomTableOuAlias,Identifiant nomAttribut){
+    public OperandeAttribut(String nomTableOuAlias, String nomAttribut){
         this.nomTableOuAlias=nomTableOuAlias;
         this.nomAttribut=nomAttribut;
     }
 
     @Override
-    public Valeur evaluer (Map<Identifiant,Tuple> contexte){
+    public Valeur evaluer (Map<String, Tuple> contexte){
         
         Tuple tuple=contexte.get(this.nomTableOuAlias);
-        return tuple.get(this.nomAttribut);
+        return tuple.getValeur(this.nomAttribut);
     }
 }

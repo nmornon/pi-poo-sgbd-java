@@ -11,11 +11,22 @@ class Table extends Relation {
      * Constructeur de la classe Table
      * @param identifiant identifiant de la table
      * @param attributs liste d'attributs décrivant la table
+     * 
+     * @throws TypeInvalideException
+     */
+    public Table(String identifiant, Collection<Attribut> attributs) {
+        super(identifiant, attributs);
+    }
+
+    /**
+     * Constructeur de la classe Table
+     * @param identifiant identifiant de la table
+     * @param attributs liste d'attributs décrivant la table
      * @param tuples tuples à ajouter à la création de la table
      * 
      * @throws TypeInvalideException
      */
-    public Table(Identifiant identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
+    public Table(String identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
         super(identifiant, attributs, tuples);
     }
 

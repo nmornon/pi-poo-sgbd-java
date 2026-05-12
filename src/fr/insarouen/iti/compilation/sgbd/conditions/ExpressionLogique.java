@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import fr.insarouen.iti.compilation.sgbd.moteur.Tuple;
-import fr.insarouen.iti.compilation.sgbd.moteur.Valeur;
-import fr.insarouen.iti.compilation.sgbd.moteur.Identifiant;
 
 public class ExpressionLogique{
 
@@ -26,7 +24,7 @@ public class ExpressionLogique{
         this.connecteurs.add(connecteur);
     }
 
-    public boolean evaluer(Map<Identifiant,Tuple> contexte){
+    public boolean evaluer(Map<String,Tuple> contexte){
 
         boolean resultat = conditions.get(0).evaluer(contexte);
 
