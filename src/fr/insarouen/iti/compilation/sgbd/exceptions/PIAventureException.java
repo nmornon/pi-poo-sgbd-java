@@ -1,6 +1,6 @@
 package fr.insarouen.iti.compilation.sgbd.exceptions;
 
-public class PIAventureException extends Exception{
+public class PIAventureException extends RuntimeException {
 
     public PIAventureException(String message) {
         super(message);
