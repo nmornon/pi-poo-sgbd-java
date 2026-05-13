@@ -25,41 +25,52 @@ package analyseurs {
 }
 
 package exception {
+  class PIAventureException {}
+  
   class TableInexistanteException {}
 
-  class TypeException {}
+  class TypeInvalideException {}
+  
+  class MemeNomDAttributException {}
 }
 
 package moteur {
   class BaseDeDonnees {
-    - identifiant: Identifiant
-    - {static} nbCle: Number
-    + getTable(Identifiant): Table
-    + creerTable(Identifiant, Attribut[]): Table
-    + supprimerTable(Identifiant)
-    + afficherTable(Table)
+    - identifiant: String
+    - nbLignes: Long
+    - estOuvert : Boolean
+    - tables : Collection<Table>
+    + getEstOuverte() : Boolean
+    + setEstOuverte(bool : Boolean)
+    + getIdentifiant() : String
+    + getNbLignes() : Long
+    + getTables() : Collection<Table>
+    + creerTable(identifiant : String, donnees : Collection<Attribut>): Table
+    + creerTable(identifiant : String, tuples : Collection<Tuple>): Table
+    + supprimerTable(id : String)
+    + afficherTable()
   }
 
   class Table {
-    - identifiant : Identifiant
+    - identifiant : String
     + inserer(Tuple)
     + inserer(Tuple[])
     + supprimer(ExpressionLogique)
   }
 
   class Relation {
-    - tuples: List<Tuple>
-    - attributs: List<Attribut>
-    + selectionner(List<Attribut>): Relation
+    - identifiant : String
+    - tuples: Collection<Tuple>
+    - attributs: Set<Attribut>
+    + getIdentifiant() : String
+    + hasAttribut(identifiant : String) : Boolean
+    + getAttribut(String identifiant) : Attribut
+    + getAttributs() : Collection<Attribut>
+    + getTuples() : Collection<Tuple>
+    + selectionner(attributs : Collection<Attribut>): Relation
     + projeter(ExpressionLogique): Relation
     + joindre(Relation, Attribut, Attribut): Relation
     + produitCartesien(Relation): Relation
-  }
-
-  class Identifiant {
-    - String nom
-    + Identifiant(String)
-    + equals(Identifiant): boolean
   }
 
   enum Type {
@@ -68,13 +79,13 @@ package moteur {
     VARCHAR
   }
 
-  class Attribut {
-    - identifiant: Identifiant
+  record Attribut {
+    - identifiant: String
     - type: Type
   }
 
   class Tuple {
-    - valeurs: HashMap<Identifiant, Valeur>
+    - valeurs: HashMap<String, Valeur>
     + Tuple()
     + hasIdentifiant() : Identifiant
     + getValeur(Identifiant): Valeur
@@ -82,33 +93,29 @@ package moteur {
     + set(Identifiant, Valeur): Tuple
   }
 
-  interface Valeur {
-    {abstract} getValeur(): Object
-    {abstract} getType(): Type
+  class Valeur {
+    + getValeur(): Object
+    + getType(): Type
+    + equals(valeur : Object) : Boolean
+    
   }
 
   class Cle {
     - valeur: Number
     - type: Type
     + Cle(Number)
-    + getValeur(): Number
-    + getType(): Type
   }
 
   class Chaine {
     - valeur: String
     - type: Type
     + Chaine(String)
-    + getValeur(): String
-    + getType(): Type
   }
 
   class Nombre {
     - valeur: Number
     - type: Type
     + Nombre(Number)
-    + getValeur(): Number
-    + getType(): Type
   }
 }
 
@@ -118,28 +125,32 @@ package conditions {
     - conditions : List<ConditionSimple>
     - connecteurs : List<OperateurLogique>
 
+    + ajouterCondition(condition : ConditionSimple)
+    + ajouterConnecteur(connecteur : OperateurLogique)
     + evaluer(contexte : Map<String, Tuple>) : boolean
   }
 
   class ConditionSimple {
     - gauche : Operande
     - droite : Operande
-    - operateur : Comparateur
+    - comparateur : Comparateur
 
     + evaluer(contexte : Map<String, Tuple>) : boolean
   }
 
-  abstract class Operande {
-    + {abstract} evaluer(contexte : Map<String, Tuple>) : Object
+  abstract Operande {
+    + {abstract} evaluer(contexte : Map<String, Tuple>) : Valeur
   }
 
   class OperandeAttribut {
     - nomTableOuAlias : String
     - nomAttribut : String
+    + evaluer(contexte : Map<String, Tuple>) : Valeur
   }
 
   class OperandeValeur {
     - contenu : Object
+    + evaluer(contexte : Map<String, Tuple>) : Valeur
   }
 
   enum OperateurLogique {
@@ -156,9 +167,6 @@ package conditions {
 
 Operande <|-- OperandeAttribut
 Operande <|-- OperandeValeur
-
-
-
 
 Main ..> GestionnairePersistance
 Main ..> AnalyseurSyntaxique
@@ -183,4 +191,3 @@ ExpressionLogique --> OperateurLogique
 ConditionSimple --> Operande
 ConditionSimple --> Comparateur
 @enduml
-
