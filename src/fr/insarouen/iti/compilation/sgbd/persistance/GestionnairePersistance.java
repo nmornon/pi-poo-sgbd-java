@@ -18,18 +18,14 @@ public class GestionnairePersistance {
     }
 
     public BaseDeDonnees charger(String nomFichier) throws IOException{
-        FileInputStream fichier = new FileInputStream(nomFichier);
-        ObjectInputStream ois = new ObjectInputStream(fichier);
-        Collection<Table> tabs = new ArrayList<>();
-        BaseDeDonnees baseDeDonnees = new BaseDeDonnees(nomFichier,tabs,0);
-        try {
-            baseDeDonnees = (BaseDeDonnees) ois.readObject();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomFichier))){
+            BaseDeDonnees baseDeDonnees = (BaseDeDonnees) ois.readObject();
             baseDeDonnees.setEstOuverte(true);
+            return baseDeDonnees;
         } catch (ClassNotFoundException e) {
             System.err.println("Impossible de trouver la classe de la base de donnees que vous avez choisi");
             e.printStackTrace();
         }
-        return baseDeDonnees;
     }
     
     public void sauvegarder(BaseDeDonnees baseDeDonnees) throws IOException{

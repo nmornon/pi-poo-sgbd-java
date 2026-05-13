@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
     TestTuple.class,
     TestValeur.class,
+    TestBaseDeDonnees.class,
 })
 
 public class AllTestsMoteur {}
