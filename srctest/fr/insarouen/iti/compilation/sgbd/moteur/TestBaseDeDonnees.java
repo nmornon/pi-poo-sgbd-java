@@ -15,6 +15,8 @@ import fr.insarouen.iti.compilation.sgbd.moteur.BaseDeDonnees;
 import fr.insarouen.iti.compilation.sgbd.moteur.Attribut;
 import fr.insarouen.iti.compilation.sgbd.moteur.Table;
 import fr.insarouen.iti.compilation.sgbd.moteur.Type;
+import fr.insarouen.iti.compilation.sgbd.moteur.Tuple;
+
 
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
 
@@ -34,11 +36,11 @@ public class testBaseDeDonnees {
     public void avantTest() {      
 
         attributs = new ArrayList<>();
-        att1 = new Attribut("Age", Type.INT);
+        Attribut att1 = new Attribut("Age", Type.INT);
         attributs.add(att1);
 
         tuples = new ArrayList<>();
-        tuple = new Tuple();
+        Tuple tuple = new Tuple();
         tuple.set("tuple1", 8);
         tuples.add(tuple);
 
@@ -48,9 +50,9 @@ public class testBaseDeDonnees {
         
         long ligne = 0;
 
-        bdd1 = new BaseDeDonnees(id1, tables, ligne);
-        bdd2 = new BaseDeDonnees(id1, tables, ligne);
-        bdd3 = new BaseDeDonnees(id2, tables, ligne);
+        bdd1 = new BaseDeDonnees("base1", tables, ligne);
+        bdd2 = new BaseDeDonnees("base1", tables, ligne);
+        bdd3 = new BaseDeDonnees("base3", tables, ligne);
     }
 
     @Test
@@ -79,7 +81,7 @@ public class testBaseDeDonnees {
     public void testSupprimerTable() throws TableInexistanteException{
         Table table1 = new Table("tb1", attributs, tuples);
         
-        bdd1.creerTable("tb1", attributs, tuple);
+        bdd1.creerTable("tb1", attributs, tuples);
         bdd1.supprimerTable("tb1");
         bdd1.getTable("tb1");
     }

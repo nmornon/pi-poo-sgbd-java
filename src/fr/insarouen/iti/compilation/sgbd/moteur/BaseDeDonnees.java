@@ -9,6 +9,7 @@ import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
 public class BaseDeDonnees {
     private String identifiant;
     private long nbLignes;
+    private boolean estOuvert = true;
     private Collection<Table> tables = new ArrayList<>();
     
 
@@ -17,6 +18,14 @@ public class BaseDeDonnees {
         this.tables.addAll(tabs);
         this.nbLignes = ligne;
         
+    }
+
+    public boolean getEstOuverte() {
+        return this.estOuvert;
+    }
+
+    public void setEstOuverte(boolean bool) {
+        this.estOuvert = bool;
     }
 
     public String getIdentifiant() {
