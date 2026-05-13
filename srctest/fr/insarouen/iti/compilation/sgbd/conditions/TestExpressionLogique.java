@@ -12,16 +12,16 @@ import fr.insarouen.iti.compilation.sgbd.moteur.*;
 
 public class TestExpressionLogique {
 
-        private Map<Identifiant,Tuple> contextHero(){
+        private Map<String,Tuple> contextHero(){
         Tuple hero=new Tuple();
 
-        hero.set(new Identifiant("nom"),new Chaine("Batman"));
-        hero.set(new Identifiant("puissance"),new Nombre(100));
-        hero.set(new Identifiant("age"),new Nombre(40));
+        hero.setValeur("nom",new Chaine("Batman"));
+        hero.setValeur("puissance",new Nombre(100));
+        hero.setValeur("age",new Nombre(40));
 
-        Map<Identifiant,Tuple> contexte = new HashMap<>();
+        Map<String,Tuple> contexte = new HashMap<>();
 
-        contexte.put(new Identifiant("Hero"),hero);
+        contexte.put("Hero",hero);
 
         return contexte;
     }
@@ -29,16 +29,16 @@ public class TestExpressionLogique {
     @Test
     public void testExpressionAvecAndVraie(){
 
-        Map<Identifiant,Tuple> contexte =contextHero();
+        Map<String,Tuple> contexte =contextHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("age")),
+            new OperandeAttribut("Hero","age"),
             new OperandeValeur(new Nombre(50)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("nom")),
+            new OperandeAttribut("Hero","nom"),
             new OperandeValeur(new Chaine("Batman")),
             Comparateur.EGAL
         );
@@ -54,16 +54,16 @@ public class TestExpressionLogique {
     @Test
     public void testExpressionAvecAndFausse(){
 
-        Map<Identifiant,Tuple> contexte =contextHero();
+        Map<String,Tuple> contexte =contextHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("age")),
+            new OperandeAttribut("Hero","age"),
             new OperandeValeur(new Nombre(50)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("nom")),
+            new OperandeAttribut("Hero","nom"),
             new OperandeValeur(new Chaine("Joker")),
             Comparateur.EGAL
         );
@@ -79,16 +79,16 @@ public class TestExpressionLogique {
     @Test
     public void testExpressionAvecOrVraie(){
 
-        Map<Identifiant,Tuple> contexte =contextHero();
+        Map<String,Tuple> contexte =contextHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("age")),
+            new OperandeAttribut("Hero","age"),
             new OperandeValeur(new Nombre(50)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("nom")),
+            new OperandeAttribut("Hero","nom"),
             new OperandeValeur(new Chaine("Joker")),
             Comparateur.EGAL
         );
@@ -104,16 +104,16 @@ public class TestExpressionLogique {
     @Test
     public void testExpressionAvecOrVFausse(){
 
-        Map<Identifiant,Tuple> contexte =contextHero();
+        Map<String,Tuple> contexte =contextHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("age")),
+            new OperandeAttribut("Hero","age"),
             new OperandeValeur(new Nombre(10)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("nom")),
+            new OperandeAttribut("Hero","nom"),
             new OperandeValeur(new Chaine("Joker")),
             Comparateur.EGAL
         );
@@ -129,22 +129,22 @@ public class TestExpressionLogique {
     @Test
     public void testExpressionAvecTroisConditionsVrai(){
 
-        Map<Identifiant,Tuple> contexte =contextHero();
+        Map<String,Tuple> contexte =contextHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("age")),
+            new OperandeAttribut("Hero","age"),
             new OperandeValeur(new Nombre(50)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("nom")),
+            new OperandeAttribut("Hero","nom"),
             new OperandeValeur(new Chaine("Batman")),
             Comparateur.EGAL
         );
 
         ConditionSimple c3= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("puissance")),
+            new OperandeAttribut("Hero","puissance"),
             new OperandeValeur(new Nombre(50)),
             Comparateur.SUPERIEUR
         );
@@ -162,22 +162,22 @@ public class TestExpressionLogique {
     @Test
     public void testExpressionAvecTroisConditionsFaux(){
 
-        Map<Identifiant,Tuple> contexte =contextHero();
+        Map<String,Tuple> contexte =contextHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("nom")),
+            new OperandeAttribut("Hero","nom"),
             new OperandeValeur(new Chaine("Joker")),
             Comparateur.EGAL
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("puissance")),
+            new OperandeAttribut("Hero","puissance"),
             new OperandeValeur(new Nombre(50)),
             Comparateur.SUPERIEUR
         );
 
         ConditionSimple c3= new ConditionSimple(
-            new OperandeAttribut(new Identifiant("Hero"),new Identifiant("age")),
+            new OperandeAttribut("Hero","age"),
             new OperandeValeur(new Nombre(30)),
             Comparateur.INFERIEUR
         );

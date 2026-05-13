@@ -9,11 +9,11 @@ public class TestTuple {
     @Test
     public void testTuple() {
         Tuple tuple = new Tuple();
-        Identifiant id = new Identifiant("identifiant");
+        String id = "identifiant";
         Nombre nb1 = new Nombre(12);
         Nombre nb2 = new Nombre(14);
-        tuple.set(id, nb1);
-        assertEquals(nb1.getValeur(), tuple.get(id).getValeur());
-        assertNotEquals(nb2.getValeur(), tuple.get(id).getValeur());
+        tuple.setValeur(id, nb1);
+        assertEquals(nb1.getValeur(), tuple.getValeur(id).getValeur());
+        assertNotEquals(nb2.getValeur(), tuple.getValeur(id).getValeur());
     }
 }
