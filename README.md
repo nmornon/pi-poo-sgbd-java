@@ -2,12 +2,23 @@
 
 ## COMMANDES GIT POUR AIDER
 ```
-# Avant de développer
-git pull
-# A la fin du développement
+# Avant de développer, se placer dans la branche principale et récupérer les modifications du serveur
+git checkout main
+git pull origin main
+# Créer et basculer sur une branche pour la fonctionnalité à implémenter
+git checkout -b nom-de-la-nouvelle-branche
+# Faire des commits réguliers sur la branche
+git status
 git add. #pour ajouter tous les fichiers du répertoire courant dans le commit
 git commit -m "Message de commit"
-git push
+# Quand tout est fini, fusionner le main à la branche pour régler les conflits
+git merge main
+# Envoyer la branche sur Gitlab quand tous les conflits sont réglés
+git push -u origin nom-de-la-branche
+# Supprimer la branche localement
+git branch -d nom-de-la-branche
+# Supprimer la branche sur le serveur
+git bush origin --delete nom-de-la-branche
 ```
 
 Pour voir quels fichiers sont compris dans votre commit
