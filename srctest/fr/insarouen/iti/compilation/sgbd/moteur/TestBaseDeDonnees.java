@@ -16,12 +16,13 @@ import fr.insarouen.iti.compilation.sgbd.moteur.Attribut;
 import fr.insarouen.iti.compilation.sgbd.moteur.Table;
 import fr.insarouen.iti.compilation.sgbd.moteur.Type;
 import fr.insarouen.iti.compilation.sgbd.moteur.Tuple;
+import fr.insarouen.iti.compilation.sgbd.moteur.Nombre;
 
 
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
 
 
-public class testBaseDeDonnees {
+public class TestBaseDeDonnees {
 
     private BaseDeDonnees bdd1;
     private BaseDeDonnees bdd2;
@@ -40,8 +41,9 @@ public class testBaseDeDonnees {
         attributs.add(att1);
 
         tuples = new ArrayList<>();
+        Valeur val1 = new Nombre(8);
         Tuple tuple = new Tuple();
-        tuple.set("tuple1", 8);
+        tuple.setValeur("Didier", val1);
         tuples.add(tuple);
 
         table = new Table("tb1", attributs);

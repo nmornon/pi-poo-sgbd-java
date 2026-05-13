@@ -5,7 +5,7 @@ import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
 import java.util.Collection;
 
 
-class Table extends Relation {
+public class Table extends Relation {
 
     /**
      * Constructeur de la classe Table

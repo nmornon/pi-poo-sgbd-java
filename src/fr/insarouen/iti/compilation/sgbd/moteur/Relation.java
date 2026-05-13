@@ -59,7 +59,7 @@ class Relation {
      */
     public boolean hasAttribut(String identifiant) {
         for (Attribut attribut : this.getAttributs()) {
-            if (attribut.getIdentifiant().equals(identifiant)) {
+            if (attribut.identifiant().equals(identifiant)) {
                 return true;
             }
         }
@@ -75,7 +75,7 @@ class Relation {
      */
     public Attribut getAttribut(String identiant) {
         for (Attribut attribut : this.getAttributs()) {
-            if (attribut.getIdentifiant().equals(identiant)) {
+            if (attribut.identifiant().equals(identiant)) {
                 return attribut;
             }
         }
@@ -100,13 +100,13 @@ class Relation {
      */
     protected void verifierTuple(Tuple tuple) {
         for (Attribut attribut : this.getAttributs()) {
-            if (tuple.hasIdentifiant(attribut.getIdentifiant())) {
-                Valeur valeur = tuple.getValeur(attribut.getIdentifiant());
+            if (tuple.hasIdentifiant(attribut.identifiant())) {
+                Valeur valeur = tuple.getValeur(attribut.identifiant());
 
-                if (attribut.getType() != valeur.getType()) {
+                if (attribut.type() != valeur.getType()) {
                     throw new TypeInvalideException("Type invalide");
                 }
-            } else if (attribut.getType() != Type.SERIAL) {
+            } else if (attribut.type() != Type.SERIAL) {
                 throw new TypeInvalideException("Attribut inexistant");
             }
         }
@@ -125,13 +125,13 @@ class Relation {
             Tuple nouveauTuple = new Tuple();
 
             for (Attribut attribut : attributs) {
-                String identifiant = attribut.getIdentifiant();
-                Valeur valeur = tuple.getValeur(attribut.getIdentifiant());
+                String identifiant = attribut.identifiant();
+                Valeur valeur = tuple.getValeur(attribut.identifiant());
                 nouveauTuple.setValeur(identifiant, valeur);
             }
             tuples.add(nouveauTuple);
         }
-        return new Relation(this.getIdentifiant(), attributs, tuples);
+        return new Relation(this.identifiant, attributs, tuples);
     }
 
     /**
@@ -161,7 +161,7 @@ class Relation {
                 tuples.add(this.concatenerTuples(tuple1, tuple2));
             }
         }
-        String identifiant = this.concatenerIdentifiants(this.getIdentifiant(), relation.getIdentifiant());
+        String identifiant = this.concatenerIdentifiants(this.identifiant, relation.getIdentifiant());
         return new Relation(identifiant, attributs, tuples);
     }
 
@@ -211,11 +211,11 @@ class Relation {
      * Affiche toutes les informations de la relation.
      */
     public void afficher() {
-        System.out.printf("> Table: %s\n", this.getIdentifiant());
+        System.out.printf("> Table: %s\n", this.identifiant);
         System.out.print("| ");
 
         for (Attribut attribut : this.getAttributs()) {
-            System.out.printf(" %15s |", attribut.getIdentifiant());
+            System.out.printf(" %15s |", attribut.identifiant());
         }
         System.out.print("\n|");
 
