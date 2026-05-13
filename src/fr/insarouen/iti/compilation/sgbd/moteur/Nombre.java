@@ -1,17 +1,12 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
-public class Nombre implements Valeur {
+public class Nombre extends Valeur {
 
-    private Number valeur;
     private Type type;
-
+    
     public Nombre(Number valeur) {
-        this.valeur = valeur;
+        super(valeur);
         this.type = Type.INT;
-    }
-
-    public Number getValeur() {
-        return this.valeur;
     }
 
     public Type getType() {

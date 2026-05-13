@@ -1,8 +1,19 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
-public interface Valeur {
+public abstract class Valeur {
 
-    public Object getValeur();
+    private Object valeur;
 
-    public Type getType();
+    public Valeur(Object valeur) {
+        this.valeur = valeur;
+    }
+    public Object getValeur() {
+        return this.valeur;
+    }
+
+    public abstract Type getType();
+
+    public boolean equals(Valeur autre) {
+        return (this.getType() == autre.getType() && this.getValeur() == autre.getValeur());
+    }
 }

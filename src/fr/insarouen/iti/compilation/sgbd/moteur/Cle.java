@@ -1,17 +1,12 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
-public class Cle implements Valeur {
+public class Cle extends Valeur {
 
-    private Number valeur;
     private Type type;
 
     public Cle(Number valeur) {
-        this.valeur = valeur;
+        super(valeur);
         this.type = Type.SERIAL;
-    }
-
-    public Number getValeur() {
-        return this.valeur;
     }
 
     public Type getType() {
