@@ -25,10 +25,19 @@ package fr.insarouen.iti.compilation.sgbd.analyseurs;
 
 import fr.insarouen.iti.compilation.sgbd.commandes.*;
 import fr.insarouen.iti.compilation.sgbd.moteur.*;
-import fr.insarouen.iti.compilation.sgbd.conditions*;
+import fr.insarouen.iti.compilation.sgbd.conditions.*;
 
 
-public class AnalyseurSyntaxique{}
+public class AnalyseurSyntaxique{
+    private BaseDeDonnees bdd;
+
+    public void setBdd(BaseDeDonnees base){
+        this.bdd = base;
+    }
+    public BaseDeDonnees getBdd(){
+        return this.bdd;
+    }
+}
 
 PARSER_END(AnalyseurSyntaxique)
 
@@ -68,36 +77,30 @@ TOKEN:{
   | <PARENTHESE_OUVRANTE : "(">
   | <PARENTHESE_FERMANTE : ")">
   | <NUMBER : (["0"-"9"])+ >
-  | <ID:["A"-"Z","a"-"z","_"](["A"-"Z","a"-"z","_","0"-"9"])*> 
+  | <ID:["A"-"Z","a"-"z","_"](["A"-"Z","a"-"z","_",".","0"-"9"])*> 
   | <STRING : "\""(~["\""])*"\"" >
 }
 
 //Pour l'instant on oublie cette méthode
-Commande commande():
-{
-    Commande cmd;
-}
+void commande():
+{}
 {
     (
-        cmd=commandeCreate()
-      | cmd=commandeInsert()
-      | cmd=commandeSelect()
-      | cmd=commandeDelete()
-      | cmd=commandeDrop()
-      | cmd=commandeTables()
-      | cmd=commandeExit()
+        commandeCreate()
+      | commandeInsert()
+      | commandeSelect()
+      | commandeDelete()
+      | commandeDrop()
+      | commandeTables()
+      | commandeExit()
     )
 
     <POINTVIRGULE>
-
-    {
-        return cmd;
-    }
 }
 
 void commandeCreate():
 {
-    Collection<Attribut> listeAttributs = new ArrayList<>();
+    Collection<Attribut> listeAttributs = new ArrayList<Attribut>();
     Attribut attr,attr2;
     Token t;
 }
@@ -110,25 +113,25 @@ void commandeCreate():
 
     {
         //Il faut récupérer la base de données à aquelle on applique la commande
-        baseDeDonnees.createTable(new Identifiant(t.image), listeAttributs);
+        this.getBdd().createTable(t.image, listeAttributs);
     }
 }
 
-Commande commandeDrop():
+void commandeDrop():
 {
     Token t;
 }
 {
     <DROP> <TABLE> t = <ID>
     <POINTVIRGULE>
-    {baseDeDonnees.dropTable(new Identifiant(t.image));}
+    {this.getBdd().dropTable(t.image);}
 }
 
 void commandeInsert():
 {
     Token id_table, id_attr, id_attr2;
-    Collection<Identifiant> listeId = new ArrayList<>();
-    Collection<Valeur> listeVal = new ArrayList<>();
+    Collection<String> listeId = new ArrayList<String>();
+    Collection<Valeur> listeVal = new ArrayList<Valeur>();
     Valeur val;
     Tuple tuple = new Tuple();
 }
@@ -136,9 +139,9 @@ void commandeInsert():
     <INSERT> <INTO> id_table = <ID>
 
     <PARENTHESE_OUVRANTE>
-    id_attr = <ID> {listeId.add(new Identifiant(id_attr.image));}
+    id_attr = <ID> {listeId.add(id_attr.image);}
     (
-        <VIRGULE> id_attr2 = <ID> {listeId.add(new Identifiant(id_attr2.image));}
+        <VIRGULE> id_attr2 = <ID> {listeId.add(id_attr2.image);}
     )*
     <PARENTHESE_FERMANTE>
 
@@ -155,7 +158,7 @@ void commandeInsert():
                 tuple.setValeur(listeId.get(i),listeVal.get(i));
             }
             //Il faut récupérer la base de données
-            baseDeDonnees.getTable().inserer(tuple);
+            this.getBdd().getTable().inserer(tuple);
         }
     }
 }
@@ -175,31 +178,35 @@ void commandeDelete():
 
     {
         if (hasWhere){
-            baseDeDonnees.getTable().supprimer(exp);
+            this.getBdd().getTable().supprimer(exp);
         }
         else {
             //methode supprimer(sans param) permet de supprimer tous les tuples
-            baseDeDonnees.getTable().supprimer();
+            this.getBdd().getTable().supprimer();
         }
     }
 }
 
+//1. Récupérer la liste des noms des attributs dans listeIdAvecAlias
+//2. Modifier cette liste pour avoir uniquement les noms des attributs sans les alias
+//3. Transformer cette liste en liste d'attributs pour pouvoir appeler la méthode selectionner
 void commandeSelect():
-//relation.selectionner(collection(attributs))
 {
     Token t_select;
-    Collection<Identifiant> listeId = new ArrayList<>();
-    Collection<Identifiant> listeId2 = new ArrayList<>();
+    Collection<String> listeIdAvecAlias = new ArrayList<String>();
+    Collection<String> listeIdSansAlias = new ArrayList<String>();
+    Collection<Attribut> listeAttr = new ArrayList<Attribut>();
     Relation relation;
     ExpressionLogique exp;
     boolean hasEtoile = false;
-    Map<Identifiant,Identifiant> alias = new HashMap<>();
+    boolean hasWhere = false;
+    Map<String,String> alias = new HashMap<String,String>();
 }
 {
     <SELECT> t_select = <ETOILE> {hasEtoile = true;}
-    | t_select = <ID> {listeId.add(new Identifiant(t_select.image));}
+    | t_select = <ID> {listeIdAvecAlias.add(t_select.image);}
     (
-        <VIRGULE> t_select = <ID> {listeId.add(new Identifiant(t_select.image));}
+        <VIRGULE> t_select = <ID> {listeIdAvecAlias.add(t_select.image);}
     )*
 
     <FROM> relation = source() 
@@ -208,22 +215,32 @@ void commandeSelect():
     )*
 
     (
-        <WHERE> exp = expressionLogique()
+        <WHERE> exp = expressionLogique() {hasWhere = true;}
     )?
 
     {
-        relation = relation.projeter(exp);
+        if (!hasWhere){
+            relation = relation.projeter(exp);
+        }
         if (!hasEtoile){
-            for(Identifiant id : listeId){
+            for(String id : listeIdAvecAlias){
                 if (alias.contains(id)){
-                    listeId2.add(alias.get(id));
+                    listeIdSansAlias.add(alias.get(id));
                 }
                 else {
-                    listeId2.add(id);
+                    listeIdSansAlias.add(id);
                 }
 
             }
-            relation = relation.selectionner(listeId2);
+            // Pour chaque attribut de la relation sur laquelle on applique la sélection
+            // On récupère les attributs qui ont le même noms que dans la listeIdSansAlias
+            for(Attribut attr : relation.getAttributs()){
+                if (listeIdSansAlias.contains(attr.getIdentifiant())){
+                    listeAttr.add(attr);
+                }
+            }
+
+            relation = relation.selectionner(listeAttr);
         }
         relation.afficher();
     }
@@ -234,51 +251,49 @@ void commandeTables(): //afficher Tables
 {
     <TABLES> 
     {
-        baseDeDonnees.afficherTables();
+        this.getBdd().afficherTables();
     }
 }
 
-void commandeExit(): //main va avoir une instance de la base
-{
-    GestionnairePersistance gest = new GestionnairePersistance();
-}
+void commandeExit():
+{}
 {
     t = <EXIT>
     | t = <QUIT>
-    {gest.sauvegarder(baseDeDonnees);}
+    {this.getBdd().setEstOuverte(false);}
 }
 
 
-Attribut attribut();
+Attribut attribut():
 {
     Type type;
     Token t;
 }
 {
     t = <ID> type = type()
-    {return new Attribut(new Identifiant(t.image),type);}
+    {return new Attribut(t.image,type);}
 }
 
-Type type();
+Type type():
 {
     Token t;
 }
 {
-    t = <INT> {return new Type.INT;}
-    | t = <VARCHAR> {return new Type.VARCHAR;}
-    | t = <SERIAL> {return new Type.SERIAL;}
+    t = <INT> {return Type.INT;}
+    | t = <VARCHAR> {return Type.VARCHAR;}
+    | t = <SERIAL> {return Type.SERIAL;}
 }
 
-Valeur valeur();
+Valeur valeur():
 {
     Token t;
 }
 {
-    t = <NUMBER> {return new Valeur(t.image,new Type.INT);}
-    | t = <STRING> {return new Valeur(t.image, new Type.VARCHAR);}
+    t = <NUMBER> {return new Valeur(t.image, Type.INT);}
+    | t = <STRING> {return new Valeur(t.image, Type.VARCHAR);}
 }
 
-Relation source();
+Relation source():
 {
     Token t;
 }
@@ -290,60 +305,45 @@ Relation source();
     )?
 
     {
-        return baseDeDonnees.getTable(t);
+        return this.getBdd().getTable(t);
     }
 }
 
-ExpressionLogique expressionLogique(): //ENCOURS
-{}
+ExpressionLogique expressionLogique():
 {
-    conditionSimple = conditionSimple()
+    ExpressionLogique exp = new ExpressionLogique();
+}
+{
+    conditionSimple = conditionSimple() {exp.ajouterCondition(conditionSimple);}
     (
-        (t = <AND>
-        | <OR>)
-        conditionSimple = conditionSimple()
+        (t = <AND> {exp.ajouterConnecteur(OperateurLogique.AND);}
+        | <OR> {exp.ajouterConnecteur(OperateurLogique.OR);}
+        )
+        conditionSimple = conditionSimple() {exp.ajouterCondition(conditionSimple);}
     )*
+    {
+        return exp;
+    }
 }
 
-ConditionSimple conditionSimple(): //ENCOURS
+ConditionSimple conditionSimple():
 {
     Token t;
     Comparateur comparateur;
     Operande opG, opD;
+    Valeur val;
 }
 {
-    t = <ID> {opG = operande()}
-    (t2 = <EGAL>
-    | <SUP>
-    | <INF>
+    t = <ID> {opG = new OperandeAttribut(t.image);}
+    (t2 = <EGAL> {comparateur = Comparateur.EGAL;}
+    | <SUPERIEUR> {comparateur = Comparateur.SUPERIEUR;}
+    | <INFERIEUR> {comparateur = Comparateur.INFERIEUR;}
     )
-    (t3 = valeur()
-    | <ID>
+    (val = valeur() {opD = new OperandeValeur(val);}
+    | t3 = <ID> {opD = new OperandeAttribut(t3.image);}
     )
 
     {
-        return new ConditionsSimple(opG, opD, comparateur)
+        return new ConditionSimple(opG, opD, comparateur);
     }
 }
-
-OperateurLogique OperateurLogique():
-{}
-{}
-
-
-
-Comparateur comparateur() :
-{}
-{}
-
-Operande operande():
-{}
-{}
-
-OperandeAttribut OperandeAttribut():
-{}
-{}
-
-OperandeValeur OperandeValeur():
-{}
-{}
