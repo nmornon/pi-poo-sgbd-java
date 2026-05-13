@@ -6,18 +6,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.FileOutputStream;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import fr.insarouen.iti.compilation.sgbd.moteur.BaseDeDonnees;
-import fr.insarouen.iti.compilation.sgbd.moteur.Table;
 
 public class GestionnairePersistance {
 
     public GestionnairePersistance() {
     }
 
-    public BaseDeDonnees charger(String nomFichier) throws IOException{
+    public BaseDeDonnees charger(String nomFichier) throws IOException {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomFichier))){
             BaseDeDonnees baseDeDonnees = (BaseDeDonnees) ois.readObject();
             baseDeDonnees.setEstOuverte(true);
@@ -25,6 +21,7 @@ public class GestionnairePersistance {
         } catch (ClassNotFoundException e) {
             System.err.println("Impossible de trouver la classe de la base de donnees que vous avez choisi");
             e.printStackTrace();
+            return null;
         }
     }
     
@@ -32,5 +29,6 @@ public class GestionnairePersistance {
         FileOutputStream fichier = new FileOutputStream(baseDeDonnees.getIdentifiant());
         ObjectOutputStream oos = new ObjectOutputStream(fichier);
         oos.writeObject(baseDeDonnees);
+        oos.close();
     }
 }

@@ -16,4 +16,9 @@ public abstract class Valeur {
     public boolean equals(Valeur autre) {
         return (this.getType() == autre.getType() && this.getValeur() == autre.getValeur());
     }
+
+    @Override
+    public String toString(){
+        return this.valeur.toString();
+    }
 }

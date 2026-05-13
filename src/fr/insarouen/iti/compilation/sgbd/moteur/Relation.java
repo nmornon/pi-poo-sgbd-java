@@ -2,9 +2,12 @@ package fr.insarouen.iti.compilation.sgbd.moteur;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import fr.insarouen.iti.compilation.sgbd.exceptions.PIAventureException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.ProduitCartesienException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.SelectionException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
 import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
 
@@ -14,8 +17,8 @@ import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
 class Relation {
     /** L'identifiant de la relation */
     private String identifiant;
-    /** La liste des attriuts de la relation */
-    private Collection<Attribut> attributs;
+    /** La liste des attributs de la relation */
+    private Set<Attribut> attributs = new HashSet<>();
     /** La liste des tuples de la relation */
     private final Collection<Tuple> tuples = new ArrayList<>();
 
@@ -39,12 +42,27 @@ class Relation {
      *                       attributs
      */
     public Relation(String identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
+        if (identifiant == null || identifiant.isEmpty()) {
+            throw new PIAventureException("L'identifiant ne peut pas être null ou vide");
+        }
         this.identifiant = identifiant;
-        this.attributs = attributs;
 
-        for (Tuple tuple : tuples) {
-            this.verifierTuple(tuple);
-            this.tuples.add(tuple);
+        if (attributs.isEmpty()) {
+            throw new PIAventureException("Une relation doit avoir au moins un attribut");
+        }
+
+        for (Attribut attribut : attributs) {
+            if (this.attributs.contains(attribut)) {
+                throw new PIAventureException("Attribut doublon");
+            }
+            this.attributs.add(attribut);
+        }
+
+        if (tuples != null) {
+            for (Tuple tuple : tuples) {
+                this.verifierTuple(tuple);
+                this.tuples.add(tuple);
+            }
         }
     }
 
@@ -114,25 +132,42 @@ class Relation {
     }
 
     /**
+     * Renvoie une relation avec l'alias spécifié comme identifiant.
+     * 
+     * @param alias l'alias de la nouvelle relation
+     * @return la relation
+     */
+    public Relation alias(String alias) {
+        return new Relation(alias, attributs, tuples);
+    }
+
+    /**
      * Applique une sélection sur la relation à partir des attributs spécifiés.
      * 
      * @param attributs la liste attributs à sélectionner
      * @return la nouvelle relation
      */
-    public Relation selectionner(Collection<Attribut> attributs) {
+    public Relation selectionner(Set<String> attributs) {
+        Set<Attribut> attributs2 = new HashSet<>();
+
+        for (String attribut : attributs) {
+            if (!this.hasAttribut(attribut)) {
+                throw new SelectionException(String.format("Attribut inexistant '%s'", attribut));
+            }
+            attributs2.add(this.getAttribut(attribut));
+        }
         Collection<Tuple> tuples = new ArrayList<>();
 
         for (Tuple tuple : this.getTuples()) {
             Tuple nouveauTuple = new Tuple();
 
-            for (Attribut attribut : attributs) {
-                String identifiant = attribut.identifiant();
-                Valeur valeur = tuple.getValeur(attribut.identifiant());
-                nouveauTuple.setValeur(identifiant, valeur);
+            for (String attribut : attributs) {
+                Valeur valeur = tuple.getValeur(attribut);
+                nouveauTuple.setValeur(attribut, valeur);
             }
             tuples.add(nouveauTuple);
         }
-        return new Relation(this.identifiant, attributs, tuples);
+        return new Relation(this.identifiant, attributs2, tuples);
     }
 
     /**
@@ -143,18 +178,7 @@ class Relation {
      * @return la nouvelle relation
      */
     public Relation projeter(ExpressionLogique expression) {
-        Collection<Tuple> tuples = new ArrayList<>();
-
-        for (Tuple tuple : this.getTuples()){
-            Map<String, Tuple> contexte = new HashMap<>();
-            contexte.put(this.getIdentifiant(),tuple);
-
-            if (expression.evaluer(contexte)){
-                tuples.add(tuple);
-            }
-        }
-
-        return new Relation(this.getIdentifiant(), this.getAttributs(), tuples);
+        return null;
     }
 
     /**
@@ -165,35 +189,33 @@ class Relation {
      * @return la nouvelle relation
      */
     public Relation produitCartesien(Relation relation) {
+        if (relation.identifiant.equals(this.identifiant)) {
+            throw new ProduitCartesienException("Produit cartesien impossible entre relations ayant le même identifiant");
+        }
         Collection<Tuple> tuples = new ArrayList<>();
-        Collection<Attribut> attributs = this.concatenerAttributs(this.getAttributs(), relation.getAttributs());
+        Collection<Attribut> attributs = this.concatenerAttributs(
+            this.identifiant, this.attributs,
+            relation.identifiant, relation.attributs
+        );
 
         for (Tuple tuple1 : this.getTuples()) {
             for (Tuple tuple2 : relation.getTuples()) {
-                tuples.add(this.concatenerTuples(tuple1, tuple2));
+                Tuple sousTuple1 = tuple1.prefixer(this.identifiant);
+                Tuple sousTuple2 = tuple2.prefixer(relation.identifiant);
+                tuples.add(sousTuple1.concatener(sousTuple2));
             }
         }
-        String identifiant = this.concatenerIdentifiants(this.identifiant, relation.getIdentifiant());
+        String identifiant = this.concatenerIdentifiants(this.identifiant, relation.identifiant);
         return new Relation(identifiant, attributs, tuples);
     }
 
-    /**
-     * Renvoie un tuple contenant la concaténation des deux tuples spécifiés.
-     * 
-     * @param tuple1 le premier tuple à concaténer
-     * @param tuple2 le second tuple à concaténer
-     * @return le tuple concaténé
-     */
-    private Tuple concatenerTuples(Tuple tuple1, Tuple tuple2) {
-        Tuple tuple = new Tuple();
+    public Relation produitCartesien(Collection<Relation> relations) {
+        Relation produit = this;
 
-        for (Map.Entry<String, Valeur> entry : tuple1.getValeurs().entrySet()) {
-            tuple.setValeur(entry.getKey(), entry.getValue());
+        for (Relation relation : relations) {
+            produit = produit.produitCartesien(relation);
         }
-        for (Map.Entry<String, Valeur> entry : tuple2.getValeurs().entrySet()) {
-            tuple.setValeur(entry.getKey(), entry.getValue());
-        }
-        return tuple;
+        return produit;
     }
 
     /**
@@ -205,16 +227,16 @@ class Relation {
      * @return la collection d'attribut concaténée
      */
     private Collection<Attribut> concatenerAttributs(
-        Collection<Attribut> attributs1,
-        Collection<Attribut> attributs2
+        String identifiant1, Collection<Attribut> attributs1,
+        String identifiant2, Collection<Attribut> attributs2
     ) {
         Collection<Attribut> attributs = new ArrayList<>();
 
         for (Attribut attribut : attributs1) {
-            attributs.add(attribut);
+            attributs.add(attribut.prefixer(identifiant1));
         }
         for (Attribut attribut : attributs2) {
-            attributs.add(attribut);
+            attributs.add(attribut.prefixer(identifiant2));
         }
         return attributs;
     }
@@ -223,28 +245,29 @@ class Relation {
      * Affiche toutes les informations de la relation.
      */
     public void afficher() {
-        System.out.printf("> Table: %s\n", this.identifiant);
-        System.out.print("| ");
+        System.out.printf("> Table: %s\n", this.getIdentifiant());
+        System.out.print("|");
 
         for (Attribut attribut : this.getAttributs()) {
-            System.out.printf(" %15s |", attribut.identifiant());
+            System.out.printf(" %-15s |", attribut.identifiant());
         }
         System.out.print("\n|");
 
         for (int i = 0; i < this.getAttributs().size(); i++) {
-            System.out.printf("%-17s|", "-");
+            System.out.printf("-".repeat(17));
+            System.out.printf("|");
         }
-        System.out.print("\n|");
+        System.out.println();
 
         for (Tuple tuple : this.getTuples()) {
-            System.out.print("| ");
+            System.out.print("|");
 
-            for (Map.Entry<String, Valeur> entry : tuple.getValeurs().entrySet()) {
-                Valeur valeur = entry.getValue();
-                System.out.printf(" %15s |", valeur);
+            for (Attribut attribut : this.getAttributs()) {
+                System.out.printf(" %-15s |", tuple.getValeur(attribut.identifiant()));
             }
             System.out.println();
         }
+        System.out.println();
     }
 
     private String concatenerIdentifiants(String identifiant1, String identifiant2) {

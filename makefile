@@ -1,3 +1,4 @@
+.SILENT:
 SRC_DIR=src
 SRC_TEST_DIR=srctest
 BIN_DIR=classes

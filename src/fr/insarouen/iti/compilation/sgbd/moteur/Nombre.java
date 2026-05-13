@@ -12,9 +12,4 @@ public class Nombre extends Valeur {
     public Type getType() {
         return this.type;
     }
-
-    @Override
-    public String toString(){
-        return this.valeur.toString();
-    }
 }
