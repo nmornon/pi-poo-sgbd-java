@@ -146,19 +146,6 @@ class Relation {
     }
 
     /**
-     * Applique une jointure sur la relation à partir d'une seconde relation,
-     * et de deux attributs appartenant chacun à une relation.
-     * 
-     * @param relation  la relation à joindre
-     * @param attribut1 l'attribut de la première relation à joindre
-     * @param attribut2 l'attribut de la seconde relation à joindre
-     * @return la nouvelle relation
-     */
-    public Relation joindre(Relation relation, Attribut attribut1, Attribut attribut2) {
-        return null;
-    }
-
-    /**
      * Applique un produit cartésien sur la relation à partir d'une seconde
      * relation.
      * 
