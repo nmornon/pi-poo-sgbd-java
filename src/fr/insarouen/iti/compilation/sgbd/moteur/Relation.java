@@ -3,6 +3,7 @@ package fr.insarouen.iti.compilation.sgbd.moteur;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.HashMap;
 
 import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
 import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
@@ -142,7 +143,18 @@ class Relation {
      * @return la nouvelle relation
      */
     public Relation projeter(ExpressionLogique expression) {
-        return null;
+        Collection<Tuple> tuples = new ArrayList<>();
+
+        for (Tuple tuple : this.getTuples()){
+            Map<String, Tuple> contexte = new HashMap<>();
+            contexte.put(this.getIdentifiant(),tuple);
+
+            if (expression.evaluer(contexte)){
+                tuples.add(tuple);
+            }
+        }
+
+        return new Relation(this.getIdentifiant(), this.getAttributs(), tuples);
     }
 
     /**
