@@ -13,7 +13,7 @@ public class OperandeValeur extends Operande {
     }
 
     @Override
-    public Valeur evaluer (Map<String, Tuple> contexte){
-        return valeur;
+    public Valeur evaluer (Tuple tuple){
+        return this.valeur;
     }
 }

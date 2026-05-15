@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+
 
 import fr.insarouen.iti.compilation.sgbd.exceptions.PIAventureException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.ProduitCartesienException;
@@ -21,7 +24,8 @@ class Relation {
     private Set<Attribut> attributs = new HashSet<>();
     /** La liste des tuples de la relation */
     private final Collection<Tuple> tuples = new ArrayList<>();
-
+    /**compteur serial */
+    private static int prochainSerial=1;
     /**
      * Construit une relation à partir de la liste d'attributs spécifiée.
      * 
@@ -57,11 +61,19 @@ class Relation {
             }
             this.attributs.add(attribut);
         }
-
+	
         if (tuples != null) {
             for (Tuple tuple : tuples) {
+            
+            	for (Attribut attribut : this.getAttributs()){
+            		if (attribut.type()==Type.SERIAL && !tuple.hasIdentifiant(attribut.identifiant())){
+            			tuple.setValeur(attribut.identifiant(),new Cle(prochainSerial));
+                        prochainSerial++;
+            		}
+            	}
                 this.verifierTuple(tuple);
                 this.tuples.add(tuple);
+                
             }
         }
     }
@@ -178,7 +190,16 @@ class Relation {
      * @return la nouvelle relation
      */
     public Relation projeter(ExpressionLogique expression) {
-        return null;
+        Collection<Tuple> tuples = new ArrayList<>();
+
+        for (Tuple tuple : this.getTuples()){
+
+            if (expression.evaluer(tuple)){
+                tuples.add(tuple);
+            }
+        }
+
+        return new Relation(this.getIdentifiant(), this.getAttributs(), tuples);
     }
 
     /**

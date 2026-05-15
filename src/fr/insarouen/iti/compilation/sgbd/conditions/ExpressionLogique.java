@@ -24,12 +24,12 @@ public class ExpressionLogique{
         this.connecteurs.add(connecteur);
     }
 
-    public boolean evaluer(Map<String,Tuple> contexte){
+    public boolean evaluer(Tuple tuple){
 
-        boolean resultat = conditions.get(0).evaluer(contexte);
+        boolean resultat = conditions.get(0).evaluer(tuple);
 
         for (int i = 1 ; i<conditions.size(); i++){
-            boolean courant = conditions.get(i).evaluer(contexte);
+            boolean courant = conditions.get(i).evaluer(tuple);
             OperateurLogique connecteur=connecteurs.get(i-1);
 
             if ( connecteur==OperateurLogique.AND){

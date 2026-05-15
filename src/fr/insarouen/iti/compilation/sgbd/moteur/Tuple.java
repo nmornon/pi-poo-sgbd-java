@@ -38,12 +38,12 @@ public class Tuple {
         Tuple tuple = new Tuple();
         
         for (Map.Entry<String, Valeur> entry : this.valeurs.entrySet()) {
-            if (!entry.getKey().contains(".")) {
-                String identifiant = String.format(("%s.%s"), prefix, entry.getKey());
-                Valeur valeur = entry.getValue();
-                tuple.setValeur(identifiant, valeur);
+            String identifiant=entry.getKey();
+            
+            if (!identifiant.contains(".")) {
+                identifiant=prefix+"."+identifiant;
             }
-            tuple.setValeur(entry.getKey(), entry.getValue());
+            tuple.setValeur(identifiant, entry.getValue());
         }
         return tuple;
     }

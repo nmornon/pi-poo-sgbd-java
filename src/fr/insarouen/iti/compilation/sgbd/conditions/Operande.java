@@ -6,5 +6,5 @@ import fr.insarouen.iti.compilation.sgbd.moteur.Valeur;
 
 public abstract class Operande{
     
-    public abstract Valeur evaluer(Map<String,Tuple> contexte);
+    public abstract Valeur evaluer(Tuple tuple);
 }

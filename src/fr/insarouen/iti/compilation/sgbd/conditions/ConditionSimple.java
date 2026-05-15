@@ -16,10 +16,10 @@ public class ConditionSimple {
         this.comparateur=comparateur;
     }
 
-    public boolean evaluer ( Map<String,Tuple> contexte ){
+    public boolean evaluer ( Tuple tuple ){
 
-        Valeur valeurGauche = gauche.evaluer(contexte);
-        Valeur valeurDroite =droite.evaluer(contexte);
+        Valeur valeurGauche = gauche.evaluer(tuple);
+        Valeur valeurDroite =droite.evaluer(tuple);
 
         Object gauche= valeurGauche.getValeur();
         Object droite = valeurDroite.getValeur();

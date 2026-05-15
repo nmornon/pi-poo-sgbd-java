@@ -15,9 +15,12 @@ public class OperandeAttribut extends Operande {
     }
 
     @Override
-    public Valeur evaluer (Map<String, Tuple> contexte){
-        
-        Tuple tuple=contexte.get(this.nomTableOuAlias);
+    public Valeur evaluer (Tuple tuple){
+        String cleComplete=this.nomTableOuAlias+"."+this.nomAttribut;
+
+        if (tuple.hasIdentifiant(cleComplete)){
+            return tuple.getValeur(cleComplete);
+        }
         return tuple.getValeur(this.nomAttribut);
     }
 }

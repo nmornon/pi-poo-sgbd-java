@@ -11,11 +11,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import fr.insarouen.iti.compilation.sgbd.exceptions.PIAventureException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.ProduitCartesienException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.SelectionException;
+import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
+import fr.insarouen.iti.compilation.sgbd.conditions.ConditionSimple;
+import fr.insarouen.iti.compilation.sgbd.conditions.OperandeAttribut;
+import fr.insarouen.iti.compilation.sgbd.conditions.OperandeValeur;
+import fr.insarouen.iti.compilation.sgbd.conditions.Comparateur;
+import fr.insarouen.iti.compilation.sgbd.conditions.OperateurLogique;
+
 
 public class TestRelation {
     public static Relation relationBases;
@@ -89,8 +97,8 @@ public class TestRelation {
         TestRelation.relationGadgets = new Relation("gadgets", TestRelation.attributsGadgets, TestRelation.tuplesGadgets);
     }
 
-    @Before
-    public void avantTout() {
+    @BeforeClass
+    public static void avantTout() {
         TestRelation.initialiser();
     }
 
@@ -209,4 +217,157 @@ public class TestRelation {
     public void test_produitCartesien_avecLesDeuxMemesRelationsSansAlias() {
         relationBases.produitCartesien(relationBases);
     }
+
+    @Test
+    public void test_projeter_apresProduitCartesien(){
+        Relation produit=relationBases.produitCartesien(relationHeroes);
+
+        ExpressionLogique condition = new ExpressionLogique();
+        condition.ajouterCondition( new ConditionSimple(
+                                        new OperandeAttribut("bases","id"),
+                                        new OperandeAttribut("heroes","base_id"),
+                                        Comparateur.EGAL
+
+        
+        ));
+
+        Relation resultat=produit.projeter(condition);
+
+        assertThat(resultat.getTuples().size(),is(9));
+
+        assertThat(resultat.hasAttribut("bases.id"),is(true));
+        assertThat(resultat.hasAttribut("bases.nom"),is(true));
+        assertThat(resultat.hasAttribut("heroes.nom"),is(true));
+        assertThat(resultat.hasAttribut("heroes.alias"),is(true));
+        assertThat(resultat.hasAttribut("gadgets.nom"),is(false));
+    }
+
+    @Test
+    public void test_serial_genereAutomatiquement() {
+        Tuple premierTuple = relationBases.getTuples().iterator().next();
+
+        assertThat(premierTuple.hasIdentifiant("id"), is(true));
+        assertThat(premierTuple.getValeur("id").getValeur(), is(1));
+    }
+
+    @Test
+    public void test_produitCartesien_nombreTuples() {
+        Relation produit = relationBases.produitCartesien(relationHeroes);
+
+        assertThat(produit.getTuples().size(), is(45));
+    }
+
+    @Test
+    public void test_produitCartesien_troisRelations_nombreTuples() {
+        Relation produit = relationBases.produitCartesien(List.of(relationHeroes, relationGadgets));
+
+        assertThat(produit.getTuples().size(), is(810));
+    }
+
+    @Test
+    public void test_projeter_basesHeroes() {
+        Relation produit = relationBases.produitCartesien(relationHeroes);
+
+        ExpressionLogique condition = new ExpressionLogique();
+        condition.ajouterCondition(new ConditionSimple(
+            new OperandeAttribut("bases", "id"),
+            new OperandeAttribut("heroes", "base_id"),
+            Comparateur.EGAL
+        ));
+
+        Relation resultat = produit.projeter(condition);
+
+        assertThat(resultat.getTuples().size(), is(9));
+        assertThat(resultat.hasAttribut("bases.nom"), is(true));
+        assertThat(resultat.hasAttribut("heroes.alias"), is(true));
+        assertThat(resultat.hasAttribut("gadgets.nom"), is(false));
+    }
+
+    @Test
+    public void test_projeter_conditionImpossible() {
+        Relation produit = relationBases.produitCartesien(relationHeroes);
+
+        ExpressionLogique condition = new ExpressionLogique();
+        condition.ajouterCondition(new ConditionSimple(
+            new OperandeAttribut("bases", "id"),
+            new OperandeValeur(new Nombre(999)),
+            Comparateur.EGAL
+        ));
+
+        Relation resultat = produit.projeter(condition);
+
+        assertThat(resultat.getTuples().size(), is(0));
+        assertThat(resultat.hasAttribut("bases.id"), is(true));
+        assertThat(resultat.hasAttribut("heroes.alias"), is(true));
+    }
+
+    @Test
+    public void test_produitCartesien_projeter_selectionner() {
+        Relation produit = relationBases.produitCartesien(relationHeroes);
+
+        ExpressionLogique condition = new ExpressionLogique();
+        condition.ajouterCondition(new ConditionSimple(
+            new OperandeAttribut("bases", "id"),
+            new OperandeAttribut("heroes", "base_id"),
+            Comparateur.EGAL
+        ));
+
+        Relation resultat = produit
+            .projeter(condition)
+            .selectionner(Set.of("bases.nom", "heroes.alias"));
+
+        assertThat(resultat.getTuples().size(), is(9));
+
+        assertThat(resultat.hasAttribut("bases.nom"), is(true));
+        assertThat(resultat.hasAttribut("heroes.alias"), is(true));
+
+        assertThat(resultat.hasAttribut("bases.id"), is(false));
+        assertThat(resultat.hasAttribut("heroes.base_id"), is(false));
+    }
+
+
+    @Test
+    public void test_troisTables_projeter_selectionner() {
+        Relation produit = relationBases.produitCartesien(List.of(relationHeroes, relationGadgets));
+
+        ExpressionLogique condition = new ExpressionLogique();
+
+        condition.ajouterCondition(new ConditionSimple(
+            new OperandeAttribut("bases", "id"),
+            new OperandeAttribut("heroes", "base_id"),
+            Comparateur.EGAL
+        ));
+
+        condition.ajouterConnecteur(OperateurLogique.AND);
+
+        condition.ajouterCondition(new ConditionSimple(
+            new OperandeAttribut("heroes", "id"),
+            new OperandeAttribut("gadgets", "hero_id"),
+            Comparateur.EGAL
+        ));
+
+        Relation resultat = produit
+            .projeter(condition)
+            .selectionner(Set.of(
+                "bases.nom",
+                "heroes.alias",
+                "gadgets.nom",
+                "gadgets.puissance"
+            ));
+
+        assertThat(resultat.getTuples().size(), is(18));
+
+        assertThat(resultat.hasAttribut("bases.nom"), is(true));
+        assertThat(resultat.hasAttribut("heroes.alias"), is(true));
+        assertThat(resultat.hasAttribut("gadgets.nom"), is(true));
+        assertThat(resultat.hasAttribut("gadgets.puissance"), is(true));
+
+        assertThat(resultat.hasAttribut("bases.id"), is(false));
+        assertThat(resultat.hasAttribut("heroes.id"), is(false));
+        assertThat(resultat.hasAttribut("gadgets.id"), is(false));
+    }
+
+
+
+
 }

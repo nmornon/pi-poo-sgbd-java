@@ -12,24 +12,20 @@ import fr.insarouen.iti.compilation.sgbd.moteur.*;
 
 public class TestConditionSimple{
 
-    private Map<String,Tuple> contextHero(){
+    private Tuple tupleHero(){
         Tuple hero=new Tuple();
 
-        hero.setValeur("nom",new Chaine("Batman"));
-        hero.setValeur("puissance",new Nombre(100));
-        hero.setValeur("age",new Nombre(40));
+        hero.setValeur("Hero.nom",new Chaine("Batman"));
+        hero.setValeur("Hero.puissance",new Nombre(100));
+        hero.setValeur("Hero.age",new Nombre(40));
 
-        Map<String,Tuple> contexte = new HashMap<>();
-
-        contexte.put("Hero",hero);
-
-        return contexte;
+        return hero;
     }
 
     @Test
     public void testSuperieurVrai(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
             new OperandeAttribut("Hero","puissance"),
@@ -37,13 +33,13 @@ public class TestConditionSimple{
             Comparateur.SUPERIEUR
         );
         
-        assertThat(condition.evaluer(contexte),is(true));
+        assertThat(condition.evaluer(tuple),is(true));
     }
 
     @Test
     public void testSuperieurFaux(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
             new OperandeAttribut("Hero","puissance"),
@@ -51,13 +47,13 @@ public class TestConditionSimple{
             Comparateur.SUPERIEUR
         );
         
-        assertThat(condition.evaluer(contexte),is(false));
+        assertThat(condition.evaluer(tuple),is(false));
     }
 
     @Test
     public void testInferieurVrai(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
             new OperandeAttribut("Hero","age"),
@@ -65,13 +61,13 @@ public class TestConditionSimple{
             Comparateur.INFERIEUR
         );
         
-        assertThat(condition.evaluer(contexte),is(true));
+        assertThat(condition.evaluer(tuple),is(true));
     }
 
     @Test
     public void testInferieurFaux(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
             new OperandeAttribut("Hero","age"),
@@ -79,13 +75,13 @@ public class TestConditionSimple{
             Comparateur.INFERIEUR
         );
         
-        assertThat(condition.evaluer(contexte),is(false));
+        assertThat(condition.evaluer(tuple),is(false));
     }
 
     @Test
     public void testEgaliteChaineVraie(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
             new OperandeAttribut("Hero","nom"),
@@ -93,13 +89,13 @@ public class TestConditionSimple{
             Comparateur.EGAL
         );
         
-        assertThat(condition.evaluer(contexte),is(true));
+        assertThat(condition.evaluer(tuple),is(true));
     }
 
     @Test
     public void testEgaliteChaineFausse(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
             new OperandeAttribut("Hero","nom"),
@@ -107,7 +103,7 @@ public class TestConditionSimple{
             Comparateur.EGAL
         );
         
-        assertThat(condition.evaluer(contexte),is(false));
+        assertThat(condition.evaluer(tuple),is(false));
     }
 
 }

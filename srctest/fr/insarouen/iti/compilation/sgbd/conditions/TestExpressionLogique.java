@@ -3,8 +3,6 @@ package fr.insarouen.iti.compilation.sgbd.conditions;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.Test;
 
 import fr.insarouen.iti.compilation.sgbd.conditions.*;
@@ -12,24 +10,35 @@ import fr.insarouen.iti.compilation.sgbd.moteur.*;
 
 public class TestExpressionLogique {
 
-        private Map<String,Tuple> contextHero(){
+    private Tuple tupleHero(){
         Tuple hero=new Tuple();
 
-        hero.setValeur("nom",new Chaine("Batman"));
-        hero.setValeur("puissance",new Nombre(100));
-        hero.setValeur("age",new Nombre(40));
+        hero.setValeur("Hero.nom",new Chaine("Batman"));
+        hero.setValeur("Hero.puissance",new Nombre(100));
+        hero.setValeur("Hero.age",new Nombre(40));
 
-        Map<String,Tuple> contexte = new HashMap<>();
+        return hero;
+    }
 
-        contexte.put("Hero",hero);
+    private Tuple tuplePersonneVoiture(){
+        Tuple tuple = new Tuple();
 
-        return contexte;
+        tuple.setValeur("Personne.id",new Cle(1));
+        tuple.setValeur("Personne.nom",new Chaine("Bob"));
+        tuple.setValeur("Personne.age",new Nombre(20));
+
+        tuple.setValeur("Voiture.id",new Cle(10));
+        tuple.setValeur("Voiture.marque",new Chaine("BMW"));
+        tuple.setValeur("Voiture.proprietaire",new Nombre(1));
+
+        return tuple;
+
     }
 
     @Test
     public void testExpressionAvecAndVraie(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
             new OperandeAttribut("Hero","age"),
@@ -48,13 +57,13 @@ public class TestExpressionLogique {
         expression.ajouterConnecteur(OperateurLogique.AND);
         expression.ajouterCondition(c2);
 
-        assertThat(expression.evaluer(contexte),is(true));
+        assertThat(expression.evaluer(tuple),is(true));
     }
 
     @Test
     public void testExpressionAvecAndFausse(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
             new OperandeAttribut("Hero","age"),
@@ -73,13 +82,13 @@ public class TestExpressionLogique {
         expression.ajouterConnecteur(OperateurLogique.AND);
         expression.ajouterCondition(c2);
 
-        assertThat(expression.evaluer(contexte),is(false));
+        assertThat(expression.evaluer(tuple),is(false));
     }
 
     @Test
     public void testExpressionAvecOrVraie(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
             new OperandeAttribut("Hero","age"),
@@ -98,13 +107,13 @@ public class TestExpressionLogique {
         expression.ajouterConnecteur(OperateurLogique.OR);
         expression.ajouterCondition(c2);
 
-        assertThat(expression.evaluer(contexte),is(true));
+        assertThat(expression.evaluer(tuple),is(true));
     }
 
     @Test
     public void testExpressionAvecOrVFausse(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
             new OperandeAttribut("Hero","age"),
@@ -123,13 +132,13 @@ public class TestExpressionLogique {
         expression.ajouterConnecteur(OperateurLogique.OR);
         expression.ajouterCondition(c2);
 
-        assertThat(expression.evaluer(contexte),is(false));
+        assertThat(expression.evaluer(tuple),is(false));
     }
 
     @Test
     public void testExpressionAvecTroisConditionsVrai(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
             new OperandeAttribut("Hero","age"),
@@ -156,13 +165,13 @@ public class TestExpressionLogique {
         expression.ajouterConnecteur(OperateurLogique.AND);
         expression.ajouterCondition(c3);
 
-        assertThat(expression.evaluer(contexte),is(true));
+        assertThat(expression.evaluer(tuple),is(true));
     }
 
     @Test
     public void testExpressionAvecTroisConditionsFaux(){
 
-        Map<String,Tuple> contexte =contextHero();
+        Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
             new OperandeAttribut("Hero","nom"),
@@ -189,6 +198,74 @@ public class TestExpressionLogique {
         expression.ajouterConnecteur(OperateurLogique.AND);
         expression.ajouterCondition(c3);
 
-        assertThat(expression.evaluer(contexte),is(false));
+        assertThat(expression.evaluer(tuple),is(false));
     }
+
+    @Test
+    public void testExpressionAvecDeuxTablesVraie(){
+
+        Tuple tuple = tuplePersonneVoiture();
+
+        ConditionSimple c1= new ConditionSimple(
+            new OperandeAttribut("Personne","id"),
+            new OperandeAttribut("Voiture","proprietaire"),
+            Comparateur.EGAL
+        );
+
+        ConditionSimple c2= new ConditionSimple(
+            new OperandeAttribut("Personne","age"),
+            new OperandeValeur(new Nombre(18)),
+            Comparateur.SUPERIEUR
+        );
+
+        ConditionSimple c3= new ConditionSimple(
+            new OperandeAttribut("Voiture","marque"),
+            new OperandeValeur(new Chaine("BMW")),
+            Comparateur.EGAL
+        );
+
+        ExpressionLogique expression= new ExpressionLogique();
+        expression.ajouterCondition(c1);
+        expression.ajouterConnecteur(OperateurLogique.AND);
+        expression.ajouterCondition(c2);
+        expression.ajouterConnecteur(OperateurLogique.AND);
+        expression.ajouterCondition(c3);
+
+        assertThat(expression.evaluer(tuple),is(true));
+    }
+
+    @Test
+    public void testExpressionAvecDeuxTablesFausse(){
+
+        Tuple tuple = tuplePersonneVoiture();
+
+        ConditionSimple c1= new ConditionSimple(
+            new OperandeAttribut("Personne","id"),
+            new OperandeAttribut("Voiture","proprietaire"),
+            Comparateur.EGAL
+        );
+
+        ConditionSimple c2= new ConditionSimple(
+            new OperandeAttribut("Personne","age"),
+            new OperandeValeur(new Nombre(18)),
+            Comparateur.SUPERIEUR
+        );
+
+        ConditionSimple c3= new ConditionSimple(
+            new OperandeAttribut("Voiture","marque"),
+            new OperandeValeur(new Chaine("Citroen")),
+            Comparateur.EGAL
+        );
+
+        ExpressionLogique expression= new ExpressionLogique();
+        expression.ajouterCondition(c1);
+        expression.ajouterConnecteur(OperateurLogique.AND);
+        expression.ajouterCondition(c2);
+        expression.ajouterConnecteur(OperateurLogique.AND);
+        expression.ajouterCondition(c3);
+
+        assertThat(expression.evaluer(tuple),is(false));
+    }
+
+
 }
