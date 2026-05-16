@@ -1,6 +1,6 @@
 package fr.insarouen.iti.compilation.sgbd.exceptions;
 
-public class ProduitCartesienException extends RuntimeException {
+public class ProduitCartesienException extends RelationException {
 
     public ProduitCartesienException(String message) {
         super(message);

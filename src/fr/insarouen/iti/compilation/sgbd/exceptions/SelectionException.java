@@ -1,6 +1,6 @@
 package fr.insarouen.iti.compilation.sgbd.exceptions;
 
-public class SelectionException extends RuntimeException {
+public class SelectionException extends RelationException {
 
     public SelectionException(String message) {
         super(message);

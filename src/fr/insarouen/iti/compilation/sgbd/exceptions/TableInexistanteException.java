@@ -1,6 +1,6 @@
 package fr.insarouen.iti.compilation.sgbd.exceptions;
 
-public class TableInexistanteException extends PIAventureException {
+public class TableInexistanteException extends TableException {
 
     public TableInexistanteException(String message) {
         super(message);

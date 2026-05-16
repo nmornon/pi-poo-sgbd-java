@@ -1,26 +1,26 @@
 package fr.insarouen.iti.compilation.sgbd.conditions;
 
-import java.util.Map;
+import fr.insarouen.iti.compilation.sgbd.exceptions.AttributInexistantException;
 import fr.insarouen.iti.compilation.sgbd.moteur.Tuple;
 import fr.insarouen.iti.compilation.sgbd.moteur.Valeur;
 
 public class OperandeAttribut extends Operande {
+    private String identifiant;
 
-    private String nomTableOuAlias;
-    private String nomAttribut;
+    public OperandeAttribut(String prefix, String attribut) {
+        this(String.format("%s.%s", prefix, attribut));
+    }
 
-    public OperandeAttribut(String nomTableOuAlias, String nomAttribut){
-        this.nomTableOuAlias=nomTableOuAlias;
-        this.nomAttribut=nomAttribut;
+    public OperandeAttribut(String identifiant) {
+        this.identifiant = identifiant;
     }
 
     @Override
-    public Valeur evaluer (Tuple tuple){
-        String cleComplete=this.nomTableOuAlias+"."+this.nomAttribut;
-
-        if (tuple.hasIdentifiant(cleComplete)){
-            return tuple.getValeur(cleComplete);
+    public Valeur evaluer(Tuple tuple) {
+        if (!tuple.hasIdentifiant(this.identifiant)) {
+            throw new AttributInexistantException(String.format(
+                "Attribut '%s' inexistant dans la relation", this.identifiant));
         }
-        return tuple.getValeur(this.nomAttribut);
+        return tuple.getValeur(this.identifiant);
     }
 }

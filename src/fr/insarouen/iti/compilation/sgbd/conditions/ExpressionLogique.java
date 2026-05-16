@@ -2,7 +2,6 @@ package fr.insarouen.iti.compilation.sgbd.conditions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import fr.insarouen.iti.compilation.sgbd.moteur.Tuple;
 
 public class ExpressionLogique{

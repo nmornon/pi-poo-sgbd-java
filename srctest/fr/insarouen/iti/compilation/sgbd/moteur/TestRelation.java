@@ -1,6 +1,7 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.equalTo;
 // import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -10,12 +11,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fr.insarouen.iti.compilation.sgbd.exceptions.PIAventureException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.AttributDejaExistantException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.AttributInexistantException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.ProduitCartesienException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansAttributException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.SelectionException;
 import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
 import fr.insarouen.iti.compilation.sgbd.conditions.ConditionSimple;
@@ -36,6 +38,7 @@ public class TestRelation {
     public static Collection<Tuple> tuplesBases = new ArrayList<>();
     public static Collection<Tuple> tuplesGadgets = new ArrayList<>();
 
+    @BeforeClass
     public static void initialiser() {
         TestRelation.attributsBases.clear();
         TestRelation.attributsBases.add(new Attribut("id", Type.SERIAL));
@@ -54,67 +57,72 @@ public class TestRelation {
         TestRelation.attributsGadgets.add(new Attribut("hero_id", Type.INT));
         TestRelation.attributsGadgets.add(new Attribut("puissance", Type.INT));
 
-        TestRelation.tuplesGadgets.clear();
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Batarang")).setValeur("hero_id", new Nombre(6)).setValeur("puissance", new Nombre(50)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Grappin")).setValeur("hero_id", new Nombre(6)).setValeur("puissance", new Nombre(30)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Velo de course")).setValeur("hero_id", new Nombre(7)).setValeur("puissance", new Nombre(40)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Casque Aero")).setValeur("hero_id", new Nombre(7)).setValeur("puissance", new Nombre(20)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Bouclier Solaire")).setValeur("hero_id", new Nombre(8)).setValeur("puissance", new Nombre(60)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Perruque de camouflage")).setValeur("hero_id", new Nombre(8)).setValeur("puissance", new Nombre(10)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Ordinateur portable")).setValeur("hero_id", new Nombre(9)).setValeur("puissance", new Nombre(80)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Moto Batgirl")).setValeur("hero_id", new Nombre(9)).setValeur("puissance", new Nombre(70)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Lunettes de BG")).setValeur("hero_id", new Nombre(10)).setValeur("puissance", new Nombre(90)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Parfum de charisme")).setValeur("hero_id", new Nombre(10)).setValeur("puissance", new Nombre(100)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Neural Network Optimizer")).setValeur("hero_id", new Nombre(11)).setValeur("puissance", new Nombre(85)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("GPU Overclocker")).setValeur("hero_id", new Nombre(11)).setValeur("puissance", new Nombre(95)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Multimetre")).setValeur("hero_id", new Nombre(12)).setValeur("puissance", new Nombre(45)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Resistance 10k Ohms")).setValeur("hero_id", new Nombre(12)).setValeur("puissance", new Nombre(15)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Trident")).setValeur("hero_id", new Nombre(13)).setValeur("puissance", new Nombre(88)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Bulle d''eau")).setValeur("hero_id", new Nombre(13)).setValeur("puissance", new Nombre(55)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Bo staff")).setValeur("hero_id", new Nombre(14)).setValeur("puissance", new Nombre(35)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("nom", new Chaine("Bat-cycle")).setValeur("hero_id", new Nombre(14)).setValeur("puissance", new Nombre(65)));
-
         TestRelation.tuplesBases.clear();
-        TestRelation.tuplesBases.add(new Tuple().setValeur("nom", new Chaine("BureauInfo")).setValeur("ville", new Chaine("ITICity")));
-        TestRelation.tuplesBases.add(new Tuple().setValeur("nom", new Chaine("BureauElec")).setValeur("ville", new Chaine("ITICity")));
-        TestRelation.tuplesBases.add(new Tuple().setValeur("nom", new Chaine("BureauML")).setValeur("ville", new Chaine("ITICity")));
-        TestRelation.tuplesBases.add(new Tuple().setValeur("nom", new Chaine("BureauDirectionITI")).setValeur("ville", new Chaine("ITICity")));
-        TestRelation.tuplesBases.add(new Tuple().setValeur("nom", new Chaine("BureauDirectionLITIS")).setValeur("ville", new Chaine("LITISCity")));
+        TestRelation.tuplesBases.add(new Tuple().setValeur("id", new Cle(1)).setValeur("nom", new Chaine("BureauInfo")).setValeur("ville", new Chaine("ITICity")));
+        TestRelation.tuplesBases.add(new Tuple().setValeur("id", new Cle(2)).setValeur("nom", new Chaine("BureauElec")).setValeur("ville", new Chaine("ITICity")));
+        TestRelation.tuplesBases.add(new Tuple().setValeur("id", new Cle(3)).setValeur("nom", new Chaine("BureauML")).setValeur("ville", new Chaine("ITICity")));
+        TestRelation.tuplesBases.add(new Tuple().setValeur("id", new Cle(4)).setValeur("nom", new Chaine("BureauDirectionITI")).setValeur("ville", new Chaine("ITICity")));
+        TestRelation.tuplesBases.add(new Tuple().setValeur("id", new Cle(5)).setValeur("nom", new Chaine("BureauDirectionLITIS")).setValeur("ville", new Chaine("LITISCity")));
         
         TestRelation.tuplesHeroes.clear();
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("nom", new Chaine("Nicola Malandain")).setValeur("alias", new Chaine("Batman")).setValeur("base_id", new Nombre(1)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("nom", new Chaine("Nicolas Delestre")).setValeur("alias", new Chaine("Bikeman")).setValeur("base_id", new Nombre(1)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("nom", new Chaine("Florian Yger")).setValeur("alias", new Chaine("Baldman")).setValeur("base_id", new Nombre(1)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("nom", new Chaine("Geraldine Del Mondo")).setValeur("alias", new Chaine("Batgirl")).setValeur("base_id", new Nombre(4)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("nom", new Chaine("Benoit Gauzere")).setValeur("alias", new Chaine("BGman")).setValeur("base_id", new Nombre(3)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("nom", new Chaine("Clement Chatelain")).setValeur("alias", new Chaine("MLman")).setValeur("base_id", new Nombre(5)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("nom", new Chaine("Hind Laghmara")).setValeur("alias", new Chaine("Resistorwoman")).setValeur("base_id", new Nombre(2)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("nom", new Chaine("Laurent Vercouter")).setValeur("alias", new Chaine("Aquaman")).setValeur("base_id", new Nombre(5)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("nom", new Chaine("Robin Condat")).setValeur("alias", new Chaine("Robin")).setValeur("base_id", new Nombre(2)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(6)).setValeur("nom", new Chaine("Nicola Malandain")).setValeur("alias", new Chaine("Batman")).setValeur("base_id", new Nombre(1)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(7)).setValeur("nom", new Chaine("Nicolas Delestre")).setValeur("alias", new Chaine("Bikeman")).setValeur("base_id", new Nombre(1)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(8)).setValeur("nom", new Chaine("Florian Yger")).setValeur("alias", new Chaine("Baldman")).setValeur("base_id", new Nombre(1)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(9)).setValeur("nom", new Chaine("Geraldine Del Mondo")).setValeur("alias", new Chaine("Batgirl")).setValeur("base_id", new Nombre(4)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(10)).setValeur("nom", new Chaine("Benoit Gauzere")).setValeur("alias", new Chaine("BGman")).setValeur("base_id", new Nombre(3)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(11)).setValeur("nom", new Chaine("Clement Chatelain")).setValeur("alias", new Chaine("MLman")).setValeur("base_id", new Nombre(5)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(12)).setValeur("nom", new Chaine("Hind Laghmara")).setValeur("alias", new Chaine("Resistorwoman")).setValeur("base_id", new Nombre(2)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(13)).setValeur("nom", new Chaine("Laurent Vercouter")).setValeur("alias", new Chaine("Aquaman")).setValeur("base_id", new Nombre(5)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(14)).setValeur("nom", new Chaine("Robin Condat")).setValeur("alias", new Chaine("Robin")).setValeur("base_id", new Nombre(2)));
+
+        TestRelation.tuplesGadgets.clear();
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(15)).setValeur("nom", new Chaine("Batarang")).setValeur("hero_id", new Nombre(6)).setValeur("puissance", new Nombre(50)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(16)).setValeur("nom", new Chaine("Grappin")).setValeur("hero_id", new Nombre(6)).setValeur("puissance", new Nombre(30)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(17)).setValeur("nom", new Chaine("Velo de course")).setValeur("hero_id", new Nombre(7)).setValeur("puissance", new Nombre(40)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(18)).setValeur("nom", new Chaine("Casque Aero")).setValeur("hero_id", new Nombre(7)).setValeur("puissance", new Nombre(20)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(19)).setValeur("nom", new Chaine("Bouclier Solaire")).setValeur("hero_id", new Nombre(8)).setValeur("puissance", new Nombre(60)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(20)).setValeur("nom", new Chaine("Perruque de camouflage")).setValeur("hero_id", new Nombre(8)).setValeur("puissance", new Nombre(10)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(21)).setValeur("nom", new Chaine("Ordinateur portable")).setValeur("hero_id", new Nombre(9)).setValeur("puissance", new Nombre(80)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(22)).setValeur("nom", new Chaine("Moto Batgirl")).setValeur("hero_id", new Nombre(9)).setValeur("puissance", new Nombre(70)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(23)).setValeur("nom", new Chaine("Lunettes de BG")).setValeur("hero_id", new Nombre(10)).setValeur("puissance", new Nombre(90)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(24)).setValeur("nom", new Chaine("Parfum de charisme")).setValeur("hero_id", new Nombre(10)).setValeur("puissance", new Nombre(100)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(25)).setValeur("nom", new Chaine("Neural Network Optimizer")).setValeur("hero_id", new Nombre(11)).setValeur("puissance", new Nombre(85)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(26)).setValeur("nom", new Chaine("GPU Overclocker")).setValeur("hero_id", new Nombre(11)).setValeur("puissance", new Nombre(95)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(27)).setValeur("nom", new Chaine("Multimetre")).setValeur("hero_id", new Nombre(12)).setValeur("puissance", new Nombre(45)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(28)).setValeur("nom", new Chaine("Resistance 10k Ohms")).setValeur("hero_id", new Nombre(12)).setValeur("puissance", new Nombre(15)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(29)).setValeur("nom", new Chaine("Trident")).setValeur("hero_id", new Nombre(13)).setValeur("puissance", new Nombre(88)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(30)).setValeur("nom", new Chaine("Bulle d''eau")).setValeur("hero_id", new Nombre(13)).setValeur("puissance", new Nombre(55)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(31)).setValeur("nom", new Chaine("Bo staff")).setValeur("hero_id", new Nombre(14)).setValeur("puissance", new Nombre(35)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(32)).setValeur("nom", new Chaine("Bat-cycle")).setValeur("hero_id", new Nombre(14)).setValeur("puissance", new Nombre(65)));
 
         TestRelation.relationBases = new Relation("bases", TestRelation.attributsBases, TestRelation.tuplesBases);
         TestRelation.relationHeroes = new Relation("heroes", TestRelation.attributsHeroes, TestRelation.tuplesHeroes);
         TestRelation.relationGadgets = new Relation("gadgets", TestRelation.attributsGadgets, TestRelation.tuplesGadgets);
     }
 
-    @BeforeClass
-    public static void avantTout() {
-        TestRelation.initialiser();
-    }
-
-    @Test(expected = PIAventureException.class)
-    public void test_constructeur_identifiantNull() {
-        new Relation(null, attributsBases);
-    }
-
-    @Test(expected = PIAventureException.class)
-    public void test_constructeur_identifiantVide() {
-        new Relation("", attributsBases);
-    }
-
-    @Test(expected = PIAventureException.class)
-    public void test_constructeur_attributsVide() {
+    @Test(expected = RelationSansAttributException.class)
+    public void test_constructeur_avecAttributsVide() {
         new Relation("relation", new ArrayList<>());
+    }
+
+    @Test(expected = AttributDejaExistantException.class)
+    public void test_constructeur_avecAttributEnDouble() {
+        Collection<Attribut> attributs = List.of(
+            new Attribut("id", Type.SERIAL),
+            new Attribut("id", Type.SERIAL)
+        );
+        new Relation("relation", attributs);
+    }
+
+    @Test(expected = AttributInexistantException.class)
+    public void test_constructeur_tupleAvecAttributInexistant() {
+        Collection<Attribut> attributs = List.of(
+            new Attribut("id", Type.SERIAL)
+        );
+        Collection<Tuple> tuples = List.of(
+            new Tuple().setValeur("attribut_inexistant", new Nombre(0))
+        );
+        new Relation("relation", attributs, tuples);
     }
 
     @Test
@@ -137,7 +145,7 @@ public class TestRelation {
 
     @Test
     public void test_getAttribut_attributInexistant() {
-        assertThat(relationBases.getAttribut("id"), equalTo(new Attribut("id", Type.SERIAL)));
+        assertThat(relationBases.getAttribut("attribut_inexistant"), nullValue());
     }
 
     @Test
@@ -172,6 +180,7 @@ public class TestRelation {
     public void test_produitCartesien_avecDeuxRelations() {
         Relation produit = relationBases.produitCartesien(relationHeroes);
         
+        assertThat(produit.getIdentifiant(), equalTo("bases_heroes"));
         assertThat(produit.hasAttribut("bases.id"), is(true));
         assertThat(produit.hasAttribut("bases.nom"), is(true));
         assertThat(produit.hasAttribut("bases.ville"), is(true));
@@ -185,9 +194,11 @@ public class TestRelation {
     public void test_produitCartesien_avecTroisRelations() {
         Relation produit = relationBases.produitCartesien(List.of(relationHeroes, relationGadgets));
         
+        assertThat(produit.getIdentifiant(), equalTo("bases_heroes_gadgets"));
         assertThat(produit.hasAttribut("bases.id"), is(true));
         assertThat(produit.hasAttribut("bases.nom"), is(true));
         assertThat(produit.hasAttribut("bases.ville"), is(true));
+
         assertThat(produit.hasAttribut("heroes.id"), is(true));
         assertThat(produit.hasAttribut("heroes.nom"), is(true));
         assertThat(produit.hasAttribut("heroes.alias"), is(true));
@@ -205,6 +216,7 @@ public class TestRelation {
         Relation relation2 = relationBases.alias("B2");
         Relation produit = relation1.produitCartesien(relation2);
         
+        assertThat(produit.getIdentifiant(), equalTo("B1_B2"));
         assertThat(produit.hasAttribut("B1.id"), is(true));
         assertThat(produit.hasAttribut("B1.nom"), is(true));
         assertThat(produit.hasAttribut("B1.ville"), is(true));

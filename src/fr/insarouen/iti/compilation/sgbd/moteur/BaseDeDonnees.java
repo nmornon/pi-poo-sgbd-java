@@ -4,20 +4,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import fr.insarouen.iti.compilation.sgbd.exceptions.TableDejaExistanteException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
 
 public class BaseDeDonnees {
     private String identifiant;
-    private long nbLignes;
+    private int prochainSerial;
     private boolean estOuvert = true;
     private Collection<Table> tables = new ArrayList<>();
-    
 
-    public BaseDeDonnees(String identifiant, Collection<Table> tabs, long ligne){
+    public BaseDeDonnees(String identifiant){
+        this(identifiant, 1);
+    }
+
+    public BaseDeDonnees(String identifiant, int dernierSerial){
+        this(identifiant, new ArrayList<>(), dernierSerial);
+    }
+
+    public BaseDeDonnees(String identifiant, Collection<Table> tables){
+        this(identifiant, tables, 1);
+    }
+
+    public BaseDeDonnees(String identifiant, Collection<Table> tables, int dernierSerial){
         this.identifiant = identifiant;
-        this.tables.addAll(tabs);
-        this.nbLignes = ligne;
-        
+        this.tables.addAll(tables);
+        this.prochainSerial = dernierSerial;
     }
 
     public boolean getEstOuverte() {
@@ -32,50 +43,63 @@ public class BaseDeDonnees {
         return this.identifiant;
     }
 
-    public long getNbLignes() {
-        return this.nbLignes;
+    public Cle getProchaineCle() {
+        return new Cle(this.prochainSerial++);
     }
 
     public Collection<Table> getTables() {
         return new ArrayList <> (this.tables);
     }
 
-    public void setLigne(long ligne) {
-        this.nbLignes = ligne;
-    } 
-
-    public Table getTable(String identifiant) throws TableInexistanteException{
-        for (Table o : this.tables) {
-            if (o.getIdentifiant().equals(identifiant)) {
-                return o;
+    public boolean hasTable(String identifiant) {
+        for (Table table : this.tables) {
+            if (table.getIdentifiant().equals(identifiant)) {
+                return true;
             }
         }
-        throw new TableInexistanteException("La table n'est pas présente dans la base de donnees");
+        return false;
+    }
+
+    public Table getTable(String identifiant) {
+        for (Table table : this.tables) {
+            if (table.getIdentifiant().equals(identifiant)) {
+                return table;
+            }
+        }
+        throw new TableInexistanteException(String.format(
+            "La table '%s' n'est pas présente dans la base de données",
+            identifiant));
     }
 
     public Table creerTable(String identifiant, Collection<Attribut> donnees) {
-        Table table = new Table(identifiant, donnees);
+        if (this.hasTable(identifiant)) {
+            throw new TableDejaExistanteException(String.format("la table '%s' existe déjà", identifiant));
+        }
+        Table table = new Table(this, identifiant, donnees);
         this.tables.add(table);
         return table;
     }
 
     public Table creerTable(String identifiant, Collection<Attribut> donnees, Collection<Tuple> tuples) {
-        Table table = new Table(identifiant, donnees, tuples);
+        Table table = new Table(this, identifiant, donnees, tuples);
         this.tables.add(table);
         return table;
     }
 
-    public void supprimerTable(String id)  throws TableInexistanteException{
+    public void supprimerTable(String identifiant)  throws TableInexistanteException{
         Iterator<Table> it = this.tables.iterator();
+
         while (it.hasNext()) {
             Table o = it.next();
 
-            if (o.getIdentifiant().equals(id)) {
+            if (o.getIdentifiant().equals(identifiant)) {
                 it.remove();
                 return;
             }
         }
-        throw new TableInexistanteException("La table n'est pas présente dans la base de donnees");
+        throw new TableInexistanteException(String.format(
+            "La table '%s' n'est pas présente dans la base de données",
+            identifiant));
     }
 
     public void afficherTables() {

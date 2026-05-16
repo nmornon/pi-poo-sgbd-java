@@ -2,10 +2,14 @@ package fr.insarouen.iti.compilation.sgbd.moteur;
 
 import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 
 public class Table extends Relation {
+    private BaseDeDonnees baseDeDonnees;
 
     /**
      * Constructeur de la classe Table
@@ -14,8 +18,12 @@ public class Table extends Relation {
      * 
      * @throws TypeInvalideException
      */
-    public Table(String identifiant, Collection<Attribut> attributs) {
-        super(identifiant, attributs);
+    public Table(
+        BaseDeDonnees baseDeDonnees,
+        String identifiant,
+        Collection<Attribut> attributs
+    ) {
+        this(baseDeDonnees, identifiant, attributs, new ArrayList<>());
     }
 
     /**
@@ -26,29 +34,35 @@ public class Table extends Relation {
      * 
      * @throws TypeInvalideException
      */
-    public Table(String identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
+    public Table(
+        BaseDeDonnees baseDeDonnees,
+        String identifiant,
+        Collection<Attribut> attributs,
+        Collection<Tuple> tuples
+    ) {
         super(identifiant, attributs, tuples);
+        this.baseDeDonnees = baseDeDonnees;
     }
 
     /**
-     * Méthode permettant d'insérer plusieurs tuples en une fois dans la table
+     * Insére un tuple dans la table.
      * 
-     * On vérifie d'abord si tous les tuples sont valides, ensuite si il n'y a aucune erreur
-     * on les rajoute tous
-     * 
-     * @param tuples tableau de tuples
+     * @param tuple le tuple à insérer
      */
-    public void inserer(Collection<Tuple> tuples) throws TypeInvalideException {
-        for(Tuple tuple : tuples){
-            this.verifierTuple(tuple);
+    public void inserer(Tuple tuple) {
+        for (Attribut attribut : this.getAttributs()) {
+            if (attribut.type() == Type.SERIAL) {
+                if (!tuple.hasIdentifiant(attribut.identifiant())) {
+                    tuple.setValeur(attribut.identifiant(), this.baseDeDonnees.getProchaineCle());
+                }
+            }
         }
-        for(Tuple tuple : tuples){
-            this.getTuples().add(tuple);
-        }
+        this.verifierTuple(tuple);
+        this.getTuples().add(tuple);
     }
 
     /**
-     * Supprime tous les tuple de la relation
+     * Supprime tous les tuples de la table.
      * 
      * @return le nombre de tuples qui ont été supprimés
      */
@@ -59,13 +73,38 @@ public class Table extends Relation {
     }
 
     /**
-     * Méthode permettant de supprimer des tuples de la table selon une expression logique
+     * Supprimer les tuples de la table selon l'expression logique spécifiée.
      * 
-     * @param condition condition à appliquer pour supprimer certains tuples (~filtre)
-     * @return le nombre de tuples qui a été supprimé avec la condition
+     * @param condition la condition à appliquer sur les tuples à supprimé
+     * @return le nombre de tuples supprimés
      */
     public int supprimer(ExpressionLogique condition) {
-        // this.getTuples().delete()
-        return 0;
+        Iterator<Tuple> iterator = this.getTuples().iterator();
+        int nbTuplesSupprimes = 0;
+
+        while (iterator.hasNext()) {
+            if (condition.evaluer(iterator.next())) {
+                iterator.remove();
+                nbTuplesSupprimes++;
+            }
+        }
+        return nbTuplesSupprimes;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof Table table)) {
+            return false;
+        }
+        return this.baseDeDonnees == table.baseDeDonnees
+            && this.getIdentifiant().equals(table.getIdentifiant())
+            && this.getAttributs().equals(table.getAttributs())
+            && this.getTuples().equals(table.getTuples());
     }
 }

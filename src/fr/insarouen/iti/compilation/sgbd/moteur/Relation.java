@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
 
-
-import fr.insarouen.iti.compilation.sgbd.exceptions.PIAventureException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.AttributDejaExistantException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.AttributInexistantException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.ProduitCartesienException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansAttributException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.SelectionException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
 import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
@@ -23,9 +22,8 @@ class Relation {
     /** La liste des attributs de la relation */
     private Set<Attribut> attributs = new HashSet<>();
     /** La liste des tuples de la relation */
-    private final Collection<Tuple> tuples = new ArrayList<>();
-    /**compteur serial */
-    private static int prochainSerial=1;
+    private Collection<Tuple> tuples = new ArrayList<>();
+
     /**
      * Construit une relation à partir de la liste d'attributs spécifiée.
      * 
@@ -46,35 +44,22 @@ class Relation {
      *                       attributs
      */
     public Relation(String identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
-        if (identifiant == null || identifiant.isEmpty()) {
-            throw new PIAventureException("L'identifiant ne peut pas être null ou vide");
-        }
         this.identifiant = identifiant;
 
         if (attributs.isEmpty()) {
-            throw new PIAventureException("Une relation doit avoir au moins un attribut");
+            throw new RelationSansAttributException("Une relation doit avoir au moins un attribut");
         }
 
         for (Attribut attribut : attributs) {
-            if (this.attributs.contains(attribut)) {
-                throw new PIAventureException("Attribut doublon");
+            if (this.hasAttribut(attribut.identifiant())) {
+                throw new AttributDejaExistantException("Deux attributs ne peuvent pas avoir le même identifiant");
             }
             this.attributs.add(attribut);
         }
 	
-        if (tuples != null) {
-            for (Tuple tuple : tuples) {
-            
-            	for (Attribut attribut : this.getAttributs()){
-            		if (attribut.type()==Type.SERIAL && !tuple.hasIdentifiant(attribut.identifiant())){
-            			tuple.setValeur(attribut.identifiant(),new Cle(prochainSerial));
-                        prochainSerial++;
-            		}
-            	}
-                this.verifierTuple(tuple);
-                this.tuples.add(tuple);
-                
-            }
+        for (Tuple tuple : tuples) {
+            this.verifierTuple(tuple);
+            this.tuples.add(tuple);
         }
     }
 
@@ -135,10 +120,14 @@ class Relation {
                 Valeur valeur = tuple.getValeur(attribut.identifiant());
 
                 if (attribut.type() != valeur.getType()) {
-                    throw new TypeInvalideException("Type invalide");
+                    throw new TypeInvalideException(String.format(
+                        "Type de valeur invalide pour l'attribut '%s', type attendu : '%s'",
+                        attribut.identifiant(), attribut.type().name()));
                 }
-            } else if (attribut.type() != Type.SERIAL) {
-                throw new TypeInvalideException("Attribut inexistant");
+            } else {
+                throw new AttributInexistantException(String.format(
+                    "Attribut '%s' inexistant dans la relation '%s'",
+                    attribut.identifiant(), this.identifiant));
             }
         }
     }
