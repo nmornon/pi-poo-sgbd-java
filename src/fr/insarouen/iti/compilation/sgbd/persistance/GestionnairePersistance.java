@@ -1,12 +1,13 @@
 package fr.insarouen.iti.compilation.sgbd.persistance;
 
 import java.io.ObjectOutputStream;
+
+import fr.insarouen.iti.compilation.sgbd.moteur.BaseDeDonnees;
+
 import java.io.ObjectInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.FileOutputStream;
-
-import fr.insarouen.iti.compilation.sgbd.moteur.BaseDeDonnees;
 
 public class GestionnairePersistance {
 

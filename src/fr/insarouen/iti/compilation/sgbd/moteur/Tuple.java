@@ -3,6 +3,8 @@ package fr.insarouen.iti.compilation.sgbd.moteur;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Valeur;
+
 public class Tuple {
     private Map<String, Valeur> valeurs;
 
@@ -28,7 +30,7 @@ public class Tuple {
     }
 
     /**
-     * Préfixe chaque attribut du tuple avec le préfixe spécifié s'il n'est pas
+     * Préfixe chaque colonne du tuple avec le préfixe spécifié s'il n'est pas
      * déjà préfixé.
      * 
      * @param prefix le préfix

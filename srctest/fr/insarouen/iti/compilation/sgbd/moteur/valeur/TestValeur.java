@@ -1,6 +1,9 @@
-package fr.insarouen.iti.compilation.sgbd.moteur;
+package fr.insarouen.iti.compilation.sgbd.moteur.valeur;
 
 import org.junit.Test;
+
+import fr.insarouen.iti.compilation.sgbd.moteur.Type;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,9 +26,9 @@ public class TestValeur {
 
     @Test
     public void testNombre() {
-        Valeur nb = new Nombre(11);
-        Valeur memeNb = new Nombre(11);
-        Valeur autreNb = new Nombre(12);
+        Valeur nb = new Entier(11);
+        Valeur memeNb = new Entier(11);
+        Valeur autreNb = new Entier(12);
         assertEquals(11, nb.getValeur());
         assertNotEquals(12, nb.getValeur());
         assertEquals(Type.INT, nb.getType());

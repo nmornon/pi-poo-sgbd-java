@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableDejaExistanteException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
 
 public class BaseDeDonnees {
     private String identifiant;
@@ -71,7 +72,7 @@ public class BaseDeDonnees {
             identifiant));
     }
 
-    public Table creerTable(String identifiant, Collection<Attribut> donnees) {
+    public Table creerTable(String identifiant, Collection<Colonne> donnees) {
         if (this.hasTable(identifiant)) {
             throw new TableDejaExistanteException(String.format("la table '%s' existe déjà", identifiant));
         }
@@ -80,7 +81,7 @@ public class BaseDeDonnees {
         return table;
     }
 
-    public Table creerTable(String identifiant, Collection<Attribut> donnees, Collection<Tuple> tuples) {
+    public Table creerTable(String identifiant, Collection<Colonne> donnees, Collection<Tuple> tuples) {
         Table table = new Table(this, identifiant, donnees, tuples);
         this.tables.add(table);
         return table;

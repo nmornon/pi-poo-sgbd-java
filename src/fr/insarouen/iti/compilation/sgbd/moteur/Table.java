@@ -1,11 +1,11 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
-import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
-import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+
+import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
+import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
 
 
 public class Table extends Relation {
@@ -14,22 +14,22 @@ public class Table extends Relation {
     /**
      * Constructeur de la classe Table
      * @param identifiant identifiant de la table
-     * @param attributs liste d'attributs décrivant la table
+     * @param colonnes liste d'colonnes décrivant la table
      * 
      * @throws TypeInvalideException
      */
     public Table(
         BaseDeDonnees baseDeDonnees,
         String identifiant,
-        Collection<Attribut> attributs
+        Collection<Colonne> colonnes
     ) {
-        this(baseDeDonnees, identifiant, attributs, new ArrayList<>());
+        this(baseDeDonnees, identifiant, colonnes, new ArrayList<>());
     }
 
     /**
      * Constructeur de la classe Table
      * @param identifiant identifiant de la table
-     * @param attributs liste d'attributs décrivant la table
+     * @param colonnes liste d'colonnes décrivant la table
      * @param tuples tuples à ajouter à la création de la table
      * 
      * @throws TypeInvalideException
@@ -37,10 +37,10 @@ public class Table extends Relation {
     public Table(
         BaseDeDonnees baseDeDonnees,
         String identifiant,
-        Collection<Attribut> attributs,
+        Collection<Colonne> colonnes,
         Collection<Tuple> tuples
     ) {
-        super(identifiant, attributs, tuples);
+        super(identifiant, colonnes, tuples);
         this.baseDeDonnees = baseDeDonnees;
     }
 
@@ -50,10 +50,10 @@ public class Table extends Relation {
      * @param tuple le tuple à insérer
      */
     public void inserer(Tuple tuple) {
-        for (Attribut attribut : this.getAttributs()) {
-            if (attribut.type() == Type.SERIAL) {
-                if (!tuple.hasIdentifiant(attribut.identifiant())) {
-                    tuple.setValeur(attribut.identifiant(), this.baseDeDonnees.getProchaineCle());
+        for (Colonne colonne : this.getColonnes()) {
+            if (colonne.type() == Type.SERIAL) {
+                if (!tuple.hasIdentifiant(colonne.identifiant())) {
+                    tuple.setValeur(colonne.identifiant(), this.baseDeDonnees.getProchaineCle());
                 }
             }
         }
@@ -104,7 +104,7 @@ public class Table extends Relation {
         }
         return this.baseDeDonnees == table.baseDeDonnees
             && this.getIdentifiant().equals(table.getIdentifiant())
-            && this.getAttributs().equals(table.getAttributs())
+            && this.getColonnes().equals(table.getColonnes())
             && this.getTuples().equals(table.getTuples());
     }
 }

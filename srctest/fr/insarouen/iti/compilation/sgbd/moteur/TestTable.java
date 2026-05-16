@@ -15,11 +15,14 @@ import org.junit.Test;
 import fr.insarouen.iti.compilation.sgbd.conditions.Comparateur;
 import fr.insarouen.iti.compilation.sgbd.conditions.ConditionSimple;
 import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
-import fr.insarouen.iti.compilation.sgbd.conditions.OperandeAttribut;
+import fr.insarouen.iti.compilation.sgbd.conditions.OperandeColonne;
 import fr.insarouen.iti.compilation.sgbd.conditions.OperandeValeur;
-import fr.insarouen.iti.compilation.sgbd.exceptions.AttributDejaExistantException;
-import fr.insarouen.iti.compilation.sgbd.exceptions.AttributInexistantException;
-import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansAttributException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.ColonneDejaExistantException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.ColonneInexistantException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansColonneException;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
 
 public class TestTable {
     public static BaseDeDonnees baseDeDonnees;
@@ -32,19 +35,19 @@ public class TestTable {
         baseDeDonnees = new BaseDeDonnees("bdd", 4);
 
         table = baseDeDonnees.creerTable("personnes", List.of(
-            new Attribut("id", Type.SERIAL),
-            new Attribut("nom", Type.VARCHAR),
-            new Attribut("age", Type.INT)
+            new Colonne("id", Type.SERIAL),
+            new Colonne("nom", Type.VARCHAR),
+            new Colonne("age", Type.INT)
         ), List.of(
             new Tuple().setValeur("id", new Cle(1))
                        .setValeur("nom", new Chaine("Alice"))
-                       .setValeur("age", new Nombre(25)),
+                       .setValeur("age", new Entier(25)),
             new Tuple().setValeur("id", new Cle(2))
                        .setValeur("nom", new Chaine("Bob"))
-                       .setValeur("age", new Nombre(30)),
+                       .setValeur("age", new Entier(30)),
             new Tuple().setValeur("id", new Cle(3))
                        .setValeur("nom", new Chaine("Charly"))
-                       .setValeur("age", new Nombre(35))
+                       .setValeur("age", new Entier(35))
         ));
     }
 
@@ -56,45 +59,45 @@ public class TestTable {
     @Test
     public void test_constructeur() {
         assertThat(table.getIdentifiant(), equalTo("personnes"));
-        assertThat(table.hasAttribut("id"), is(true));
-        assertThat(table.hasAttribut("nom"), is(true));
-        assertThat(table.hasAttribut("age"), is(true));
+        assertThat(table.hasColonne("id"), is(true));
+        assertThat(table.hasColonne("nom"), is(true));
+        assertThat(table.hasColonne("age"), is(true));
     }
     
-    @Test(expected = RelationSansAttributException.class)
-    public void test_constructeur_attributsVide() {
+    @Test(expected = RelationSansColonneException.class)
+    public void test_constructeur_colonnesVide() {
         new Table(baseDeDonnees, "table", Collections.emptyList());
     }
 
-    @Test(expected = AttributDejaExistantException.class)
-    public void test_constructeur_avecAttributEnDouble() {
-        Collection<Attribut> attributs = List.of(
-            new Attribut("id", Type.SERIAL),
-            new Attribut("id", Type.SERIAL)
+    @Test(expected = ColonneDejaExistantException.class)
+    public void test_constructeur_avecColonneEnDouble() {
+        Collection<Colonne> colonnes = List.of(
+            new Colonne("id", Type.SERIAL),
+            new Colonne("id", Type.SERIAL)
         );
-        new Table(baseDeDonnees, "table", attributs);
+        new Table(baseDeDonnees, "table", colonnes);
     }
 
-    @Test(expected = AttributInexistantException.class)
-    public void test_constructeur_tupleAvecAttributInexistant() {
-        Collection<Attribut> attributs = List.of(
-            new Attribut("id", Type.SERIAL)
+    @Test(expected = ColonneInexistantException.class)
+    public void test_constructeur_tupleAvecColonneInexistant() {
+        Collection<Colonne> colonnes = List.of(
+            new Colonne("id", Type.SERIAL)
         );
         Collection<Tuple> tuples = List.of(
-            new Tuple().setValeur("attribut_inexistant", new Nombre(0))
+            new Tuple().setValeur("colonne_inexistant", new Entier(0))
         );
-        new Table(baseDeDonnees, "table", attributs, tuples);
+        new Table(baseDeDonnees, "table", colonnes, tuples);
     }
 
     @Test
     public void test_inserer() {
         Tuple tuple1 = new Tuple()
                 .setValeur("nom", new Chaine("Delestre"))
-                .setValeur("age", new Nombre(42));
+                .setValeur("age", new Entier(42));
 
         Tuple tuple2 = new Tuple()
                 .setValeur("nom", new Chaine("Malandin"))
-                .setValeur("age", new Nombre(42 * 4));
+                .setValeur("age", new Entier(42 * 4));
 
         table.inserer(tuple1);
         table.inserer(tuple2);
@@ -104,9 +107,9 @@ public class TestTable {
         assertThat(tuple2.getValeur("id"), equalTo(new Cle(5)));
     }
 
-    @Test(expected = AttributInexistantException.class)
-    public void test_inserer_tupleAvecAttributInexistant() {
-        table.inserer(new Tuple().setValeur("poids", new Nombre(70)));
+    @Test(expected = ColonneInexistantException.class)
+    public void test_inserer_tupleAvecColonneInexistant() {
+        table.inserer(new Tuple().setValeur("poids", new Entier(70)));
     }
 
     @Test
@@ -121,8 +124,8 @@ public class TestTable {
     public void test_supprimer_tousLesTuples() {
         ExpressionLogique condition = new ExpressionLogique();
         condition.ajouterCondition(new ConditionSimple(
-            new OperandeAttribut("age"),
-            new OperandeValeur(new Nombre(30)),
+            new OperandeColonne("age"),
+            new OperandeValeur(new Entier(30)),
             Comparateur.SUPERIEUR
         ));
         assertThat(table.supprimer(condition), is(1));

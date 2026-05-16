@@ -1,6 +1,8 @@
-package fr.insarouen.iti.compilation.sgbd.moteur;
+package fr.insarouen.iti.compilation.sgbd.moteur.valeur;
 
-public abstract class Valeur {
+import fr.insarouen.iti.compilation.sgbd.moteur.Type;
+
+public abstract class Valeur implements Comparable<Valeur> {
     private Type type;
     private Object valeur;
 

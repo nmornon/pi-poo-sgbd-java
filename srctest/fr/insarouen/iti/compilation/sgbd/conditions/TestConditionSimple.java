@@ -3,12 +3,11 @@ package fr.insarouen.iti.compilation.sgbd.conditions;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.Test;
 
-import fr.insarouen.iti.compilation.sgbd.conditions.*;
 import fr.insarouen.iti.compilation.sgbd.moteur.*;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
 
 public class TestConditionSimple{
 
@@ -16,8 +15,8 @@ public class TestConditionSimple{
         Tuple hero=new Tuple();
 
         hero.setValeur("Hero.nom",new Chaine("Batman"));
-        hero.setValeur("Hero.puissance",new Nombre(100));
-        hero.setValeur("Hero.age",new Nombre(40));
+        hero.setValeur("Hero.puissance",new Entier(100));
+        hero.setValeur("Hero.age",new Entier(40));
 
         return hero;
     }
@@ -28,8 +27,8 @@ public class TestConditionSimple{
         Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
-            new OperandeAttribut("Hero","puissance"),
-            new OperandeValeur(new Nombre(50)),
+            new OperandeColonne("Hero","puissance"),
+            new OperandeValeur(new Entier(50)),
             Comparateur.SUPERIEUR
         );
         
@@ -42,8 +41,8 @@ public class TestConditionSimple{
         Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
-            new OperandeAttribut("Hero","puissance"),
-            new OperandeValeur(new Nombre(200)),
+            new OperandeColonne("Hero","puissance"),
+            new OperandeValeur(new Entier(200)),
             Comparateur.SUPERIEUR
         );
         
@@ -56,8 +55,8 @@ public class TestConditionSimple{
         Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
-            new OperandeAttribut("Hero","age"),
-            new OperandeValeur(new Nombre(50)),
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(50)),
             Comparateur.INFERIEUR
         );
         
@@ -70,8 +69,8 @@ public class TestConditionSimple{
         Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
-            new OperandeAttribut("Hero","age"),
-            new OperandeValeur(new Nombre(30)),
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(30)),
             Comparateur.INFERIEUR
         );
         
@@ -84,7 +83,7 @@ public class TestConditionSimple{
         Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
-            new OperandeAttribut("Hero","nom"),
+            new OperandeColonne("Hero","nom"),
             new OperandeValeur(new Chaine("Batman")),
             Comparateur.EGAL
         );
@@ -98,7 +97,7 @@ public class TestConditionSimple{
         Tuple tuple = tupleHero();
 
         ConditionSimple condition= new ConditionSimple(
-            new OperandeAttribut("Hero","nom"),
+            new OperandeColonne("Hero","nom"),
             new OperandeValeur(new Chaine("Joker")),
             Comparateur.EGAL
         );

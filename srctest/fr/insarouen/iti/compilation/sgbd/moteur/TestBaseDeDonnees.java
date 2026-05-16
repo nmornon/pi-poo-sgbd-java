@@ -13,28 +13,28 @@ import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
 
 public class TestBaseDeDonnees {
     private BaseDeDonnees bdd;
-    private Collection<Attribut> attributs;
+    private Collection<Colonne> colonnes;
 
     @Before
     public void avantTest() {
         bdd = new BaseDeDonnees("base");
-        attributs = List.of(
-            new Attribut("id", Type.SERIAL),
-            new Attribut("nom", Type.VARCHAR),
-            new Attribut("age", Type.INT)
+        colonnes = List.of(
+            new Colonne("id", Type.SERIAL),
+            new Colonne("nom", Type.VARCHAR),
+            new Colonne("age", Type.INT)
         );
     }
 
     @Test
     public void test_creerTable() throws TableInexistanteException{
-        bdd.creerTable("table", attributs);
+        bdd.creerTable("table", colonnes);
         assertThat(bdd.hasTable("table"), is(true));
     }
 
     @Test(expected = TableDejaExistanteException.class)
     public void test_creerTable_avecTableDejaExistante() throws TableInexistanteException{
-        bdd.creerTable("table", attributs);
-        bdd.creerTable("table", attributs);
+        bdd.creerTable("table", colonnes);
+        bdd.creerTable("table", colonnes);
     }
 
     @Test(expected = TableInexistanteException.class)
@@ -44,7 +44,7 @@ public class TestBaseDeDonnees {
     
     @Test
     public void test_supprimerTable() throws TableInexistanteException{
-        bdd.creerTable("table", attributs);
+        bdd.creerTable("table", colonnes);
         bdd.supprimerTable("table");
         assertThat(bdd.hasTable("table"), is(false));
     }

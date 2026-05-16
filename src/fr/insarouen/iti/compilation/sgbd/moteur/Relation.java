@@ -5,13 +5,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import fr.insarouen.iti.compilation.sgbd.exceptions.AttributDejaExistantException;
-import fr.insarouen.iti.compilation.sgbd.exceptions.AttributInexistantException;
+import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
+import fr.insarouen.iti.compilation.sgbd.exceptions.ColonneDejaExistantException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.ColonneInexistantException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.ProduitCartesienException;
-import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansAttributException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansColonneException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.SelectionException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
-import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Valeur;
 
 /**
  * Classe représentant une relation.
@@ -19,42 +20,42 @@ import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
 class Relation {
     /** L'identifiant de la relation */
     private String identifiant;
-    /** La liste des attributs de la relation */
-    private Set<Attribut> attributs = new HashSet<>();
+    /** La liste des colonnes de la relation */
+    private Set<Colonne> colonnes = new HashSet<>();
     /** La liste des tuples de la relation */
     private Collection<Tuple> tuples = new ArrayList<>();
 
     /**
-     * Construit une relation à partir de la liste d'attributs spécifiée.
+     * Construit une relation à partir de la liste d'colonnes spécifiée.
      * 
-     * @param attributs la liste des attributs
+     * @param colonnes la liste des colonnes
      */
-    public Relation(String identifiant, Collection<Attribut> attributs) {
-        this(identifiant, attributs, new ArrayList<>());
+    public Relation(String identifiant, Collection<Colonne> colonnes) {
+        this(identifiant, colonnes, new ArrayList<>());
     }
 
     /**
-     * Construit une relation à partir de la liste d'attributs spécifiée et de
+     * Construit une relation à partir de la liste d'colonnes spécifiée et de
      * la liste de tuples spécifiée.
      * 
-     * @param attributs la liste des attributs
+     * @param colonnes la liste des colonnes
      * @param tuples    la liste des tuple
      * 
      * @throws TypeInvalideException si au moins un tuple ne correspond pas aux
-     *                       attributs
+     *                       colonnes
      */
-    public Relation(String identifiant, Collection<Attribut> attributs, Collection<Tuple> tuples) {
+    public Relation(String identifiant, Collection<Colonne> colonnes, Collection<Tuple> tuples) {
         this.identifiant = identifiant;
 
-        if (attributs.isEmpty()) {
-            throw new RelationSansAttributException("Une relation doit avoir au moins un attribut");
+        if (colonnes.isEmpty()) {
+            throw new RelationSansColonneException("Une relation doit avoir au moins un colonne");
         }
 
-        for (Attribut attribut : attributs) {
-            if (this.hasAttribut(attribut.identifiant())) {
-                throw new AttributDejaExistantException("Deux attributs ne peuvent pas avoir le même identifiant");
+        for (Colonne colonne : colonnes) {
+            if (this.hasColonne(colonne.identifiant())) {
+                throw new ColonneDejaExistantException("Deux colonnes ne peuvent pas avoir le même identifiant");
             }
-            this.attributs.add(attribut);
+            this.colonnes.add(colonne);
         }
 	
         for (Tuple tuple : tuples) {
@@ -68,14 +69,14 @@ class Relation {
     }
 
     /**
-     * Détermine si la relation a un attribut avec l'identifiant spécifié.
+     * Détermine si la relation a un colonne avec l'identifiant spécifié.
      * 
-     * @param identifiant l'identifiant de l'attribut à vérifier
-     * @return true si l'attribut est dans la relation, false sinon
+     * @param identifiant l'identifiant de l'colonne à vérifier
+     * @return true si l'colonne est dans la relation, false sinon
      */
-    public boolean hasAttribut(String identifiant) {
-        for (Attribut attribut : this.getAttributs()) {
-            if (attribut.identifiant().equals(identifiant)) {
+    public boolean hasColonne(String identifiant) {
+        for (Colonne colonne : this.getColonnes()) {
+            if (colonne.identifiant().equals(identifiant)) {
                 return true;
             }
         }
@@ -83,23 +84,23 @@ class Relation {
     }
 
     /**
-     * Renvoie l'attribut avec l'identiant spécifié, s'il n'existe pas, renvoie
+     * Renvoie l'colonne avec l'identiant spécifié, s'il n'existe pas, renvoie
      * null.
      * 
-     * @param identifiant l'identifiant de l'attribut à recherché
-     * @return l'attribut recherché ou null
+     * @param identifiant l'identifiant de l'colonne à recherché
+     * @return l'colonne recherché ou null
      */
-    public Attribut getAttribut(String identiant) {
-        for (Attribut attribut : this.getAttributs()) {
-            if (attribut.identifiant().equals(identiant)) {
-                return attribut;
+    public Colonne getColonne(String identiant) {
+        for (Colonne colonne : this.getColonnes()) {
+            if (colonne.identifiant().equals(identiant)) {
+                return colonne;
             }
         }
         return null;
     }
 
-    public Collection<Attribut> getAttributs() {
-        return this.attributs;
+    public Collection<Colonne> getColonnes() {
+        return this.colonnes;
     }
 
     public Collection<Tuple> getTuples() {
@@ -115,19 +116,19 @@ class Relation {
      * @throws TypeInvalideException si le tuple spécifié est invalide
      */
     protected void verifierTuple(Tuple tuple) {
-        for (Attribut attribut : this.getAttributs()) {
-            if (tuple.hasIdentifiant(attribut.identifiant())) {
-                Valeur valeur = tuple.getValeur(attribut.identifiant());
+        for (Colonne colonne : this.getColonnes()) {
+            if (tuple.hasIdentifiant(colonne.identifiant())) {
+                Valeur valeur = tuple.getValeur(colonne.identifiant());
 
-                if (attribut.type() != valeur.getType()) {
+                if (colonne.type() != valeur.getType()) {
                     throw new TypeInvalideException(String.format(
-                        "Type de valeur invalide pour l'attribut '%s', type attendu : '%s'",
-                        attribut.identifiant(), attribut.type().name()));
+                        "Type de valeur invalide pour l'colonne '%s', type attendu : '%s'",
+                        colonne.identifiant(), colonne.type().name()));
                 }
             } else {
-                throw new AttributInexistantException(String.format(
-                    "Attribut '%s' inexistant dans la relation '%s'",
-                    attribut.identifiant(), this.identifiant));
+                throw new ColonneInexistantException(String.format(
+                    "Colonne '%s' inexistant dans la relation '%s'",
+                    colonne.identifiant(), this.identifiant));
             }
         }
     }
@@ -139,36 +140,36 @@ class Relation {
      * @return la relation
      */
     public Relation alias(String alias) {
-        return new Relation(alias, attributs, tuples);
+        return new Relation(alias, colonnes, tuples);
     }
 
     /**
-     * Applique une sélection sur la relation à partir des attributs spécifiés.
+     * Applique une sélection sur la relation à partir des colonnes spécifiés.
      * 
-     * @param attributs la liste attributs à sélectionner
+     * @param colonnes la liste colonnes à sélectionner
      * @return la nouvelle relation
      */
-    public Relation selectionner(Set<String> attributs) {
-        Set<Attribut> attributs2 = new HashSet<>();
+    public Relation selectionner(Set<String> colonnes) {
+        Set<Colonne> colonnes2 = new HashSet<>();
 
-        for (String attribut : attributs) {
-            if (!this.hasAttribut(attribut)) {
-                throw new SelectionException(String.format("Attribut inexistant '%s'", attribut));
+        for (String colonne : colonnes) {
+            if (!this.hasColonne(colonne)) {
+                throw new SelectionException(String.format("Colonne inexistant '%s'", colonne));
             }
-            attributs2.add(this.getAttribut(attribut));
+            colonnes2.add(this.getColonne(colonne));
         }
         Collection<Tuple> tuples = new ArrayList<>();
 
         for (Tuple tuple : this.getTuples()) {
             Tuple nouveauTuple = new Tuple();
 
-            for (String attribut : attributs) {
-                Valeur valeur = tuple.getValeur(attribut);
-                nouveauTuple.setValeur(attribut, valeur);
+            for (String colonne : colonnes) {
+                Valeur valeur = tuple.getValeur(colonne);
+                nouveauTuple.setValeur(colonne, valeur);
             }
             tuples.add(nouveauTuple);
         }
-        return new Relation(this.identifiant, attributs2, tuples);
+        return new Relation(this.identifiant, colonnes2, tuples);
     }
 
     /**
@@ -188,7 +189,7 @@ class Relation {
             }
         }
 
-        return new Relation(this.getIdentifiant(), this.getAttributs(), tuples);
+        return new Relation(this.getIdentifiant(), this.getColonnes(), tuples);
     }
 
     /**
@@ -203,9 +204,9 @@ class Relation {
             throw new ProduitCartesienException("Produit cartesien impossible entre relations ayant le même identifiant");
         }
         Collection<Tuple> tuples = new ArrayList<>();
-        Collection<Attribut> attributs = this.concatenerAttributs(
-            this.identifiant, this.attributs,
-            relation.identifiant, relation.attributs
+        Collection<Colonne> colonnes = this.concatenerColonnes(
+            this.identifiant, this.colonnes,
+            relation.identifiant, relation.colonnes
         );
 
         for (Tuple tuple1 : this.getTuples()) {
@@ -216,7 +217,7 @@ class Relation {
             }
         }
         String identifiant = this.concatenerIdentifiants(this.identifiant, relation.identifiant);
-        return new Relation(identifiant, attributs, tuples);
+        return new Relation(identifiant, colonnes, tuples);
     }
 
     public Relation produitCartesien(Collection<Relation> relations) {
@@ -229,26 +230,26 @@ class Relation {
     }
 
     /**
-     * Renvoie une collection d'attribut contenant la concaténation des deux
-     * collections d'attributs spécifiées.
+     * Renvoie une collection d'colonne contenant la concaténation des deux
+     * collections d'colonnes spécifiées.
      * 
-     * @param attributs1 la première liste d'attribut à concaténer
-     * @param attributs1 la seconde liste d'attribut à concaténer
-     * @return la collection d'attribut concaténée
+     * @param colonnes1 la première liste d'colonne à concaténer
+     * @param colonnes1 la seconde liste d'colonne à concaténer
+     * @return la collection d'colonne concaténée
      */
-    private Collection<Attribut> concatenerAttributs(
-        String identifiant1, Collection<Attribut> attributs1,
-        String identifiant2, Collection<Attribut> attributs2
+    private Collection<Colonne> concatenerColonnes(
+        String identifiant1, Collection<Colonne> colonnes1,
+        String identifiant2, Collection<Colonne> colonnes2
     ) {
-        Collection<Attribut> attributs = new ArrayList<>();
+        Collection<Colonne> colonnes = new ArrayList<>();
 
-        for (Attribut attribut : attributs1) {
-            attributs.add(attribut.prefixer(identifiant1));
+        for (Colonne colonne : colonnes1) {
+            colonnes.add(colonne.prefixer(identifiant1));
         }
-        for (Attribut attribut : attributs2) {
-            attributs.add(attribut.prefixer(identifiant2));
+        for (Colonne colonne : colonnes2) {
+            colonnes.add(colonne.prefixer(identifiant2));
         }
-        return attributs;
+        return colonnes;
     }
 
     /**
@@ -258,12 +259,12 @@ class Relation {
         System.out.printf("> Table: %s\n", this.getIdentifiant());
         System.out.print("|");
 
-        for (Attribut attribut : this.getAttributs()) {
-            System.out.printf(" %-15s |", attribut.identifiant());
+        for (Colonne colonne : this.getColonnes()) {
+            System.out.printf(" %-15s |", colonne.identifiant());
         }
         System.out.print("\n|");
 
-        for (int i = 0; i < this.getAttributs().size(); i++) {
+        for (int i = 0; i < this.getColonnes().size(); i++) {
             System.out.printf("-".repeat(17));
             System.out.printf("|");
         }
@@ -272,8 +273,8 @@ class Relation {
         for (Tuple tuple : this.getTuples()) {
             System.out.print("|");
 
-            for (Attribut attribut : this.getAttributs()) {
-                System.out.printf(" %-15s |", tuple.getValeur(attribut.identifiant()));
+            for (Colonne colonne : this.getColonnes()) {
+                System.out.printf(" %-15s |", tuple.getValeur(colonne.identifiant()));
             }
             System.out.println();
         }

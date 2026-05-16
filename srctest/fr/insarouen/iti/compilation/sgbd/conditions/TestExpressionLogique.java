@@ -5,8 +5,10 @@ import static org.hamcrest.CoreMatchers.is;
 
 import org.junit.Test;
 
-import fr.insarouen.iti.compilation.sgbd.conditions.*;
 import fr.insarouen.iti.compilation.sgbd.moteur.*;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
 
 public class TestExpressionLogique {
 
@@ -14,8 +16,8 @@ public class TestExpressionLogique {
         Tuple hero=new Tuple();
 
         hero.setValeur("Hero.nom",new Chaine("Batman"));
-        hero.setValeur("Hero.puissance",new Nombre(100));
-        hero.setValeur("Hero.age",new Nombre(40));
+        hero.setValeur("Hero.puissance",new Entier(100));
+        hero.setValeur("Hero.age",new Entier(40));
 
         return hero;
     }
@@ -25,11 +27,11 @@ public class TestExpressionLogique {
 
         tuple.setValeur("Personne.id",new Cle(1));
         tuple.setValeur("Personne.nom",new Chaine("Bob"));
-        tuple.setValeur("Personne.age",new Nombre(20));
+        tuple.setValeur("Personne.age",new Entier(20));
 
         tuple.setValeur("Voiture.id",new Cle(10));
         tuple.setValeur("Voiture.marque",new Chaine("BMW"));
-        tuple.setValeur("Voiture.proprietaire",new Nombre(1));
+        tuple.setValeur("Voiture.proprietaire",new Entier(1));
 
         return tuple;
 
@@ -41,13 +43,13 @@ public class TestExpressionLogique {
         Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut("Hero","age"),
-            new OperandeValeur(new Nombre(50)),
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(50)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut("Hero","nom"),
+            new OperandeColonne("Hero","nom"),
             new OperandeValeur(new Chaine("Batman")),
             Comparateur.EGAL
         );
@@ -66,13 +68,13 @@ public class TestExpressionLogique {
         Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut("Hero","age"),
-            new OperandeValeur(new Nombre(50)),
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(50)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut("Hero","nom"),
+            new OperandeColonne("Hero","nom"),
             new OperandeValeur(new Chaine("Joker")),
             Comparateur.EGAL
         );
@@ -91,13 +93,13 @@ public class TestExpressionLogique {
         Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut("Hero","age"),
-            new OperandeValeur(new Nombre(50)),
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(50)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut("Hero","nom"),
+            new OperandeColonne("Hero","nom"),
             new OperandeValeur(new Chaine("Joker")),
             Comparateur.EGAL
         );
@@ -116,13 +118,13 @@ public class TestExpressionLogique {
         Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut("Hero","age"),
-            new OperandeValeur(new Nombre(10)),
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(10)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut("Hero","nom"),
+            new OperandeColonne("Hero","nom"),
             new OperandeValeur(new Chaine("Joker")),
             Comparateur.EGAL
         );
@@ -141,20 +143,20 @@ public class TestExpressionLogique {
         Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut("Hero","age"),
-            new OperandeValeur(new Nombre(50)),
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(50)),
             Comparateur.INFERIEUR
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut("Hero","nom"),
+            new OperandeColonne("Hero","nom"),
             new OperandeValeur(new Chaine("Batman")),
             Comparateur.EGAL
         );
 
         ConditionSimple c3= new ConditionSimple(
-            new OperandeAttribut("Hero","puissance"),
-            new OperandeValeur(new Nombre(50)),
+            new OperandeColonne("Hero","puissance"),
+            new OperandeValeur(new Entier(50)),
             Comparateur.SUPERIEUR
         );
 
@@ -174,20 +176,20 @@ public class TestExpressionLogique {
         Tuple tuple = tupleHero();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut("Hero","nom"),
+            new OperandeColonne("Hero","nom"),
             new OperandeValeur(new Chaine("Joker")),
             Comparateur.EGAL
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut("Hero","puissance"),
-            new OperandeValeur(new Nombre(50)),
+            new OperandeColonne("Hero","puissance"),
+            new OperandeValeur(new Entier(50)),
             Comparateur.SUPERIEUR
         );
 
         ConditionSimple c3= new ConditionSimple(
-            new OperandeAttribut("Hero","age"),
-            new OperandeValeur(new Nombre(30)),
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(30)),
             Comparateur.INFERIEUR
         );
 
@@ -207,19 +209,19 @@ public class TestExpressionLogique {
         Tuple tuple = tuplePersonneVoiture();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut("Personne","id"),
-            new OperandeAttribut("Voiture","proprietaire"),
+            new OperandeColonne("Personne","id"),
+            new OperandeColonne("Voiture","proprietaire"),
             Comparateur.EGAL
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut("Personne","age"),
-            new OperandeValeur(new Nombre(18)),
+            new OperandeColonne("Personne","age"),
+            new OperandeValeur(new Entier(18)),
             Comparateur.SUPERIEUR
         );
 
         ConditionSimple c3= new ConditionSimple(
-            new OperandeAttribut("Voiture","marque"),
+            new OperandeColonne("Voiture","marque"),
             new OperandeValeur(new Chaine("BMW")),
             Comparateur.EGAL
         );
@@ -240,19 +242,19 @@ public class TestExpressionLogique {
         Tuple tuple = tuplePersonneVoiture();
 
         ConditionSimple c1= new ConditionSimple(
-            new OperandeAttribut("Personne","id"),
-            new OperandeAttribut("Voiture","proprietaire"),
+            new OperandeColonne("Personne","id"),
+            new OperandeColonne("Voiture","proprietaire"),
             Comparateur.EGAL
         );
 
         ConditionSimple c2= new ConditionSimple(
-            new OperandeAttribut("Personne","age"),
-            new OperandeValeur(new Nombre(18)),
+            new OperandeColonne("Personne","age"),
+            new OperandeValeur(new Entier(18)),
             Comparateur.SUPERIEUR
         );
 
         ConditionSimple c3= new ConditionSimple(
-            new OperandeAttribut("Voiture","marque"),
+            new OperandeColonne("Voiture","marque"),
             new OperandeValeur(new Chaine("Citroen")),
             Comparateur.EGAL
         );

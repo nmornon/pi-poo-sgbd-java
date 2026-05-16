@@ -14,48 +14,51 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fr.insarouen.iti.compilation.sgbd.exceptions.AttributDejaExistantException;
-import fr.insarouen.iti.compilation.sgbd.exceptions.AttributInexistantException;
-import fr.insarouen.iti.compilation.sgbd.exceptions.ProduitCartesienException;
-import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansAttributException;
-import fr.insarouen.iti.compilation.sgbd.exceptions.SelectionException;
-import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
-import fr.insarouen.iti.compilation.sgbd.conditions.ConditionSimple;
-import fr.insarouen.iti.compilation.sgbd.conditions.OperandeAttribut;
-import fr.insarouen.iti.compilation.sgbd.conditions.OperandeValeur;
 import fr.insarouen.iti.compilation.sgbd.conditions.Comparateur;
+import fr.insarouen.iti.compilation.sgbd.conditions.ConditionSimple;
+import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
+import fr.insarouen.iti.compilation.sgbd.conditions.OperandeColonne;
+import fr.insarouen.iti.compilation.sgbd.conditions.OperandeValeur;
 import fr.insarouen.iti.compilation.sgbd.conditions.OperateurLogique;
+import fr.insarouen.iti.compilation.sgbd.exceptions.ColonneDejaExistantException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.ColonneInexistantException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.ProduitCartesienException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansColonneException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.SelectionException;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
 
 
 public class TestRelation {
     public static Relation relationBases;
     public static Relation relationHeroes;
     public static Relation relationGadgets;
-    public static Collection<Attribut> attributsHeroes = new ArrayList<>();
-    public static Collection<Attribut> attributsBases = new ArrayList<>();
-    public static Collection<Attribut> attributsGadgets = new ArrayList<>();
+    public static Collection<Colonne> colonnesHeroes = new ArrayList<>();
+    public static Collection<Colonne> colonnesBases = new ArrayList<>();
+    public static Collection<Colonne> colonnesGadgets = new ArrayList<>();
     public static Collection<Tuple> tuplesHeroes = new ArrayList<>();
     public static Collection<Tuple> tuplesBases = new ArrayList<>();
     public static Collection<Tuple> tuplesGadgets = new ArrayList<>();
 
     @BeforeClass
     public static void initialiser() {
-        TestRelation.attributsBases.clear();
-        TestRelation.attributsBases.add(new Attribut("id", Type.SERIAL));
-        TestRelation.attributsBases.add(new Attribut("nom", Type.VARCHAR));
-        TestRelation.attributsBases.add(new Attribut("ville", Type.VARCHAR));
+        TestRelation.colonnesBases.clear();
+        TestRelation.colonnesBases.add(new Colonne("id", Type.SERIAL));
+        TestRelation.colonnesBases.add(new Colonne("nom", Type.VARCHAR));
+        TestRelation.colonnesBases.add(new Colonne("ville", Type.VARCHAR));
 
-        TestRelation.attributsHeroes.clear();
-        TestRelation.attributsHeroes.add(new Attribut("id", Type.SERIAL));
-        TestRelation.attributsHeroes.add(new Attribut("nom", Type.VARCHAR));
-        TestRelation.attributsHeroes.add(new Attribut("alias", Type.VARCHAR));
-        TestRelation.attributsHeroes.add(new Attribut("base_id", Type.INT));
+        TestRelation.colonnesHeroes.clear();
+        TestRelation.colonnesHeroes.add(new Colonne("id", Type.SERIAL));
+        TestRelation.colonnesHeroes.add(new Colonne("nom", Type.VARCHAR));
+        TestRelation.colonnesHeroes.add(new Colonne("alias", Type.VARCHAR));
+        TestRelation.colonnesHeroes.add(new Colonne("base_id", Type.INT));
 
-        TestRelation.attributsGadgets.clear();
-        TestRelation.attributsGadgets.add(new Attribut("id", Type.SERIAL));
-        TestRelation.attributsGadgets.add(new Attribut("nom", Type.VARCHAR));
-        TestRelation.attributsGadgets.add(new Attribut("hero_id", Type.INT));
-        TestRelation.attributsGadgets.add(new Attribut("puissance", Type.INT));
+        TestRelation.colonnesGadgets.clear();
+        TestRelation.colonnesGadgets.add(new Colonne("id", Type.SERIAL));
+        TestRelation.colonnesGadgets.add(new Colonne("nom", Type.VARCHAR));
+        TestRelation.colonnesGadgets.add(new Colonne("hero_id", Type.INT));
+        TestRelation.colonnesGadgets.add(new Colonne("puissance", Type.INT));
 
         TestRelation.tuplesBases.clear();
         TestRelation.tuplesBases.add(new Tuple().setValeur("id", new Cle(1)).setValeur("nom", new Chaine("BureauInfo")).setValeur("ville", new Chaine("ITICity")));
@@ -65,64 +68,64 @@ public class TestRelation {
         TestRelation.tuplesBases.add(new Tuple().setValeur("id", new Cle(5)).setValeur("nom", new Chaine("BureauDirectionLITIS")).setValeur("ville", new Chaine("LITISCity")));
         
         TestRelation.tuplesHeroes.clear();
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(6)).setValeur("nom", new Chaine("Nicola Malandain")).setValeur("alias", new Chaine("Batman")).setValeur("base_id", new Nombre(1)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(7)).setValeur("nom", new Chaine("Nicolas Delestre")).setValeur("alias", new Chaine("Bikeman")).setValeur("base_id", new Nombre(1)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(8)).setValeur("nom", new Chaine("Florian Yger")).setValeur("alias", new Chaine("Baldman")).setValeur("base_id", new Nombre(1)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(9)).setValeur("nom", new Chaine("Geraldine Del Mondo")).setValeur("alias", new Chaine("Batgirl")).setValeur("base_id", new Nombre(4)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(10)).setValeur("nom", new Chaine("Benoit Gauzere")).setValeur("alias", new Chaine("BGman")).setValeur("base_id", new Nombre(3)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(11)).setValeur("nom", new Chaine("Clement Chatelain")).setValeur("alias", new Chaine("MLman")).setValeur("base_id", new Nombre(5)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(12)).setValeur("nom", new Chaine("Hind Laghmara")).setValeur("alias", new Chaine("Resistorwoman")).setValeur("base_id", new Nombre(2)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(13)).setValeur("nom", new Chaine("Laurent Vercouter")).setValeur("alias", new Chaine("Aquaman")).setValeur("base_id", new Nombre(5)));
-        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(14)).setValeur("nom", new Chaine("Robin Condat")).setValeur("alias", new Chaine("Robin")).setValeur("base_id", new Nombre(2)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(6)).setValeur("nom", new Chaine("Nicola Malandain")).setValeur("alias", new Chaine("Batman")).setValeur("base_id", new Entier(1)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(7)).setValeur("nom", new Chaine("Nicolas Delestre")).setValeur("alias", new Chaine("Bikeman")).setValeur("base_id", new Entier(1)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(8)).setValeur("nom", new Chaine("Florian Yger")).setValeur("alias", new Chaine("Baldman")).setValeur("base_id", new Entier(1)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(9)).setValeur("nom", new Chaine("Geraldine Del Mondo")).setValeur("alias", new Chaine("Batgirl")).setValeur("base_id", new Entier(4)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(10)).setValeur("nom", new Chaine("Benoit Gauzere")).setValeur("alias", new Chaine("BGman")).setValeur("base_id", new Entier(3)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(11)).setValeur("nom", new Chaine("Clement Chatelain")).setValeur("alias", new Chaine("MLman")).setValeur("base_id", new Entier(5)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(12)).setValeur("nom", new Chaine("Hind Laghmara")).setValeur("alias", new Chaine("Resistorwoman")).setValeur("base_id", new Entier(2)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(13)).setValeur("nom", new Chaine("Laurent Vercouter")).setValeur("alias", new Chaine("Aquaman")).setValeur("base_id", new Entier(5)));
+        TestRelation.tuplesHeroes.add(new Tuple().setValeur("id", new Cle(14)).setValeur("nom", new Chaine("Robin Condat")).setValeur("alias", new Chaine("Robin")).setValeur("base_id", new Entier(2)));
 
         TestRelation.tuplesGadgets.clear();
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(15)).setValeur("nom", new Chaine("Batarang")).setValeur("hero_id", new Nombre(6)).setValeur("puissance", new Nombre(50)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(16)).setValeur("nom", new Chaine("Grappin")).setValeur("hero_id", new Nombre(6)).setValeur("puissance", new Nombre(30)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(17)).setValeur("nom", new Chaine("Velo de course")).setValeur("hero_id", new Nombre(7)).setValeur("puissance", new Nombre(40)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(18)).setValeur("nom", new Chaine("Casque Aero")).setValeur("hero_id", new Nombre(7)).setValeur("puissance", new Nombre(20)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(19)).setValeur("nom", new Chaine("Bouclier Solaire")).setValeur("hero_id", new Nombre(8)).setValeur("puissance", new Nombre(60)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(20)).setValeur("nom", new Chaine("Perruque de camouflage")).setValeur("hero_id", new Nombre(8)).setValeur("puissance", new Nombre(10)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(21)).setValeur("nom", new Chaine("Ordinateur portable")).setValeur("hero_id", new Nombre(9)).setValeur("puissance", new Nombre(80)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(22)).setValeur("nom", new Chaine("Moto Batgirl")).setValeur("hero_id", new Nombre(9)).setValeur("puissance", new Nombre(70)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(23)).setValeur("nom", new Chaine("Lunettes de BG")).setValeur("hero_id", new Nombre(10)).setValeur("puissance", new Nombre(90)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(24)).setValeur("nom", new Chaine("Parfum de charisme")).setValeur("hero_id", new Nombre(10)).setValeur("puissance", new Nombre(100)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(25)).setValeur("nom", new Chaine("Neural Network Optimizer")).setValeur("hero_id", new Nombre(11)).setValeur("puissance", new Nombre(85)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(26)).setValeur("nom", new Chaine("GPU Overclocker")).setValeur("hero_id", new Nombre(11)).setValeur("puissance", new Nombre(95)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(27)).setValeur("nom", new Chaine("Multimetre")).setValeur("hero_id", new Nombre(12)).setValeur("puissance", new Nombre(45)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(28)).setValeur("nom", new Chaine("Resistance 10k Ohms")).setValeur("hero_id", new Nombre(12)).setValeur("puissance", new Nombre(15)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(29)).setValeur("nom", new Chaine("Trident")).setValeur("hero_id", new Nombre(13)).setValeur("puissance", new Nombre(88)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(30)).setValeur("nom", new Chaine("Bulle d''eau")).setValeur("hero_id", new Nombre(13)).setValeur("puissance", new Nombre(55)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(31)).setValeur("nom", new Chaine("Bo staff")).setValeur("hero_id", new Nombre(14)).setValeur("puissance", new Nombre(35)));
-        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(32)).setValeur("nom", new Chaine("Bat-cycle")).setValeur("hero_id", new Nombre(14)).setValeur("puissance", new Nombre(65)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(15)).setValeur("nom", new Chaine("Batarang")).setValeur("hero_id", new Entier(6)).setValeur("puissance", new Entier(50)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(16)).setValeur("nom", new Chaine("Grappin")).setValeur("hero_id", new Entier(6)).setValeur("puissance", new Entier(30)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(17)).setValeur("nom", new Chaine("Velo de course")).setValeur("hero_id", new Entier(7)).setValeur("puissance", new Entier(40)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(18)).setValeur("nom", new Chaine("Casque Aero")).setValeur("hero_id", new Entier(7)).setValeur("puissance", new Entier(20)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(19)).setValeur("nom", new Chaine("Bouclier Solaire")).setValeur("hero_id", new Entier(8)).setValeur("puissance", new Entier(60)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(20)).setValeur("nom", new Chaine("Perruque de camouflage")).setValeur("hero_id", new Entier(8)).setValeur("puissance", new Entier(10)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(21)).setValeur("nom", new Chaine("Ordinateur portable")).setValeur("hero_id", new Entier(9)).setValeur("puissance", new Entier(80)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(22)).setValeur("nom", new Chaine("Moto Batgirl")).setValeur("hero_id", new Entier(9)).setValeur("puissance", new Entier(70)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(23)).setValeur("nom", new Chaine("Lunettes de BG")).setValeur("hero_id", new Entier(10)).setValeur("puissance", new Entier(90)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(24)).setValeur("nom", new Chaine("Parfum de charisme")).setValeur("hero_id", new Entier(10)).setValeur("puissance", new Entier(100)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(25)).setValeur("nom", new Chaine("Neural Network Optimizer")).setValeur("hero_id", new Entier(11)).setValeur("puissance", new Entier(85)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(26)).setValeur("nom", new Chaine("GPU Overclocker")).setValeur("hero_id", new Entier(11)).setValeur("puissance", new Entier(95)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(27)).setValeur("nom", new Chaine("Multimetre")).setValeur("hero_id", new Entier(12)).setValeur("puissance", new Entier(45)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(28)).setValeur("nom", new Chaine("Resistance 10k Ohms")).setValeur("hero_id", new Entier(12)).setValeur("puissance", new Entier(15)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(29)).setValeur("nom", new Chaine("Trident")).setValeur("hero_id", new Entier(13)).setValeur("puissance", new Entier(88)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(30)).setValeur("nom", new Chaine("Bulle d''eau")).setValeur("hero_id", new Entier(13)).setValeur("puissance", new Entier(55)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(31)).setValeur("nom", new Chaine("Bo staff")).setValeur("hero_id", new Entier(14)).setValeur("puissance", new Entier(35)));
+        TestRelation.tuplesGadgets.add(new Tuple().setValeur("id", new Cle(32)).setValeur("nom", new Chaine("Bat-cycle")).setValeur("hero_id", new Entier(14)).setValeur("puissance", new Entier(65)));
 
-        TestRelation.relationBases = new Relation("bases", TestRelation.attributsBases, TestRelation.tuplesBases);
-        TestRelation.relationHeroes = new Relation("heroes", TestRelation.attributsHeroes, TestRelation.tuplesHeroes);
-        TestRelation.relationGadgets = new Relation("gadgets", TestRelation.attributsGadgets, TestRelation.tuplesGadgets);
+        TestRelation.relationBases = new Relation("bases", TestRelation.colonnesBases, TestRelation.tuplesBases);
+        TestRelation.relationHeroes = new Relation("heroes", TestRelation.colonnesHeroes, TestRelation.tuplesHeroes);
+        TestRelation.relationGadgets = new Relation("gadgets", TestRelation.colonnesGadgets, TestRelation.tuplesGadgets);
     }
 
-    @Test(expected = RelationSansAttributException.class)
-    public void test_constructeur_avecAttributsVide() {
+    @Test(expected = RelationSansColonneException.class)
+    public void test_constructeur_avecColonnesVide() {
         new Relation("relation", new ArrayList<>());
     }
 
-    @Test(expected = AttributDejaExistantException.class)
-    public void test_constructeur_avecAttributEnDouble() {
-        Collection<Attribut> attributs = List.of(
-            new Attribut("id", Type.SERIAL),
-            new Attribut("id", Type.SERIAL)
+    @Test(expected = ColonneDejaExistantException.class)
+    public void test_constructeur_avecColonneEnDouble() {
+        Collection<Colonne> colonnes = List.of(
+            new Colonne("id", Type.SERIAL),
+            new Colonne("id", Type.SERIAL)
         );
-        new Relation("relation", attributs);
+        new Relation("relation", colonnes);
     }
 
-    @Test(expected = AttributInexistantException.class)
-    public void test_constructeur_tupleAvecAttributInexistant() {
-        Collection<Attribut> attributs = List.of(
-            new Attribut("id", Type.SERIAL)
+    @Test(expected = ColonneInexistantException.class)
+    public void test_constructeur_tupleAvecColonneInexistant() {
+        Collection<Colonne> colonnes = List.of(
+            new Colonne("id", Type.SERIAL)
         );
         Collection<Tuple> tuples = List.of(
-            new Tuple().setValeur("attribut_inexistant", new Nombre(0))
+            new Tuple().setValeur("colonne_inexistant", new Entier(0))
         );
-        new Relation("relation", attributs, tuples);
+        new Relation("relation", colonnes, tuples);
     }
 
     @Test
@@ -133,19 +136,19 @@ public class TestRelation {
     }
 
     @Test
-    public void test_hasAttribut() {
-        assertThat(relationBases.hasAttribut("id"), is(true));
-        assertThat(relationBases.hasAttribut("attribut_inexistant"), is(false));
+    public void test_hasColonne() {
+        assertThat(relationBases.hasColonne("id"), is(true));
+        assertThat(relationBases.hasColonne("colonne_inexistant"), is(false));
     }
 
     @Test
-    public void test_getAttribut_attributExistant() {
-        assertThat(relationBases.getAttribut("id"), equalTo(new Attribut("id", Type.SERIAL)));
+    public void test_getColonne_colonneExistant() {
+        assertThat(relationBases.getColonne("id"), equalTo(new Colonne("id", Type.SERIAL)));
     }
 
     @Test
-    public void test_getAttribut_attributInexistant() {
-        assertThat(relationBases.getAttribut("attribut_inexistant"), nullValue());
+    public void test_getColonne_colonneInexistant() {
+        assertThat(relationBases.getColonne("colonne_inexistant"), nullValue());
     }
 
     @Test
@@ -156,24 +159,24 @@ public class TestRelation {
     }
 
     // @Test
-    // public void test_getAttributs() {
-    //     assertThat(relationBases.getAttributs(), containsInAnyOrder(attributsBases.toArray()));
-    //     assertThat(relationHeroes.getAttributs(), containsInAnyOrder(attributsHeroes.toArray()));
-    //     assertThat(relationGadgets.getAttributs(), containsInAnyOrder(attributsGadgets.toArray()));
+    // public void test_getColonnes() {
+    //     assertThat(relationBases.getColonnes(), containsInAnyOrder(colonnesBases.toArray()));
+    //     assertThat(relationHeroes.getColonnes(), containsInAnyOrder(colonnesHeroes.toArray()));
+    //     assertThat(relationGadgets.getColonnes(), containsInAnyOrder(colonnesGadgets.toArray()));
     // }
 
     @Test
     public void test_selectionner() {
         Relation relation = relationBases.selectionner(Set.of("nom", "ville"));
         
-        assertThat(relation.hasAttribut("id"), is(false));
-        assertThat(relation.hasAttribut("nom"), is(true));
-        assertThat(relation.hasAttribut("ville"), is(true));
+        assertThat(relation.hasColonne("id"), is(false));
+        assertThat(relation.hasColonne("nom"), is(true));
+        assertThat(relation.hasColonne("ville"), is(true));
     }
 
     @Test(expected = SelectionException.class)
-    public void test_selectionner_attributInexistant() {
-        relationBases.selectionner(Set.of("attribut_inexistant"));
+    public void test_selectionner_colonneInexistant() {
+        relationBases.selectionner(Set.of("colonne_inexistant"));
     }
 
     @Test
@@ -181,13 +184,13 @@ public class TestRelation {
         Relation produit = relationBases.produitCartesien(relationHeroes);
         
         assertThat(produit.getIdentifiant(), equalTo("bases_heroes"));
-        assertThat(produit.hasAttribut("bases.id"), is(true));
-        assertThat(produit.hasAttribut("bases.nom"), is(true));
-        assertThat(produit.hasAttribut("bases.ville"), is(true));
-        assertThat(produit.hasAttribut("heroes.id"), is(true));
-        assertThat(produit.hasAttribut("heroes.nom"), is(true));
-        assertThat(produit.hasAttribut("heroes.alias"), is(true));
-        assertThat(produit.hasAttribut("heroes.base_id"), is(true));
+        assertThat(produit.hasColonne("bases.id"), is(true));
+        assertThat(produit.hasColonne("bases.nom"), is(true));
+        assertThat(produit.hasColonne("bases.ville"), is(true));
+        assertThat(produit.hasColonne("heroes.id"), is(true));
+        assertThat(produit.hasColonne("heroes.nom"), is(true));
+        assertThat(produit.hasColonne("heroes.alias"), is(true));
+        assertThat(produit.hasColonne("heroes.base_id"), is(true));
     }
 
     @Test
@@ -195,19 +198,19 @@ public class TestRelation {
         Relation produit = relationBases.produitCartesien(List.of(relationHeroes, relationGadgets));
         
         assertThat(produit.getIdentifiant(), equalTo("bases_heroes_gadgets"));
-        assertThat(produit.hasAttribut("bases.id"), is(true));
-        assertThat(produit.hasAttribut("bases.nom"), is(true));
-        assertThat(produit.hasAttribut("bases.ville"), is(true));
+        assertThat(produit.hasColonne("bases.id"), is(true));
+        assertThat(produit.hasColonne("bases.nom"), is(true));
+        assertThat(produit.hasColonne("bases.ville"), is(true));
 
-        assertThat(produit.hasAttribut("heroes.id"), is(true));
-        assertThat(produit.hasAttribut("heroes.nom"), is(true));
-        assertThat(produit.hasAttribut("heroes.alias"), is(true));
-        assertThat(produit.hasAttribut("heroes.base_id"), is(true));
+        assertThat(produit.hasColonne("heroes.id"), is(true));
+        assertThat(produit.hasColonne("heroes.nom"), is(true));
+        assertThat(produit.hasColonne("heroes.alias"), is(true));
+        assertThat(produit.hasColonne("heroes.base_id"), is(true));
 
-        assertThat(produit.hasAttribut("gadgets.id"), is(true));
-        assertThat(produit.hasAttribut("gadgets.nom"), is(true));
-        assertThat(produit.hasAttribut("gadgets.hero_id"), is(true));
-        assertThat(produit.hasAttribut("gadgets.puissance"), is(true));
+        assertThat(produit.hasColonne("gadgets.id"), is(true));
+        assertThat(produit.hasColonne("gadgets.nom"), is(true));
+        assertThat(produit.hasColonne("gadgets.hero_id"), is(true));
+        assertThat(produit.hasColonne("gadgets.puissance"), is(true));
     }
 
     @Test
@@ -217,12 +220,12 @@ public class TestRelation {
         Relation produit = relation1.produitCartesien(relation2);
         
         assertThat(produit.getIdentifiant(), equalTo("B1_B2"));
-        assertThat(produit.hasAttribut("B1.id"), is(true));
-        assertThat(produit.hasAttribut("B1.nom"), is(true));
-        assertThat(produit.hasAttribut("B1.ville"), is(true));
-        assertThat(produit.hasAttribut("B2.id"), is(true));
-        assertThat(produit.hasAttribut("B2.nom"), is(true));
-        assertThat(produit.hasAttribut("B2.ville"), is(true));
+        assertThat(produit.hasColonne("B1.id"), is(true));
+        assertThat(produit.hasColonne("B1.nom"), is(true));
+        assertThat(produit.hasColonne("B1.ville"), is(true));
+        assertThat(produit.hasColonne("B2.id"), is(true));
+        assertThat(produit.hasColonne("B2.nom"), is(true));
+        assertThat(produit.hasColonne("B2.ville"), is(true));
     }
 
     @Test(expected = ProduitCartesienException.class)
@@ -236,8 +239,8 @@ public class TestRelation {
 
         ExpressionLogique condition = new ExpressionLogique();
         condition.ajouterCondition( new ConditionSimple(
-                                        new OperandeAttribut("bases","id"),
-                                        new OperandeAttribut("heroes","base_id"),
+                                        new OperandeColonne("bases","id"),
+                                        new OperandeColonne("heroes","base_id"),
                                         Comparateur.EGAL
 
         
@@ -247,11 +250,11 @@ public class TestRelation {
 
         assertThat(resultat.getTuples().size(),is(9));
 
-        assertThat(resultat.hasAttribut("bases.id"),is(true));
-        assertThat(resultat.hasAttribut("bases.nom"),is(true));
-        assertThat(resultat.hasAttribut("heroes.nom"),is(true));
-        assertThat(resultat.hasAttribut("heroes.alias"),is(true));
-        assertThat(resultat.hasAttribut("gadgets.nom"),is(false));
+        assertThat(resultat.hasColonne("bases.id"),is(true));
+        assertThat(resultat.hasColonne("bases.nom"),is(true));
+        assertThat(resultat.hasColonne("heroes.nom"),is(true));
+        assertThat(resultat.hasColonne("heroes.alias"),is(true));
+        assertThat(resultat.hasColonne("gadgets.nom"),is(false));
     }
 
     @Test
@@ -282,17 +285,17 @@ public class TestRelation {
 
         ExpressionLogique condition = new ExpressionLogique();
         condition.ajouterCondition(new ConditionSimple(
-            new OperandeAttribut("bases", "id"),
-            new OperandeAttribut("heroes", "base_id"),
+            new OperandeColonne("bases", "id"),
+            new OperandeColonne("heroes", "base_id"),
             Comparateur.EGAL
         ));
 
         Relation resultat = produit.projeter(condition);
 
         assertThat(resultat.getTuples().size(), is(9));
-        assertThat(resultat.hasAttribut("bases.nom"), is(true));
-        assertThat(resultat.hasAttribut("heroes.alias"), is(true));
-        assertThat(resultat.hasAttribut("gadgets.nom"), is(false));
+        assertThat(resultat.hasColonne("bases.nom"), is(true));
+        assertThat(resultat.hasColonne("heroes.alias"), is(true));
+        assertThat(resultat.hasColonne("gadgets.nom"), is(false));
     }
 
     @Test
@@ -301,16 +304,16 @@ public class TestRelation {
 
         ExpressionLogique condition = new ExpressionLogique();
         condition.ajouterCondition(new ConditionSimple(
-            new OperandeAttribut("bases", "id"),
-            new OperandeValeur(new Nombre(999)),
+            new OperandeColonne("bases", "id"),
+            new OperandeValeur(new Entier(999)),
             Comparateur.EGAL
         ));
 
         Relation resultat = produit.projeter(condition);
 
         assertThat(resultat.getTuples().size(), is(0));
-        assertThat(resultat.hasAttribut("bases.id"), is(true));
-        assertThat(resultat.hasAttribut("heroes.alias"), is(true));
+        assertThat(resultat.hasColonne("bases.id"), is(true));
+        assertThat(resultat.hasColonne("heroes.alias"), is(true));
     }
 
     @Test
@@ -319,8 +322,8 @@ public class TestRelation {
 
         ExpressionLogique condition = new ExpressionLogique();
         condition.ajouterCondition(new ConditionSimple(
-            new OperandeAttribut("bases", "id"),
-            new OperandeAttribut("heroes", "base_id"),
+            new OperandeColonne("bases", "id"),
+            new OperandeColonne("heroes", "base_id"),
             Comparateur.EGAL
         ));
 
@@ -330,11 +333,11 @@ public class TestRelation {
 
         assertThat(resultat.getTuples().size(), is(9));
 
-        assertThat(resultat.hasAttribut("bases.nom"), is(true));
-        assertThat(resultat.hasAttribut("heroes.alias"), is(true));
+        assertThat(resultat.hasColonne("bases.nom"), is(true));
+        assertThat(resultat.hasColonne("heroes.alias"), is(true));
 
-        assertThat(resultat.hasAttribut("bases.id"), is(false));
-        assertThat(resultat.hasAttribut("heroes.base_id"), is(false));
+        assertThat(resultat.hasColonne("bases.id"), is(false));
+        assertThat(resultat.hasColonne("heroes.base_id"), is(false));
     }
 
 
@@ -345,16 +348,16 @@ public class TestRelation {
         ExpressionLogique condition = new ExpressionLogique();
 
         condition.ajouterCondition(new ConditionSimple(
-            new OperandeAttribut("bases", "id"),
-            new OperandeAttribut("heroes", "base_id"),
+            new OperandeColonne("bases", "id"),
+            new OperandeColonne("heroes", "base_id"),
             Comparateur.EGAL
         ));
 
         condition.ajouterConnecteur(OperateurLogique.AND);
 
         condition.ajouterCondition(new ConditionSimple(
-            new OperandeAttribut("heroes", "id"),
-            new OperandeAttribut("gadgets", "hero_id"),
+            new OperandeColonne("heroes", "id"),
+            new OperandeColonne("gadgets", "hero_id"),
             Comparateur.EGAL
         ));
 
@@ -369,14 +372,14 @@ public class TestRelation {
 
         assertThat(resultat.getTuples().size(), is(18));
 
-        assertThat(resultat.hasAttribut("bases.nom"), is(true));
-        assertThat(resultat.hasAttribut("heroes.alias"), is(true));
-        assertThat(resultat.hasAttribut("gadgets.nom"), is(true));
-        assertThat(resultat.hasAttribut("gadgets.puissance"), is(true));
+        assertThat(resultat.hasColonne("bases.nom"), is(true));
+        assertThat(resultat.hasColonne("heroes.alias"), is(true));
+        assertThat(resultat.hasColonne("gadgets.nom"), is(true));
+        assertThat(resultat.hasColonne("gadgets.puissance"), is(true));
 
-        assertThat(resultat.hasAttribut("bases.id"), is(false));
-        assertThat(resultat.hasAttribut("heroes.id"), is(false));
-        assertThat(resultat.hasAttribut("gadgets.id"), is(false));
+        assertThat(resultat.hasColonne("bases.id"), is(false));
+        assertThat(resultat.hasColonne("heroes.id"), is(false));
+        assertThat(resultat.hasColonne("gadgets.id"), is(false));
     }
 
 
