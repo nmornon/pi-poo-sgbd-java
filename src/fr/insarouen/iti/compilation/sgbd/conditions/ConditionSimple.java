@@ -15,16 +15,15 @@ public class ConditionSimple {
     }
 
     public boolean evaluer(Tuple tuple) {
-        Valeur valeurGauche = gauche.evaluer(tuple);
-        Valeur valeurDroite = droite.evaluer(tuple);
+        Valeur valeurGauche = this.gauche.evaluer(tuple);
+        Valeur valeurDroite = this.droite.evaluer(tuple);
+        int evaluation = valeurGauche.compareTo(valeurDroite);
 
-        int comparaison = valeurGauche.compareTo(valeurDroite);
-
-        switch (comparateur){
-            case EGAL:      return comparaison ==  0;
-            case SUPERIEUR: return comparaison == +1;
-            case INFERIEUR: return comparaison == -1;
-            default:        return false;
-        }
+        return switch (this.comparateur) {
+            case EGAL      -> evaluation ==  0;
+            case SUPERIEUR -> evaluation == +1;
+            case INFERIEUR -> evaluation == -1;
+            default        -> false;
+        };
     }
 }
