@@ -5,27 +5,58 @@ import java.util.Map;
 
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Valeur;
 
+/**
+ * Classe représentant un tuple (ligne) d'une relation
+ */
 public class Tuple {
+    /** Collection de paires de identifiant/valeur */
     private Map<String, Valeur> valeurs;
 
+    /**
+     * Construit un tuple vide
+     */
     public Tuple() {
         this.valeurs = new HashMap<>();
     }
 
+     /**
+     * Indique si le tuple contient l'identifiant spécifié
+     * 
+     * @param identifiant le nom de la colonne 
+     * @return true si le tuple possède cette colonne, false sinon
+     */
     public boolean hasIdentifiant(String identifiant) {
         return this.valeurs.containsKey(identifiant);
     }
 
+    /**
+     * Renvoie toutes les valeurs du tuple
+     *
+     * @return une map identifiants/valeurs
+     */
     public Map<String, Valeur> getValeurs() {
         return this.valeurs;
     }
 
+    /**
+     * Renvoie la valeur associée à l'identifiant spécifié
+     *
+     * @param identifiant le nom de la colonne
+     * @return la valeur associée, ou null si c'est inexistant
+     */
     public Valeur getValeur(String identifiant) {
         return this.valeurs.get(identifiant);
     }
 
-    public Tuple setValeur(String String, Valeur valeur) {
-        this.valeurs.put(String, valeur);
+    /** 
+     * Associe une valeur à un identifiant dans le tuple et le retourne
+     * 
+     * @param identifiant l'identifiant du tuple
+     * @param valeur la valeur associée du tuple
+     * @return le tuple
+     */
+    public Tuple setValeur(String identifiant, Valeur valeur) {
+        this.valeurs.put(identifiant, valeur);
         return this;
     }
 
@@ -69,6 +100,7 @@ public class Tuple {
         return concatenation;
     }
 
+    /** Méthode toString() */
     @Override
     public String toString() {
         return valeurs.toString();
