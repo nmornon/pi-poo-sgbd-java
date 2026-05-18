@@ -4,28 +4,54 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import java.io.Serializable;
+
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableDejaExistanteException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
 
-public class BaseDeDonnees {
+public class BaseDeDonnees implements Serializable {
     private String identifiant;
     private int prochainSerial;
     private boolean estOuvert = true;
     private Collection<Table> tables = new ArrayList<>();
 
+    /**
+     * Constructeur de la classe BaseDeDonnees
+     * @param identifiant identifiant de la BaseDeDonnees
+     * 
+     */
     public BaseDeDonnees(String identifiant){
         this(identifiant, 1);
     }
 
+    /**
+     * Constructeur de la classe BaseDeDonnees
+     * @param identifiant identifiant de la BaseDeDonnees
+     * @param dernierSerial dernière ligne correspondant au dernier tuple de la base
+     * 
+     */
     public BaseDeDonnees(String identifiant, int dernierSerial){
         this(identifiant, new ArrayList<>(), dernierSerial);
     }
 
+    /**
+     * Constructeur de la classe BaseDeDonnees
+     * @param identifiant identifiant de la BaseDeDonnees
+     * @param tables liste de table 
+     * 
+     */
     public BaseDeDonnees(String identifiant, Collection<Table> tables){
         this(identifiant, tables, 1);
     }
 
+    /**
+     * Constructeur de la classe BaseDeDonnees
+     * @param identifiant identifiant de la BaseDeDonnees
+     * @param tables liste de table 
+     * @param dernierSerial dernière ligne correspondant au dernier tuple de la base
+     * 
+     */
     public BaseDeDonnees(String identifiant, Collection<Table> tables, int dernierSerial){
         this.identifiant = identifiant;
         this.tables.addAll(tables);
@@ -52,6 +78,11 @@ public class BaseDeDonnees {
         return new ArrayList <> (this.tables);
     }
 
+    /**
+     * Vérifie qu'une table est dans la base de données
+     * @param identifiant identifiant de la table
+     * 
+     */
     public boolean hasTable(String identifiant) {
         for (Table table : this.tables) {
             if (table.getIdentifiant().equals(identifiant)) {
@@ -61,6 +92,11 @@ public class BaseDeDonnees {
         return false;
     }
 
+    /**
+     * Récupère une table de la base de données
+     * @param identifiant identifiant de la table
+     * 
+     */
     public Table getTable(String identifiant) {
         for (Table table : this.tables) {
             if (table.getIdentifiant().equals(identifiant)) {
@@ -72,6 +108,12 @@ public class BaseDeDonnees {
             identifiant));
     }
 
+    /**
+     * Crée une nouvelle table dans la base de données
+     * @param identifiant identifiant de la table
+     * @param donnees les données contenue dans la table
+     * 
+     */
     public Table creerTable(String identifiant, Collection<Colonne> donnees) {
         if (this.hasTable(identifiant)) {
             throw new TableDejaExistanteException(String.format("la table '%s' existe déjà", identifiant));
@@ -81,12 +123,26 @@ public class BaseDeDonnees {
         return table;
     }
 
+    /**
+     * Crée une nouvelle table dans la base de données
+     * @param identifiant identifiant de la table
+     * @param donnees les attributs de la table
+     * @param tuples les données contenue dans la table pour chaque attributs
+     * 
+     */
     public Table creerTable(String identifiant, Collection<Colonne> donnees, Collection<Tuple> tuples) {
         Table table = new Table(this, identifiant, donnees, tuples);
         this.tables.add(table);
         return table;
     }
 
+    /**
+     * Supprime une table de la base de données
+     * @param identifiant identifiant de la table
+     * 
+     * @throws TableInexistanteException
+     * 
+     */
     public void supprimerTable(String identifiant)  throws TableInexistanteException{
         Iterator<Table> it = this.tables.iterator();
 
@@ -103,6 +159,10 @@ public class BaseDeDonnees {
             identifiant));
     }
 
+    /**
+     * Affiche l'ensemble des tables contenue dans la base de données
+     * 
+     */
     public void afficherTables() {
         for (Table o : this.tables) {
             o.afficher();
