@@ -15,6 +15,13 @@ public class GestionnairePersistance {
     }
 
     public BaseDeDonnees charger(String nomFichier) throws IOException {
+        
+        if (!(new File(nomFichier).exists())) {
+            BaseDeDonnees baseDeDonnees = new BaseDeDonnees(nomFichier);
+            baseDeDonnees.setEstOuverte(true);
+            return baseDeDonnees;
+        }
+
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomFichier))){
             BaseDeDonnees baseDeDonnees = (BaseDeDonnees) ois.readObject();
             baseDeDonnees.setEstOuverte(true);
