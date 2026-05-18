@@ -4,6 +4,8 @@ SRC_TEST_DIR=srctest
 BIN_DIR=classes
 BIN_TEST_DIR=classestest
 DOC_DIR=doc
+DIR_ANALYSEUR=src/fr/insarouen/iti/compilation/sgbd/analyseurs
+PATH_ANALYSEUR=$(DIR_ANALYSEUR)/AnalyseurSyntaxique.jj
 
 JUNIT_JAR=/usr/share/java/junit4.jar
 HAMCREST_JAR=/usr/share/java/hamcrest-all.jar
@@ -22,7 +24,7 @@ compile: clean
 print: compile
 	javap -classpath $(BIN_DIR) $(shell find $(CLASSES_DIR) -name "*.class")
 
-run: compile
+run: javacc compile
 	java -classpath $(BIN_DIR) $(MAIN)
 
 test: compile
@@ -30,6 +32,12 @@ test: compile
 	javac -d $(BIN_TEST_DIR) -classpath $(BIN_TEST_DIR):$(BIN_DIR):$(JUNIT_JAR):$(HAMCREST_JAR) -sourcepath $(SRC_TEST_DIR) $(SOURCES_TESTS)
 	echo ""
 	java -classpath $(BIN_TEST_DIR):$(JUNIT_JAR):$(BIN_DIR):$(HAMCREST_JAR) org.junit.runner.JUnitCore $(TEST_FILE)
+
+javacc:
+	javacc -OUTPUT_DIRECTORY=$(DIR_ANALYSEUR) $(PATH_ANALYSEUR)
+
+javacc_clean:
+	rm $(DIR_ANALYSEUR)/*.java
 
 doc: compile
 	mkdir -p $(DOC_DIR)

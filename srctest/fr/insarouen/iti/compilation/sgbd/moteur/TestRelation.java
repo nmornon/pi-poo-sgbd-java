@@ -214,6 +214,13 @@ public class TestRelation {
     }
 
     @Test
+    public void test_alias() {
+        Relation relation = relationBases.alias("B");
+
+        assertThat(relation.getIdentifiant(), equalTo("B"));
+    }
+
+    @Test
     public void test_produitCartesien_avecLesDeuxMemesRelationsAvecAlias() {
         Relation relation1 = relationBases.alias("B1");
         Relation relation2 = relationBases.alias("B2");

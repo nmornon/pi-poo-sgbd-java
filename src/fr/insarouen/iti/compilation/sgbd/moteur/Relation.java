@@ -1,5 +1,6 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,7 +18,7 @@ import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Valeur;
 /**
  * Classe représentant une relation.
  */
-class Relation {
+public class Relation implements Serializable {
     /** L'identifiant de la relation */
     private String identifiant;
     /** La liste des colonnes de la relation */
@@ -140,6 +141,15 @@ class Relation {
      * @return la relation
      */
     public Relation alias(String alias) {
+        Collection<Colonne> colonnes = new ArrayList<>();
+        Collection<Tuple> tuples = new ArrayList<>();
+
+        for (Colonne colonne : this.colonnes) {
+            colonnes.add(colonne.prefixer(alias));
+        }
+        for (Tuple tuple : this.tuples) {
+            tuples.add(tuple.prefixer(alias));
+        }
         return new Relation(alias, colonnes, tuples);
     }
 
@@ -256,16 +266,16 @@ class Relation {
      * Affiche toutes les informations de la relation.
      */
     public void afficher() {
-        System.out.printf("> Table: %s\n", this.getIdentifiant());
+        System.out.printf("Table: %s\n", this.getIdentifiant());
         System.out.print("|");
 
         for (Colonne colonne : this.getColonnes()) {
-            System.out.printf(" %-15s |", colonne.identifiant());
+            System.out.printf(" %-20s |", colonne.identifiant());
         }
         System.out.print("\n|");
 
         for (int i = 0; i < this.getColonnes().size(); i++) {
-            System.out.printf("-".repeat(17));
+            System.out.printf("-".repeat(22));
             System.out.printf("|");
         }
         System.out.println();
@@ -274,7 +284,7 @@ class Relation {
             System.out.print("|");
 
             for (Colonne colonne : this.getColonnes()) {
-                System.out.printf(" %-15s |", tuple.getValeur(colonne.identifiant()));
+                System.out.printf(" %-20s |", tuple.getValeur(colonne.identifiant()));
             }
             System.out.println();
         }

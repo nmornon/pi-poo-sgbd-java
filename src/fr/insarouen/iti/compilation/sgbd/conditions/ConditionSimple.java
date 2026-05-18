@@ -20,9 +20,9 @@ public class ConditionSimple {
         int evaluation = valeurGauche.compareTo(valeurDroite);
 
         return switch (this.comparateur) {
-            case EGAL      -> evaluation ==  0;
-            case SUPERIEUR -> evaluation == +1;
-            case INFERIEUR -> evaluation == -1;
+            case EGAL      -> evaluation == 0;
+            case SUPERIEUR -> evaluation  > 0;
+            case INFERIEUR -> evaluation  < 0;
             default        -> false;
         };
     }

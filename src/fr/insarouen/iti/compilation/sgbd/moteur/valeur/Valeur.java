@@ -36,10 +36,6 @@ public abstract class Valeur implements Comparable<Valeur> {
 
     @Override
     public String toString(){
-        return String.format(
-            "%s(%s)",
-            this.getClass().getSimpleName(),
-            this.valeur
-        );
+        return this.valeur.toString();
     }
 }
