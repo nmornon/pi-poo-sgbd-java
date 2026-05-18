@@ -10,47 +10,57 @@ import fr.insarouen.iti.compilation.sgbd.exceptions.TableDejaExistanteException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
 
+/**
+ * Classe représentant la base de données
+ */
 public class BaseDeDonnees implements Serializable {
+    /** L'identifiant de la base de données */
     private String identifiant;
+    /** Clé du prochain tuple de la base de données */
     private int prochainSerial;
+    /** Booléen permettant de savoir si la base est ouverte */
     private boolean estOuvert = true;
+    /** La liste des tables de la base de données */
     private Collection<Table> tables = new ArrayList<>();
 
     /**
-     * Constructeur de la classe BaseDeDonnees
-     * @param identifiant identifiant de la BaseDeDonnees
+     * Construit la base à partir de l'identifiant et le compteur de clés que l'on
+            initialise à 1
      * 
+     * @param identifiant le nom de la base
      */
     public BaseDeDonnees(String identifiant){
         this(identifiant, 1);
     }
 
     /**
-     * Constructeur de la classe BaseDeDonnees
-     * @param identifiant identifiant de la BaseDeDonnees
-     * @param dernierSerial dernière ligne correspondant au dernier tuple de la base
+     * Construit la base à partir de l'identifiant et le compteur de clés
      * 
+     * @param identifiant nom de la base
+     * @param dernierSerial dernière clé utilisée
      */
     public BaseDeDonnees(String identifiant, int dernierSerial){
         this(identifiant, new ArrayList<>(), dernierSerial);
     }
 
     /**
-     * Constructeur de la classe BaseDeDonnees
-     * @param identifiant identifiant de la BaseDeDonnees
-     * @param tables liste de table 
+     * Construit la base à partir de l'identifiant, des tables fournies et
+            le compteur de clés que l'on initialise à 1
      * 
+     * @param identifiant nom de la base
+     * @param tables tables à charger dans la base
      */
     public BaseDeDonnees(String identifiant, Collection<Table> tables){
         this(identifiant, tables, 1);
     }
 
     /**
-     * Constructeur de la classe BaseDeDonnees
-     * @param identifiant identifiant de la BaseDeDonnees
-     * @param tables liste de table 
-     * @param dernierSerial dernière ligne correspondant au dernier tuple de la base
-     * 
+     * Construit la base à partir de l'identifiant, le compteur de clés et
+            des tables fournies
+     *
+     * @param identifiant nom de la base
+     * @param dernierSerial dernière clé utilisée
+     * @param tables tables à charger dans la base
      */
     public BaseDeDonnees(String identifiant, Collection<Table> tables, int dernierSerial){
         this.identifiant = identifiant;
@@ -58,30 +68,56 @@ public class BaseDeDonnees implements Serializable {
         this.prochainSerial = dernierSerial;
     }
 
+    /**
+     * Indique si la base est ouverte
+     * 
+     * @return true si la base est ouverte, false sinon
+     */
     public boolean getEstOuverte() {
         return this.estOuvert;
     }
 
+    /**
+     * Ouvre ou ferme la base
+     * 
+     * @param bool true pour ouvrir la base, false pour la fermer
+     */
     public void setEstOuverte(boolean bool) {
         this.estOuvert = bool;
     }
 
+    /**
+     * Renvoie l'identifiant de la base
+     * 
+     * @return le nom de la base
+     */
     public String getIdentifiant() {
         return this.identifiant;
     }
 
+    /**
+     * Génère la prochaine clé
+     * 
+     * @return la prochaine clé de type Cle
+     */
     public Cle getProchaineCle() {
         return new Cle(this.prochainSerial++);
     }
 
+    /**
+     * Renvoie une copie de la collection des tables de la base
+     * 
+     * @return les tables de la base
+     */
     public Collection<Table> getTables() {
         return new ArrayList <> (this.tables);
     }
 
     /**
-     * Vérifie qu'une table est dans la base de données
-     * @param identifiant identifiant de la table
-     * 
+     * Vérifie qu'une table avec l'identifiant spécifié existe
+     *
+     * @param identifiant nom de la table que l'on cherche
+     * @return true si la table existe, false sinon
      */
     public boolean hasTable(String identifiant) {
         for (Table table : this.tables) {
@@ -93,9 +129,11 @@ public class BaseDeDonnees implements Serializable {
     }
 
     /**
-     * Récupère une table de la base de données
-     * @param identifiant identifiant de la table
-     * 
+     * Renvoie une table à partir de son identifiant
+     *
+     * @param identifiant nom de la table que l'on cherche
+     * @return table correspondante
+     * @throws TableInexistanteException si aucune table ne possède ce nom
      */
     public Table getTable(String identifiant) {
         for (Table table : this.tables) {
@@ -109,10 +147,12 @@ public class BaseDeDonnees implements Serializable {
     }
 
     /**
-     * Crée une nouvelle table dans la base de données
-     * @param identifiant identifiant de la table
-     * @param donnees les données contenue dans la table
-     * 
+     * Crée une table vide avant de l'ajouter à la base
+     *
+     * @param identifiant nom de la table à ajouter
+     * @param donnees colonnes de la table
+     * @return la table créée
+     * @throws TableDejaExistanteException si une table de même identifiant existe déjà
      */
     public Table creerTable(String identifiant, Collection<Colonne> donnees) {
         if (this.hasTable(identifiant)) {
@@ -124,11 +164,12 @@ public class BaseDeDonnees implements Serializable {
     }
 
     /**
-     * Crée une nouvelle table dans la base de données
-     * @param identifiant identifiant de la table
-     * @param donnees les attributs de la table
-     * @param tuples les données contenue dans la table pour chaque attributs
-     * 
+     * Crée une table remplie avant de l'ajouter à la base
+     *
+     * @param identifiant nom de la table à ajouter
+     * @param donnees colonnes de la table
+     * @param tuples typles de la table
+     * @return la table créée
      */
     public Table creerTable(String identifiant, Collection<Colonne> donnees, Collection<Tuple> tuples) {
         Table table = new Table(this, identifiant, donnees, tuples);
@@ -137,11 +178,10 @@ public class BaseDeDonnees implements Serializable {
     }
 
     /**
-     * Supprime une table de la base de données
-     * @param identifiant identifiant de la table
-     * 
-     * @throws TableInexistanteException
-     * 
+     * Supprime une table de la base
+     *
+     * @param identifiant nom de la table à supprimer
+     * @throws TableInexistanteException si la table n'existe pas
      */
     public void supprimerTable(String identifiant)  throws TableInexistanteException{
         Iterator<Table> it = this.tables.iterator();
@@ -160,8 +200,7 @@ public class BaseDeDonnees implements Serializable {
     }
 
     /**
-     * Affiche l'ensemble des tables contenue dans la base de données
-     * 
+     * Affiche toutes les tables de la base
      */
     public String toString() {
         for (Table o : this.tables) {
@@ -174,6 +213,11 @@ public class BaseDeDonnees implements Serializable {
         return texte.toString();
     }
 
+    /** Compare deux bases à l'aide de leur identifiant
+     * 
+     * @param object objet à comparer avec la base
+     * @return true si les identifiants sont les mêmes, false sinon
+     */
     @Override
     public boolean equals(Object object) {
         if (object == null) {
