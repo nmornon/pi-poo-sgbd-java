@@ -1,6 +1,13 @@
 @startuml
 left to right direction
-actor "Technicien Batcave" as tb
+skinparam actorRender2D true
+skinparam actor {
+    BackgroundColor transparent
+    BorderColor transparent
+    StereotypeFontColor transparent
+}
+
+actor "<img:/home/llacroix/Documents/PI-AVENTURE/pi-aventure/batcave-technician.png{scale=0.5}>\n       Technicien Batcave" as tb
 
 package "Manipulation de la structure" {
   usecase "Créer une table" as UC1
