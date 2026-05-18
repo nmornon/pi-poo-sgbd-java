@@ -5,7 +5,7 @@ BIN_DIR=classes
 BIN_TEST_DIR=classestest
 DOC_DIR=doc
 DIR_ANALYSEUR=src/fr/insarouen/iti/compilation/sgbd/analyseurs
-PATH_ANALYSEUR=$(DIR_ANALYSEUR)/AnalyseurSyntaxique.jj
+PATH_ANALYSEUR=$(DIR_ANALYSEUR)/Interpreteur.jj
 
 JUNIT_JAR=/usr/share/java/junit4.jar
 HAMCREST_JAR=/usr/share/java/hamcrest-all.jar
@@ -25,7 +25,7 @@ print: compile
 	javap -classpath $(BIN_DIR) $(shell find $(CLASSES_DIR) -name "*.class")
 
 run: javacc compile
-	java -classpath $(BIN_DIR) $(MAIN)
+	java -classpath $(BIN_DIR) $(MAIN) base.bdd
 
 test: compile
 	mkdir -p $(BIN_TEST_DIR)

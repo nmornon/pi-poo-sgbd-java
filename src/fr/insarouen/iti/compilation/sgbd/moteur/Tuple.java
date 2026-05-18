@@ -1,5 +1,6 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +9,7 @@ import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Valeur;
 /**
  * Classe représentant un tuple (ligne) d'une relation
  */
-public class Tuple {
+public class Tuple implements Serializable {
     /** Collection de paires de identifiant/valeur */
     private Map<String, Valeur> valeurs;
 

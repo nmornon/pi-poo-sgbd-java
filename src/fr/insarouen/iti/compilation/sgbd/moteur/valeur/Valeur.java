@@ -1,9 +1,11 @@
 package fr.insarouen.iti.compilation.sgbd.moteur.valeur;
 
+import java.io.Serializable;
+
 import fr.insarouen.iti.compilation.sgbd.moteur.Type;
 
 /** Classe abstraites représentant les différentes valeurs possibles pour les tuples et colonnes */
-public abstract class Valeur implements Comparable<Valeur> {
+public abstract class Valeur implements Comparable<Valeur>, Serializable {
     /** Le type */
     private Type type;
     /** La valeur */

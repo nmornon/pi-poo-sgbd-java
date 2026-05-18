@@ -1,6 +1,8 @@
 package fr.insarouen.iti.compilation.sgbd.moteur;
 
-public record Colonne(String identifiant, Type type) {
+import java.io.Serializable;
+
+public record Colonne(String identifiant, Type type) implements Serializable {
 
     /**
      * Préfixe l'colonne avec le préfixe spécifié s'il n'est pas déjà préfixé.

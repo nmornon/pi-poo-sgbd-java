@@ -105,9 +105,7 @@ void commande():
 {
     (
           <SINGLE_LINE_COMMENT>
-        | {
-            System.out.print("> ");
-        } (
+        | (
               commandeCreate()
             | commandeInsert()
             | commandeSelect()
