@@ -163,11 +163,15 @@ public class BaseDeDonnees implements Serializable {
      * Affiche l'ensemble des tables contenue dans la base de données
      * 
      */
-    public void afficherTables() {
+    public String toString() {
         for (Table o : this.tables) {
-            o.afficher();
-            System.out.println(" ------------------------------- ");
+            StringBuilder texte = new StringBuilder();
+            texte.append(String.format("Identifiant de la base : %s \n", this.identiant));
+            texte.append(String.format("Table %s \n", o.getIdentifiant());
+            texte.append(String.format("\n", o.toString());
+            texte.append(String.format("--------------------- \n");
         }
+        return texte.toString();
     }
 
     @Override
