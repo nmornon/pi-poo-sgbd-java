@@ -135,7 +135,6 @@ void commandeCreate():
     <PARENTHESE_FERMANTE>
 
     {
-        //Il faut récupérer la base de données à aquelle on applique la commande
         this.getBdd().creerTable(table, listeColonnes);
         System.out.printf("Table %s créée.\n", table);
     }
@@ -249,8 +248,7 @@ void commandeSelect():
         if (!hasEtoile){
             relation = relation.selectionner(colonnes);
         }
-        relation.afficher();
-        // Sysyem.out.println(relation);
+        System.out.println(relation);
     }
 }
 
@@ -284,8 +282,7 @@ void commandeTables():
 {
     <TABLES> 
     {
-        this.getBdd().afficherTables();
-        // System.out.println(this.getBdd());
+        System.out.println(this.getBdd());
     }
 }
 

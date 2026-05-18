@@ -203,12 +203,12 @@ public class BaseDeDonnees implements Serializable {
      * Affiche toutes les tables de la base
      */
     public String toString() {
+        StringBuilder texte = new StringBuilder();
         for (Table o : this.tables) {
-            StringBuilder texte = new StringBuilder();
-            texte.append(String.format("Identifiant de la base : %s \n", this.identiant));
-            texte.append(String.format("Table %s \n", o.getIdentifiant());
-            texte.append(String.format("\n", o.toString());
-            texte.append(String.format("--------------------- \n");
+            texte.append(String.format("Identifiant de la base : %s \n", this.identifiant));
+            texte.append(String.format("Table %s \n", o.getIdentifiant()));
+            texte.append(String.format("\n", o.toString()));
+            texte.append(String.format("--------------------- \n"));
         }
         return texte.toString();
     }

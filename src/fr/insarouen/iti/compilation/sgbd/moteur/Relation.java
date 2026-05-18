@@ -265,30 +265,33 @@ public class Relation implements Serializable {
     /**
      * Affiche toutes les informations de la relation.
      */
-    public void afficher() {
-        System.out.printf("Table: %s\n", this.getIdentifiant());
-        System.out.print("|");
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("Table: %s\n", this.getIdentifiant()));
+        builder.append("|");
 
         for (Colonne colonne : this.getColonnes()) {
-            System.out.printf(" %-20s |", colonne.identifiant());
+            builder.append(String.format(" %-20s |", colonne.identifiant()));
         }
-        System.out.print("\n|");
+        builder.append("\n|");
 
         for (int i = 0; i < this.getColonnes().size(); i++) {
-            System.out.printf("-".repeat(22));
-            System.out.printf("|");
+            builder.append(String.format("-".repeat(22)));
+            builder.append(String.format("|"));
         }
-        System.out.println();
+        builder.append("\n");
 
         for (Tuple tuple : this.getTuples()) {
-            System.out.print("|");
+            builder.append("|");
 
             for (Colonne colonne : this.getColonnes()) {
-                System.out.printf(" %-20s |", tuple.getValeur(colonne.identifiant()));
+                builder.append(String.format(" %-20s |", tuple.getValeur(colonne.identifiant())));
             }
-            System.out.println();
+            builder.append("\n");
         }
-        System.out.println();
+        builder.append("\n");
+        return builder.toString();
     }
 
     private String concatenerIdentifiants(String identifiant1, String identifiant2) {
