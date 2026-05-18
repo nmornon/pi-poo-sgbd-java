@@ -1,7 +1,7 @@
 package fr.insarouen.iti.compilation.sgbd.exceptions;
 
 /** Indique le type n'est pas valide */
-public class TypeInvalideException extends PIAventureException {
+public class TypeInvalideException extends SGBDException {
 
     /**
      * Crée une exception avec un message

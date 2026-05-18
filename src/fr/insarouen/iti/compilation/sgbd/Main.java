@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 import fr.insarouen.iti.compilation.sgbd.analyseurs.Interpreteur;
 import fr.insarouen.iti.compilation.sgbd.analyseurs.ParseException;
-import fr.insarouen.iti.compilation.sgbd.exceptions.PIAventureException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.SGBDException;
 import fr.insarouen.iti.compilation.sgbd.moteur.BaseDeDonnees;
 import fr.insarouen.iti.compilation.sgbd.persistance.GestionnairePersistance;
 
@@ -39,7 +39,7 @@ public class Main {
                 analyseur.commande();
             } catch (ParseException e) {
                 System.err.printf("Erreur : %s\n", e.getMessage());
-            } catch (PIAventureException e) {
+            } catch (SGBDException e) {
                 System.err.printf("Erreur : %s\n", e.getMessage());
             }
         }

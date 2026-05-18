@@ -3,7 +3,7 @@ package fr.insarouen.iti.compilation.sgbd.exceptions;
 /**
  * Classe mère des exceptions sur les tables
  */
-public class TableException extends PIAventureException {
+public class TableException extends SGBDException {
 
     /**
      * Crée une exception avec un message

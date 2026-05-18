@@ -3,14 +3,14 @@ package fr.insarouen.iti.compilation.sgbd.exceptions;
 /**
  * Classe mère des exceptions du sgbd
  */
-public class PIAventureException extends RuntimeException {
+public class SGBDException extends RuntimeException {
 
     /**
      * Crée une exception avec un message
      *
      * @param message message décrivant l'erreur
      */
-    public PIAventureException(String message) {
+    public SGBDException(String message) {
         super(message);
     }
 
@@ -20,7 +20,7 @@ public class PIAventureException extends RuntimeException {
      * @param message message décrivant l'erreur
      * @param cause cause de l'exception
      */
-    public PIAventureException(String message, Throwable cause) {
+    public SGBDException(String message, Throwable cause) {
         super(message, cause);
     }
 }
