@@ -202,11 +202,15 @@ public class BaseDeDonnees implements Serializable {
     /**
      * Affiche toutes les tables de la base
      */
-    public void afficherTables() {
+    public String toString() {
         for (Table o : this.tables) {
-            o.afficher();
-            System.out.println(" ------------------------------- ");
+            StringBuilder texte = new StringBuilder();
+            texte.append(String.format("Identifiant de la base : %s \n", this.identiant));
+            texte.append(String.format("Table %s \n", o.getIdentifiant());
+            texte.append(String.format("\n", o.toString());
+            texte.append(String.format("--------------------- \n");
         }
+        return texte.toString();
     }
 
     /** Compare deux bases à l'aide de leur identifiant
