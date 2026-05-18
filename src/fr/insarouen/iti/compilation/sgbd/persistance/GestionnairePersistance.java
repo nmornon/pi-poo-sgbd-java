@@ -10,16 +10,21 @@ import java.io.IOException;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 
+/** Classe GestionnairePersistance permettant les sauvegardes de base de données sur un fichier */
 public class GestionnairePersistance {
 
+    /**
+     * Construit un gestionnaire de persistance.
+     */
     public GestionnairePersistance() {
     }
 
     /**
-     * Charge une base de données depuis un fichier 
-     * @param nomFichier nom du fichier
+     * Charge la base de données à partir d'un fichier
      * 
-     * @throws IOException
+     * @param nomFichier le nom du fichier pour charger la base
+     * @return la base chargée
+     * @throws IOException si on n'arrive pas à lire le fichier
      */
     public BaseDeDonnees charger(String nomFichier) throws IOException {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomFichier))){
@@ -35,10 +40,10 @@ public class GestionnairePersistance {
         }
     }
     
-    /**
-     * Sauvegarde une base de données dans un fichier 
-     * @param baseDeDonnnees la base de données a sauvegarder
+    /** Sauvegarde la base dans un fichier
      * 
+     * @param baseDeDonnees base à sauvegarder
+     * @throws IOException si on n'arrive pas à écrire dans le fichier
      */
     public void sauvegarder(BaseDeDonnees baseDeDonnees) throws IOException{
         FileOutputStream fichier = new FileOutputStream(baseDeDonnees.getIdentifiant());
