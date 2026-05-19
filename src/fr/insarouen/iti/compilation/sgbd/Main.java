@@ -31,16 +31,17 @@ public class Main {
                     commande = commande + "\n" + scanner.nextLine();
                 }
 
-            initialiserInterpreteur(commande);
+                initialiserInterpreteur(commande);
 
-            try {
-                Interpreteur.commande(bdd);
-            } catch (ParseException e) {
-                System.err.printf("Erreur : %s\n", e.getMessage());
-            } catch (SGBDException e) {
-                System.err.printf("Erreur : %s\n", e.getMessage());
-            } catch (TokenMgrError e) {
-                System.err.printf("Erreur : %s\n", e.getMessage());
+                try {
+                    Interpreteur.commande(bdd);
+                } catch (ParseException e) {
+                    System.err.printf("Erreur : %s\n", e.getMessage());
+                } catch (SGBDException e) {
+                    System.err.printf("Erreur : %s\n", e.getMessage());
+                } catch (TokenMgrError e) {
+                    System.err.printf("Erreur : %s\n", e.getMessage());
+                }
             }
         }
         gestionnaire.sauvegarder(bdd);
