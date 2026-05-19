@@ -12,6 +12,7 @@ import fr.insarouen.iti.compilation.sgbd.moteur.BaseDeDonnees;
 import fr.insarouen.iti.compilation.sgbd.persistance.GestionnairePersistance;
 
 public class Main {
+    private static Interpreteur interpreteur = null;
     
     public static void main(String[] args) throws IOException {
         GestionnairePersistance gestionnaire = new GestionnairePersistance();
@@ -28,13 +29,10 @@ public class Main {
                 commande = commande + "\n" + scanner.nextLine();
             }
 
-            Reader reader = new StringReader(commande);
-
-            Interpreteur analyseur = new Interpreteur(reader);
-            analyseur.setBdd(bdd);
+            initialiserInterpreteur(commande);
 
             try {
-                analyseur.commande();
+                Interpreteur.commande(bdd);
             } catch (ParseException e) {
                 System.err.printf("Erreur : %s\n", e.getMessage());
             } catch (SGBDException e) {
@@ -43,5 +41,15 @@ public class Main {
         }
         gestionnaire.sauvegarder(bdd);
         scanner.close();
+    }
+
+    private static void initialiserInterpreteur(String commande) {
+        Reader reader = new StringReader(commande);
+
+        if (Main.interpreteur == null) {
+            Main.interpreteur = new Interpreteur(reader);
+        } else {
+            Interpreteur.ReInit(reader);
+        }
     }
 }

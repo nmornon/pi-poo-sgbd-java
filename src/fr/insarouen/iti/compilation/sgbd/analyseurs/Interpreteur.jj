@@ -2,7 +2,7 @@ options {
   LOOKAHEAD = 1;
   CHOICE_AMBIGUITY_CHECK = 1;
   OTHER_AMBIGUITY_CHECK = 1;
-  STATIC = false;
+  STATIC = true;
   DEBUG_PARSER = false;
   DEBUG_LOOKAHEAD = false;
   DEBUG_TOKEN_MANAGER = false;
@@ -45,16 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class Interpreteur {
-    private BaseDeDonnees bdd;
-
-    public void setBdd(BaseDeDonnees base){
-        this.bdd = base;
-    }
-    public BaseDeDonnees getBdd(){
-        return this.bdd;
-    }
-}
+public class Interpreteur {}
 
 PARSER_END(Interpreteur)
 
@@ -99,25 +90,25 @@ TOKEN:{
   | <COMMENTAIRE: "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
 }
 
-void commande():
+void commande(BaseDeDonnees bdd):
 {}
 {
     (
           <COMMENTAIRE>
         | (
-              commandeCreate()
-            | commandeInsert()
-            | commandeSelect()
-            | commandeDelete()
-            | commandeDrop()
-            | commandeTables()
-            | commandeExit()
+              commandeCreate(bdd)
+            | commandeInsert(bdd)
+            | commandeSelect(bdd)
+            | commandeDelete(bdd)
+            | commandeDrop(bdd)
+            | commandeTables(bdd)
+            | commandeExit(bdd)
         ) <POINTVIRGULE> 
     )*
     <EOF>
 }
 
-void commandeCreate():
+void commandeCreate(BaseDeDonnees bdd):
 {
     Collection<Colonne> colonnes = new ArrayList<Colonne>();
     Colonne colonne;
@@ -131,24 +122,24 @@ void commandeCreate():
     )*
     <PARENTHESE_FERMANTE>
     {
-        this.getBdd().creerTable(table, colonnes);
+        bdd.creerTable(table, colonnes);
         System.out.printf("Table %s créée.\n", table);
     }
 }
 
-void commandeDrop():
+void commandeDrop(BaseDeDonnees bdd):
 {
     String table;
 }
 {
     <DROP> <TABLE> table = identifiant()
     {
-        this.getBdd().supprimerTable(table);
+        bdd.supprimerTable(table);
         System.out.printf("Table %s supprimée.\n", table);
     }
 }
 
-void commandeInsert():
+void commandeInsert(BaseDeDonnees bdd):
 {
     String table, colonne;
     List<String> colonnes = new ArrayList<String>();
@@ -172,12 +163,12 @@ void commandeInsert():
         for (int i = 0; i < colonnes.size(); i++){
             tuple.setValeur(colonnes.get(i), valeurs.get(i));
         }
-        this.getBdd().getTable(table).inserer(tuple);
+        bdd.getTable(table).inserer(tuple);
         System.out.printf("1 ligne insérée dans la table %s.\n", table);
     }
 }
 
-void commandeDelete():
+void commandeDelete(BaseDeDonnees bdd):
 {
     String table;
     ExpressionLogique expression = null;
@@ -192,15 +183,15 @@ void commandeDelete():
         int nbLignesSupprimees;
 
         if (hasWhere){
-            nbLignesSupprimees = this.getBdd().getTable(table).supprimer(expression);
+            nbLignesSupprimees = bdd.getTable(table).supprimer(expression);
         } else {
-            nbLignesSupprimees = this.getBdd().getTable(table).supprimer();
+            nbLignesSupprimees = bdd.getTable(table).supprimer();
         }
         System.out.printf("%d ligne(s) supprimée(s) dans la table %s.\n", nbLignesSupprimees, table);
     }
 }
 
-void commandeSelect():
+void commandeSelect(BaseDeDonnees bdd):
 {
     String table;
     Set<String> colonnes = new HashSet<String>();
@@ -217,9 +208,9 @@ void commandeSelect():
             <VIRGULE> table = identifiant() { colonnes.add(table); }
         )*
     )
-    <FROM> relation = source() 
+    <FROM> relation = source(bdd)
     (
-        <VIRGULE> source = source() {relation = relation.produitCartesien(source);}
+        <VIRGULE> source = source(bdd) {relation = relation.produitCartesien(source);}
     )*
     (
         <WHERE> expression = expressionLogique() { hasWhere = true; }
@@ -235,23 +226,23 @@ void commandeSelect():
     }
 }
 
-void commandeTables():
+void commandeTables(BaseDeDonnees bdd):
 {}
 {
     <TABLES> 
     {
-        System.out.println(this.getBdd());
+        System.out.println(bdd);
     }
 }
 
-void commandeExit():
+void commandeExit(BaseDeDonnees bdd):
 {}
 {
     ( 
       <EXIT> | <QUIT>
     )
     {
-        this.getBdd().setEstOuverte(false);
+        bdd.setEstOuverte(false);
         System.out.println("Au revoir !");
     }
 }
@@ -298,7 +289,7 @@ ConditionSimple conditionSimple():
     }
 }
 
-Relation source():
+Relation source(BaseDeDonnees bdd):
 {
     String identifiant, alias;
 }
@@ -306,10 +297,10 @@ Relation source():
     identifiant = identifiant()
     (
         (<AS>)?
-        alias = identifiant() { return this.getBdd().getTable(identifiant).alias(alias); }
+        alias = identifiant() { return bdd.getTable(identifiant).alias(alias); }
     )?
     {
-        return this.getBdd().getTable(identifiant);
+        return bdd.getTable(identifiant);
     }
 }
 
