@@ -14,7 +14,7 @@ MAIN=fr.insarouen.iti.compilation.sgbd.Main
 TEST_FILE=fr.insarouen.iti.compilation.sgbd.AllTests
 SOURCES=$(shell find $(SRC_DIR) -name "*.java")
 SOURCES_TESTS=$(shell find $(SRC_TEST_DIR) -name "*.java")
-BASE?=base.bdd
+BASE?=base
 
 all: run
 
@@ -26,7 +26,7 @@ print: compile
 	javap -classpath $(BIN_DIR) $(shell find $(CLASSES_DIR) -name "*.class")
 
 run: javacc compile
-	java -classpath $(BIN_DIR) $(MAIN) $(BASE)
+	java -classpath $(BIN_DIR) $(MAIN) $(BASE).bdd
 
 test: compile
 	mkdir -p $(BIN_TEST_DIR)
@@ -35,7 +35,7 @@ test: compile
 	java -classpath $(BIN_TEST_DIR):$(JUNIT_JAR):$(BIN_DIR):$(HAMCREST_JAR) org.junit.runner.JUnitCore $(TEST_FILE)
 
 javacc:
-	javacc -OUTPUT_DIRECTORY=$(DIR_ANALYSEUR) $(PATH_ANALYSEUR)
+	javacc -OUTPUT_DIRECTORY=$(DIR_ANALYSEUR) $(PATH_ANALYSEUR) > /dev/null
 
 javacc_clean:
 	rm $(DIR_ANALYSEUR)/*.java
