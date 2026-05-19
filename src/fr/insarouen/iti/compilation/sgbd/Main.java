@@ -15,9 +15,7 @@ public class Main {
     
     public static void main(String[] args) throws IOException {
         GestionnairePersistance gestionnaire = new GestionnairePersistance();
-        System.out.println(args);
         BaseDeDonnees bdd = gestionnaire.charger(args[0]);
-        // BaseDeDonnees bdd = new BaseDeDonnees("base");
         Scanner scanner = new Scanner(System.in);
 
         System.out.printf("Base de données : %s\n", bdd.getIdentifiant());

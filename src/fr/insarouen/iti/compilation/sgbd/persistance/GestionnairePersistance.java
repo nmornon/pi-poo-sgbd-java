@@ -36,7 +36,7 @@ public class GestionnairePersistance {
             e.printStackTrace();
             return null;
         } catch (FileNotFoundException e) {
-            throw new FileNotFoundException("Il n'y a pas de fichier de ce nom");
+            return new BaseDeDonnees(nomFichier);
         }
     }
     

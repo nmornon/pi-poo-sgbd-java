@@ -18,7 +18,7 @@ options {
   FORCE_LA_CHECK = true;
 }
 
-PARSER_BEGIN(AnalyseurSyntaxique)
+PARSER_BEGIN(Interpreteur)
 package fr.insarouen.iti.compilation.sgbd.analyseurs;
 
 import fr.insarouen.iti.compilation.sgbd.moteur.Colonne;
@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class AnalyseurSyntaxique{
+public class Interpreteur {
     private BaseDeDonnees bdd;
 
     public void setBdd(BaseDeDonnees base){
@@ -56,7 +56,7 @@ public class AnalyseurSyntaxique{
     }
 }
 
-PARSER_END(AnalyseurSyntaxique)
+PARSER_END(Interpreteur)
 
 SKIP: {
       " " 
