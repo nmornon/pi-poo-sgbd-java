@@ -2,7 +2,7 @@ options {
   LOOKAHEAD = 1;
   CHOICE_AMBIGUITY_CHECK = 1;
   OTHER_AMBIGUITY_CHECK = 1;
-  STATIC = false;
+  STATIC = true;
   DEBUG_PARSER = false;
   DEBUG_LOOKAHEAD = false;
   DEBUG_TOKEN_MANAGER = false;
@@ -45,16 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class Interpreteur {
-    private BaseDeDonnees bdd;
-
-    public void setBdd(BaseDeDonnees base){
-        this.bdd = base;
-    }
-    public BaseDeDonnees getBdd(){
-        return this.bdd;
-    }
-}
+public class Interpreteur {}
 
 PARSER_END(Interpreteur)
 
@@ -96,152 +87,137 @@ TOKEN:{
   | <NUMBER: (["0"-"9"])+ >
   | <ID:["A"-"Z","a"-"z","_"](["A"-"Z","a"-"z","_",".","0"-"9"])*> 
   | <STRING: "\""(~["\""])*"\"">
-  | <COMMENTAIRE: "--">
-  | <SINGLE_LINE_COMMENT: "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+  | <COMMENTAIRE: "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
 }
 
-void commande():
+void commande(BaseDeDonnees bdd):
 {}
 {
     (
-          <SINGLE_LINE_COMMENT>
+          <COMMENTAIRE>
         | (
-              commandeCreate()
-            | commandeInsert()
-            | commandeSelect()
-            | commandeDelete()
-            | commandeDrop()
-            | commandeTables()
-            | commandeExit()
+              commandeCreate(bdd)
+            | commandeInsert(bdd)
+            | commandeSelect(bdd)
+            | commandeDelete(bdd)
+            | commandeDrop(bdd)
+            | commandeTables(bdd)
+            | commandeExit(bdd)
         ) <POINTVIRGULE> 
     )*
     <EOF>
 }
 
-void commandeCreate():
+void commandeCreate(BaseDeDonnees bdd):
 {
-    Collection<Colonne> listeColonnes = new ArrayList<Colonne>();
+    Collection<Colonne> colonnes = new ArrayList<Colonne>();
     Colonne colonne;
     String table;
 }
 {
     <CREATE> <TABLE> table = identifiant() <PARENTHESE_OUVRANTE>
-    colonne = colonne() {listeColonnes.add(colonne);}
+    colonne = colonne() { colonnes.add(colonne); }
     (
-        <VIRGULE> colonne = colonne() {listeColonnes.add(colonne);}
+        <VIRGULE> colonne = colonne() { colonnes.add(colonne); }
     )*
     <PARENTHESE_FERMANTE>
-
     {
-        this.getBdd().creerTable(table, listeColonnes);
+        bdd.creerTable(table, colonnes);
         System.out.printf("Table %s créée.\n", table);
     }
 }
 
-void commandeDrop():
+void commandeDrop(BaseDeDonnees bdd):
 {
     String table;
 }
 {
     <DROP> <TABLE> table = identifiant()
     {
-        this.getBdd().supprimerTable(table);
+        bdd.supprimerTable(table);
         System.out.printf("Table %s supprimée.\n", table);
     }
 }
 
-void commandeInsert():
+void commandeInsert(BaseDeDonnees bdd):
 {
     String table, colonne;
-    List<String> listeId = new ArrayList<String>();
-    List<Valeur> listeVal = new ArrayList<Valeur>();
-    Valeur val;
+    List<String> colonnes = new ArrayList<String>();
+    List<Valeur> valeurs = new ArrayList<Valeur>();
+    Valeur valeur;
     Tuple tuple = new Tuple();
 }
 {
-    <INSERT> <INTO> table = identifiant()
-
-    <PARENTHESE_OUVRANTE>
-    colonne = identifiant() {listeId.add(colonne);}
+    <INSERT> <INTO> table = identifiant() <PARENTHESE_OUVRANTE>
+    colonne = identifiant() { colonnes.add(colonne); }
     (
-        <VIRGULE> colonne = identifiant() {listeId.add(colonne);}
-    )*
-    <PARENTHESE_FERMANTE>
-
-    <VALUES> <PARENTHESE_OUVRANTE> val = valeur() {listeVal.add(val);}
+        <VIRGULE> colonne = identifiant() { colonnes.add(colonne); }
+    )* <PARENTHESE_FERMANTE>
+    <VALUES> <PARENTHESE_OUVRANTE> valeur = valeur() { valeurs.add(valeur); }
     (
-        <VIRGULE> val = valeur() {listeVal.add(val);}
+        <VIRGULE> valeur = valeur() { valeurs.add(valeur); }
     )*
     <PARENTHESE_FERMANTE>
 
     {
-        for(int i=0; i<listeId.size(); i++){
-            tuple.setValeur(listeId.get(i), listeVal.get(i));
+        for (int i = 0; i < colonnes.size(); i++){
+            tuple.setValeur(colonnes.get(i), valeurs.get(i));
         }
-        this.getBdd().getTable(table).inserer(tuple);
+        bdd.getTable(table).inserer(tuple);
         System.out.printf("1 ligne insérée dans la table %s.\n", table);
     }
 }
 
-void commandeDelete():
+void commandeDelete(BaseDeDonnees bdd):
 {
     String table;
-    ExpressionLogique exp = null;
+    ExpressionLogique expression = null;
     boolean hasWhere = false;
 }
 {
     <DELETE> <FROM> table = identifiant()
     (
-        <WHERE> exp = expressionLogique() {hasWhere = true;}
+        <WHERE> expression = expressionLogique() { hasWhere = true; }
     )?
-
     {
         int nbLignesSupprimees;
+
         if (hasWhere){
-            nbLignesSupprimees = this.getBdd().getTable(table).supprimer(exp);
-        }
-        else {
-            //methode supprimer(sans param) permet de supprimer tous les tuples
-            nbLignesSupprimees = this.getBdd().getTable(table).supprimer();
+            nbLignesSupprimees = bdd.getTable(table).supprimer(expression);
+        } else {
+            nbLignesSupprimees = bdd.getTable(table).supprimer();
         }
         System.out.printf("%d ligne(s) supprimée(s) dans la table %s.\n", nbLignesSupprimees, table);
     }
 }
 
-//1. Récupérer la liste des noms des colonnes dans listeIdAvecAlias
-//2. Modifier cette liste pour avoir uniquement les noms des colonnes sans les alias
-//3. Transformer cette liste en liste d'colonnes pour pouvoir appeler la méthode selectionner
-void commandeSelect():
+void commandeSelect(BaseDeDonnees bdd):
 {
-    Token t_select;
+    String table;
     Set<String> colonnes = new HashSet<String>();
     Relation relation, source;
-    ExpressionLogique exp = null;
+    ExpressionLogique expression = null;
     boolean hasEtoile = false;
     boolean hasWhere = false;
 }
 {
-    <SELECT> 
-    (
-        <ETOILE> { hasEtoile = true; }
-        | t_select = <ID> {colonnes.add(t_select.image);}
+    <SELECT> (
+          <ETOILE> { hasEtoile = true; }
+        | table = identifiant() { colonnes.add(table); }
         (
-            <VIRGULE> t_select = <ID> {colonnes.add(t_select.image);}
+            <VIRGULE> table = identifiant() { colonnes.add(table); }
         )*
     )
-
-    <FROM> relation = source() 
+    <FROM> relation = source(bdd)
     (
-        <VIRGULE> source = source() {relation = relation.produitCartesien(source);}
+        <VIRGULE> source = source(bdd) {relation = relation.produitCartesien(source);}
     )*
-
     (
-        <WHERE> exp = expressionLogique() { hasWhere = true; }
+        <WHERE> expression = expressionLogique() { hasWhere = true; }
     )?
-
     {
         if (hasWhere){
-            relation = relation.projeter(exp);
+            relation = relation.projeter(expression);
         }
         if (!hasEtoile){
             relation = relation.selectionner(colonnes);
@@ -250,7 +226,70 @@ void commandeSelect():
     }
 }
 
-Relation source():
+void commandeTables(BaseDeDonnees bdd):
+{}
+{
+    <TABLES> 
+    {
+        System.out.println(bdd);
+    }
+}
+
+void commandeExit(BaseDeDonnees bdd):
+{}
+{
+    ( 
+      <EXIT> | <QUIT>
+    )
+    {
+        bdd.setEstOuverte(false);
+        System.out.println("Au revoir !");
+    }
+}
+
+ExpressionLogique expressionLogique():
+{
+    ConditionSimple conditionSimple;
+    ExpressionLogique expression = new ExpressionLogique();
+}
+{
+    conditionSimple = conditionSimple() { expression.ajouterCondition(conditionSimple); }
+    (
+        (
+            <AND> { expression.ajouterConnecteur(OperateurLogique.AND); }
+          | <OR>  { expression.ajouterConnecteur(OperateurLogique.OR); }
+        )
+        conditionSimple = conditionSimple() { expression.ajouterCondition(conditionSimple); }
+    )*
+    {
+        return expression;
+    }
+}
+
+ConditionSimple conditionSimple():
+{
+    String colonne;
+    Comparateur comparateur;
+    Operande operandeGauche, operandeDroit;
+    Valeur valeur;
+}
+{
+    colonne = identifiant() { operandeGauche = new OperandeColonne(colonne); }
+    (
+          <EGAL>      { comparateur = Comparateur.EGAL; }
+        | <SUPERIEUR> { comparateur = Comparateur.SUPERIEUR; }
+        | <INFERIEUR> { comparateur = Comparateur.INFERIEUR; }
+    )
+    (
+          valeur = valeur()       { operandeDroit = new OperandeValeur(valeur); }
+        | colonne = identifiant() { operandeDroit = new OperandeColonne(colonne); }
+    )
+    {
+        return new ConditionSimple(operandeGauche, operandeDroit, comparateur);
+    }
+}
+
+Relation source(BaseDeDonnees bdd):
 {
     String identifiant, alias;
 }
@@ -258,10 +297,22 @@ Relation source():
     identifiant = identifiant()
     (
         (<AS>)?
-        alias = identifiant() { return this.getBdd().getTable(identifiant).alias(alias); }
+        alias = identifiant() { return bdd.getTable(identifiant).alias(alias); }
     )?
     {
-        return this.getBdd().getTable(identifiant);
+        return bdd.getTable(identifiant);
+    }
+}
+
+Colonne colonne():
+{
+    String identifiant;
+    Type type;
+}
+{
+    identifiant = identifiant() type = type()
+    {
+        return new Colonne(identifiant, type);
     }
 }
 
@@ -275,95 +326,19 @@ String identifiant():
     }
 }
 
-void commandeTables():
-{}
+Valeur valeur():
 {
-    <TABLES> 
-    {
-        System.out.println(this.getBdd());
-    }
-}
-
-void commandeExit():
-{}
-{
-    ( 
-      <EXIT> | <QUIT>
-    )
-    {
-        this.getBdd().setEstOuverte(false);
-        System.out.println("Au revoir !");
-    }
-}
-
-
-Colonne colonne():
-{
-    Type type;
-    Token t;
+    Token token;
 }
 {
-    t = <ID> type = type()
-    {return new Colonne(t.image,type);}
+      token = <NUMBER> { return new Entier(Integer.valueOf(token.image)); }
+    | token = <STRING> { return new Chaine(token.image.substring(1, token.image.length() - 1)); }
 }
 
 Type type():
+{}
 {
-    Token t;
-}
-{
-    t = <INT> {return Type.INT;}
-    | t = <VARCHAR> {return Type.VARCHAR;}
-    | t = <SERIAL> {return Type.SERIAL;}
-}
-
-Valeur valeur():
-{
-    Token t;
-}
-{
-    t = <NUMBER> {return new Entier(Integer.valueOf(t.image));}
-    | t = <STRING> {return new Chaine(t.image);}
-}
-
-ExpressionLogique expressionLogique():
-{
-    ConditionSimple conditionSimple;
-    ExpressionLogique exp = new ExpressionLogique();
-}
-{
-    conditionSimple = conditionSimple() {exp.ajouterCondition(conditionSimple);}
-    (
-        (
-            <AND> {exp.ajouterConnecteur(OperateurLogique.AND);}
-          | <OR> {exp.ajouterConnecteur(OperateurLogique.OR);}
-        )
-        conditionSimple = conditionSimple() {exp.ajouterCondition(conditionSimple);}
-    )*
-    {
-        return exp;
-    }
-}
-
-ConditionSimple conditionSimple():
-{
-    String colonne1, colonne2;
-    Comparateur comparateur;
-    Operande opG, opD;
-    Valeur valeur;
-}
-{
-    colonne1 = identifiant() {opG = new OperandeColonne(colonne1);}
-    (
-      <EGAL>      {comparateur = Comparateur.EGAL;}
-    | <SUPERIEUR> {comparateur = Comparateur.SUPERIEUR;}
-    | <INFERIEUR> {comparateur = Comparateur.INFERIEUR;}
-    )
-    (
-        valeur = valeur() {opD = new OperandeValeur(valeur);}
-      | colonne2 = identifiant() {opD = new OperandeColonne(colonne2);}
-    )
-    {
-        return new ConditionSimple(opG, opD, comparateur);
-    }
+      <INT>     { return Type.INT; }
+    | <VARCHAR> { return Type.VARCHAR; }
+    | <SERIAL>  { return Type.SERIAL; }
 }

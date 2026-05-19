@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
+import fr.insarouen.iti.compilation.sgbd.exceptions.InsertionException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
 
 
@@ -54,6 +55,8 @@ public class Table extends Relation {
             if (colonne.type() == Type.SERIAL) {
                 if (!tuple.hasIdentifiant(colonne.identifiant())) {
                     tuple.setValeur(colonne.identifiant(), this.baseDeDonnees.getProchaineCle());
+                } else {
+                    throw new InsertionException("Vous ne pouvez pas spécifiée une valeur de type SERIAL.");
                 }
             }
         }

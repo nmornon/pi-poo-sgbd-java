@@ -3,7 +3,7 @@ package fr.insarouen.iti.compilation.sgbd.moteur;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.equalTo;
-// import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.ArrayList;
@@ -158,12 +158,12 @@ public class TestRelation {
         assertThat(relationGadgets.getTuples(), equalTo(tuplesGadgets));
     }
 
-    // @Test
-    // public void test_getColonnes() {
-    //     assertThat(relationBases.getColonnes(), containsInAnyOrder(colonnesBases.toArray()));
-    //     assertThat(relationHeroes.getColonnes(), containsInAnyOrder(colonnesHeroes.toArray()));
-    //     assertThat(relationGadgets.getColonnes(), containsInAnyOrder(colonnesGadgets.toArray()));
-    // }
+    @Test
+    public void test_getColonnes() {
+        assertThat(relationBases.getColonnes(), containsInAnyOrder(colonnesBases.toArray()));
+        assertThat(relationHeroes.getColonnes(), containsInAnyOrder(colonnesHeroes.toArray()));
+        assertThat(relationGadgets.getColonnes(), containsInAnyOrder(colonnesGadgets.toArray()));
+    }
 
     @Test
     public void test_selectionner() {

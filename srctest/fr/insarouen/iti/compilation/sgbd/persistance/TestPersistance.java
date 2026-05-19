@@ -7,17 +7,10 @@ import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 
-import java.io.ObjectOutputStream;
 import java.io.File;
+import java.io.IOException;
 
 import fr.insarouen.iti.compilation.sgbd.moteur.BaseDeDonnees;
-import fr.insarouen.iti.compilation.sgbd.persistance.GestionnairePersistance;
-
-import java.io.ObjectInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
 
 
 public class TestPersistance {
@@ -30,9 +23,9 @@ public class TestPersistance {
         gestionnaire = new GestionnairePersistance();
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test
     public void test_chargerFichierInexistant() throws IOException{
-        gestionnaire.charger("Base");
+        assertThat(gestionnaire.charger("Base"), equalTo(new BaseDeDonnees("Base")));
     }
 
     @Test

@@ -104,6 +104,6 @@ public class Tuple implements Serializable {
     /** Méthode toString() */
     @Override
     public String toString() {
-        return valeurs.toString();
+        return this.valeurs.toString();
     }
 }

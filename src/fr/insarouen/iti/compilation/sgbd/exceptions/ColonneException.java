@@ -3,7 +3,7 @@ package fr.insarouen.iti.compilation.sgbd.exceptions;
 /**
  * Classe mère des exceptions sur les colonnes
  */
-public class ColonneException extends RuntimeException {
+public class ColonneException extends SGBDException {
 
     /**
      * Crée une exception avec un message

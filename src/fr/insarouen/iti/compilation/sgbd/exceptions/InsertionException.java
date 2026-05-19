@@ -1,14 +1,14 @@
 package fr.insarouen.iti.compilation.sgbd.exceptions;
 
-/** Indique une exception sur le tuple */
-public class TupleException extends RuntimeException {
+/** Indique une erreur dans l'insertion d'une table */
+public class InsertionException extends TableException {
 
     /**
      * Crée une exception avec un message
      *
      * @param message message décrivant l'erreur
      */
-    public TupleException(String message) {
+    public InsertionException(String message) {
         super(message);
     }
 
@@ -18,7 +18,7 @@ public class TupleException extends RuntimeException {
      * @param message message décrivant l'erreur
      * @param cause cause de l'exception
      */
-    public TupleException(String message, Throwable cause) {
+    public InsertionException(String message, Throwable cause) {
         super(message, cause);
     }    
 }

@@ -13,6 +13,7 @@ import fr.insarouen.iti.compilation.sgbd.moteur.BaseDeDonnees;
 import fr.insarouen.iti.compilation.sgbd.persistance.GestionnairePersistance;
 
 public class Main {
+    private static Interpreteur interpreteur = null;
     
     public static void main(String[] args) throws IOException {
         GestionnairePersistance gestionnaire = new GestionnairePersistance();
@@ -30,23 +31,29 @@ public class Main {
                     commande = commande + "\n" + scanner.nextLine();
                 }
 
-                Reader reader = new StringReader(commande);
+            initialiserInterpreteur(commande);
 
-                Interpreteur analyseur = new Interpreteur(reader);
-                analyseur.setBdd(bdd);
-
-                try {
-                    analyseur.commande();
-                } catch (ParseException e) {
-                    System.err.printf("Erreur : %s\n", e.getMessage());
-                } catch (SGBDException e) {
-                    System.err.printf("Erreur : %s\n", e.getMessage());
-                } catch (TokenMgrError e) {
-                    System.err.printf("Erreur : %s\n", e.getMessage());
-                }
+            try {
+                Interpreteur.commande(bdd);
+            } catch (ParseException e) {
+                System.err.printf("Erreur : %s\n", e.getMessage());
+            } catch (SGBDException e) {
+                System.err.printf("Erreur : %s\n", e.getMessage());
+            } catch (TokenMgrError e) {
+                System.err.printf("Erreur : %s\n", e.getMessage());
             }
         }
         gestionnaire.sauvegarder(bdd);
         scanner.close();
+    }
+
+    private static void initialiserInterpreteur(String commande) {
+        Reader reader = new StringReader(commande);
+
+        if (Main.interpreteur == null) {
+            Main.interpreteur = new Interpreteur(reader);
+        } else {
+            Interpreteur.ReInit(reader);
+        }
     }
 }

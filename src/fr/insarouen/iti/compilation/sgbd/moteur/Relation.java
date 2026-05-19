@@ -179,7 +179,8 @@ public class Relation implements Serializable {
             }
             tuples.add(nouveauTuple);
         }
-        return new Relation(this.identifiant, colonnes2, tuples);
+        String identifiant = this.concatenerIdentifiants(this.identifiant, "selection");
+        return new Relation(identifiant, colonnes2, tuples);
     }
 
     /**
@@ -193,13 +194,12 @@ public class Relation implements Serializable {
         Collection<Tuple> tuples = new ArrayList<>();
 
         for (Tuple tuple : this.getTuples()){
-
             if (expression.evaluer(tuple)){
                 tuples.add(tuple);
             }
         }
-
-        return new Relation(this.getIdentifiant(), this.getColonnes(), tuples);
+        String identifiant = this.concatenerIdentifiants(this.identifiant, "projection");
+        return new Relation(identifiant, this.colonnes, tuples);
     }
 
     /**
@@ -268,8 +268,10 @@ public class Relation implements Serializable {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("Table: %s\n", this.getIdentifiant()));
-        builder.append("|");
+        builder.append(this.getClass().getSimpleName());
+        builder.append(": ");
+        builder.append(this.getIdentifiant());
+        builder.append("\n|");
 
         for (Colonne colonne : this.getColonnes()) {
             builder.append(String.format(" %-20s |", colonne.identifiant()));
@@ -277,7 +279,7 @@ public class Relation implements Serializable {
         builder.append("\n|");
 
         for (int i = 0; i < this.getColonnes().size(); i++) {
-            builder.append(String.format("-".repeat(22)));
+            builder.append(String.format(" %s ", "-".repeat(20)));
             builder.append(String.format("|"));
         }
         builder.append("\n");
