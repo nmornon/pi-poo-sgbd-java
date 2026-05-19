@@ -3,7 +3,7 @@ package fr.insarouen.iti.compilation.sgbd.exceptions;
 /**
  * Classe mère des exceptions sur les relations
  */
-public class RelationException extends RuntimeException {
+public class RelationException extends SGBDException {
 
     /**
      * Crée une exception avec un message
