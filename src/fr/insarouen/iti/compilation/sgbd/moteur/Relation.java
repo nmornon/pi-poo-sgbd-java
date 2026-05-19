@@ -268,8 +268,10 @@ public class Relation implements Serializable {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("Table: %s\n", this.getIdentifiant()));
-        builder.append("|");
+        builder.append(this.getClass().getSimpleName());
+        builder.append(": ");
+        builder.append(this.getIdentifiant());
+        builder.append("\n|");
 
         for (Colonne colonne : this.getColonnes()) {
             builder.append(String.format(" %-20s |", colonne.identifiant()));
