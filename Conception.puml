@@ -1,10 +1,10 @@
 @startuml
 title SGBD - Conception
 
-package application {
-  class Main {
+
+package sgbd {
+class Main {
     + {static} main(args : String[])
-  }
 }
 
 package persistance {
@@ -24,7 +24,7 @@ package exception {
 
   class ColonneDejaExistantException{}
   class ColonneException{}
-  class ColonneInexistantException{}
+  class ColonneInexistanteException{}
   class SGBDException {}
   class ProduitCartesienException{}
   class RelationException{}
@@ -169,6 +169,8 @@ package conditions {
   }
 }
 
+}
+
 Operande <|-- OperandeAttribut
 Operande <|-- OperandeValeur
 
@@ -189,7 +191,7 @@ Valeur <|-- Chaine
 Valeur <|-- Nombre
 
 ColonneException <|-- ColonneDejaExistantException
-ColonneException <|-- ColonneInexistantException 
+ColonneException <|-- ColonneInexistanteException 
 RelationException <|-- ProduitCartesienException
 RelationException <|-- RelationSansColonneException
 RelationException <|-- SelectionException
