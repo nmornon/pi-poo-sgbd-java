@@ -14,24 +14,27 @@ package persistance {
   }
 }
 
-package analyseurs {
-  class AnalyseurSyntaxique {
+package interpreteur {
+  class Interpreteur {
     + interpreter(String): Commande
-  }
-
-  interface Commande {
-    + executer(BaseDeDonnees)
   }
 }
 
 package exception {
-  class PIAventureException {}
-  
-  class TableInexistanteException {}
 
-  class TypeInvalideException {}
-  
-  class MemeNomDAttributException {}
+  class ColonneDejaExistantException{}
+  class ColonneException{}
+  class ColonneInexistantException{}
+  class SGBDException {}
+  class ProduitCartesienException{}
+  class RelationException{}
+  class RelationSansColonneException{}
+  class SelectionException{}
+  class TableDejaExistanteException{}
+  class TableException{}
+  class TableInexistanteException{}
+  class TypeInvalideException{}
+
 }
 
 package moteur {
@@ -48,7 +51,7 @@ package moteur {
     + creerTable(identifiant : String, donnees : Collection<Attribut>): Table
     + creerTable(identifiant : String, tuples : Collection<Tuple>): Table
     + supprimerTable(id : String)
-    + afficherTable()
+    + toString () : String
   }
 
   class Table {
@@ -124,10 +127,11 @@ package conditions {
   class ExpressionLogique {
     - conditions : List<ConditionSimple>
     - connecteurs : List<OperateurLogique>
-
-    + ajouterCondition(condition : ConditionSimple)
-    + ajouterConnecteur(connecteur : OperateurLogique)
-    + evaluer(contexte : Map<String, Tuple>) : boolean
+    
+    + ExpressionLogique()
+    + ajouterCondition(condition : ConditionSimple) : void 
+    + ajouterConnecteur(connecteur : OperateurLogique) : void 
+    + evaluer(tuple : Tuple) : boolean
   }
 
   class ConditionSimple {
@@ -168,9 +172,8 @@ package conditions {
 Operande <|-- OperandeAttribut
 Operande <|-- OperandeValeur
 
-Main ..> GestionnairePersistance
-Main ..> AnalyseurSyntaxique
-
+Main --> GestionnairePersistance
+Main --> Interpreteur
 
 GestionnairePersistance --> BaseDeDonnees
 
@@ -181,9 +184,25 @@ Relation "1" *-- "*" Attribut
 
 Attribut *-- Valeur
 
-Valeur <|.. Cle
-Valeur <|.. Chaine
-Valeur <|.. Nombre
+Valeur <|-- Cle
+Valeur <|-- Chaine
+Valeur <|-- Nombre
+
+ColonneException <|-- ColonneDejaExistantException
+ColonneException <|-- ColonneInexistantException 
+RelationException <|-- ProduitCartesienException
+RelationException <|-- RelationSansColonneException
+RelationException <|-- SelectionException
+TableException <|-- TableDejaExistanteException
+SGBDException <|-- TableException
+TableException <|-- TableInexistanteException
+SGBDException <|-- TypeInvalideException 
+SGBDException <|-- ColonneException
+SGBDException <|-- RelationException
+
+
+
+
 
 ExpressionLogique "1" *-- "*" ConditionSimple
 ExpressionLogique --> OperateurLogique
