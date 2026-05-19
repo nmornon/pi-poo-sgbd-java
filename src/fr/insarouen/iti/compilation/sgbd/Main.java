@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.util.Scanner;
 
 import fr.insarouen.iti.compilation.sgbd.analyseurs.Interpreteur;
+import fr.insarouen.iti.compilation.sgbd.analyseurs.TokenMgrError;
 import fr.insarouen.iti.compilation.sgbd.analyseurs.ParseException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.SGBDException;
 import fr.insarouen.iti.compilation.sgbd.moteur.BaseDeDonnees;
@@ -24,21 +25,25 @@ public class Main {
             System.out.print("> ");
             String commande = scanner.nextLine();
 
-            while (!commande.contains(";")) {
-                commande = commande + "\n" + scanner.nextLine();
-            }
+            if (!commande.startsWith("--")){
+                while (!commande.contains(";")) {
+                    commande = commande + "\n" + scanner.nextLine();
+                }
 
-            Reader reader = new StringReader(commande);
+                Reader reader = new StringReader(commande);
 
-            Interpreteur analyseur = new Interpreteur(reader);
-            analyseur.setBdd(bdd);
+                Interpreteur analyseur = new Interpreteur(reader);
+                analyseur.setBdd(bdd);
 
-            try {
-                analyseur.commande();
-            } catch (ParseException e) {
-                System.err.printf("Erreur : %s\n", e.getMessage());
-            } catch (SGBDException e) {
-                System.err.printf("Erreur : %s\n", e.getMessage());
+                try {
+                    analyseur.commande();
+                } catch (ParseException e) {
+                    System.err.printf("Erreur : %s\n", e.getMessage());
+                } catch (SGBDException e) {
+                    System.err.printf("Erreur : %s\n", e.getMessage());
+                } catch (TokenMgrError e) {
+                    System.err.printf("Erreur : %s\n", e.getMessage());
+                }
             }
         }
         gestionnaire.sauvegarder(bdd);

@@ -14,6 +14,7 @@ MAIN=fr.insarouen.iti.compilation.sgbd.Main
 TEST_FILE=fr.insarouen.iti.compilation.sgbd.AllTests
 SOURCES=$(shell find $(SRC_DIR) -name "*.java")
 SOURCES_TESTS=$(shell find $(SRC_TEST_DIR) -name "*.java")
+BASE?=base.bdd
 
 all: run
 
@@ -25,7 +26,7 @@ print: compile
 	javap -classpath $(BIN_DIR) $(shell find $(CLASSES_DIR) -name "*.class")
 
 run: javacc compile
-	java -classpath $(BIN_DIR) $(MAIN) base.bdd
+	java -classpath $(BIN_DIR) $(MAIN) $(BASE)
 
 test: compile
 	mkdir -p $(BIN_TEST_DIR)
