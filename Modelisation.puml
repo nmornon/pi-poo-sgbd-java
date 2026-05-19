@@ -1,35 +1,18 @@
 @startuml
 title SGBD - Modélisation
 
+package "moteur" {
   class BaseDeDonnees {
-    - nomBase: ChaineDeCaractere
-    - tables: Table[]
-    - {static} nbCle: Number
-    + getTable(nomTable: ChaineDeCaracteres): Table
-    + creerTable(nomTable:ChaineDeCaracteres, attributs: Attribut[]): Table
-    + supprimerTable(nomTable: ChaineDeCaracteres)
-    + afficherTable(Table)
+    - identifiant: ChaineDeCaractere
+    - prochainSerial : Entier
+    - estOuvert : Boolean
   }
 
   class Table {
-    - nomTable: ChaineDeCaracteres
-    + inserer(Tuple)
-    + inserer(Tuple[])
-    + supprimer(ExpressionLogique)
   }
 
   class Relation {
-    - tuples: Tuple[]
-    - attributs: Attribut[]
-    + selectionner(Attribut[]): Relation
-    + projeter(ExpressionLogique): Relation
-    + joindre(Relation, Attribut, Attribut): Relation
-    + produitCartesien(Relation): Relation
-  }
-
-  class Attribut {
-    - nom: ChaineDeCaracteres
-    - type: Type
+    - identifiant : ChaineDeCaractere 
   }
 
   enum Type {
@@ -39,35 +22,34 @@ title SGBD - Modélisation
   }
 
   class Tuple {
-    
   }
 
-  class ExpressionLogique {
-    - conditions : List<ConditionSimple>
-    - connecteurs : List<OperateurLogique>
+  class Colonne{
+    - identifiant : ChaineDeCaractere
+    - type : Type
+  }
+}
 
-    + evaluer(contexte : Map<String, Tuple>) : boolean
+package "conditions"{
+  class ExpressionLogique {
+    - connecteurs : OperateurLogique[]
   }
 
   class ConditionSimple {
     - gauche : Operande
     - droite : Operande
     - operateur : Comparateur
-
-    + evaluer(contexte : Map<String, Tuple>) : boolean
   }
 
   abstract class Operande {
-    + {abstract} evaluer(contexte : Map<String, Tuple>) : Object
   }
 
-  class OperandeAttribut {
-    - nomTableOuAlias : String
-    - nomAttribut : String
+  class OperandeColonne {
+    - identifiant : ChaineDeCaractere 
   }
 
   class OperandeValeur {
-    - contenu : Object
+    - valeur : Valeur 
   }
 
   enum OperateurLogique {
@@ -80,20 +62,43 @@ title SGBD - Modélisation
     SUPERIEUR
     INFERIEUR
   }
+}
 
-Operande <|-- OperandeAttribut
+package "valeur"{
+
+  class Valeur {
+   - type : Type
+   - valeur : Object
+   
+  }
+
+  class Entier {}
+
+  class Cle {}
+
+  class Chaine{}
+}
+
+Operande <|-- OperandeColonne
 Operande <|-- OperandeValeur
 
+Valeur <|-- Entier 
+Valeur <|-- Cle 
+Valeur <|-- Chaine
 
 BaseDeDonnees "1" *-- "*" Table
 Relation <|-- Table
-Relation "1"  o-- "*" Tuple
-Relation "1" *-- "*" Attribut
+Relation *-- Tuple
+Relation "1" *-- "*" Colonne
 
 ExpressionLogique "1" *-- "*" ConditionSimple
 ExpressionLogique --> OperateurLogique
 
 ConditionSimple --> Operande
 ConditionSimple --> Comparateur
+OperandeColonne --> Colonne
+Tuple "1" *-- "*"  Valeur
+Valeur -->Type
+Valeur -->OperandeValeur
 @enduml
 
