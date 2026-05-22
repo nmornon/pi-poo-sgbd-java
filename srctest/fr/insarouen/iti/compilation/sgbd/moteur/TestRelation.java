@@ -130,13 +130,6 @@ public class TestRelation {
     }
 
     @Test
-    public void test_getIdentifiant() {
-        assertThat(relationBases.getIdentifiant(), equalTo("bases"));
-        assertThat(relationHeroes.getIdentifiant(), equalTo("heroes"));
-        assertThat(relationGadgets.getIdentifiant(), equalTo("gadgets"));
-    }
-
-    @Test
     public void test_hasColonne() {
         assertThat(relationBases.hasColonne("id"), is(true));
         assertThat(relationBases.hasColonne("colonne_inexistant"), is(false));
@@ -225,6 +218,10 @@ public class TestRelation {
         Relation relation = relationBases.alias("B");
 
         assertThat(relation.getIdentifiant(), equalTo("B"));
+
+        assertThat(relation.hasColonne("B.id"), is(true));
+        assertThat(relation.hasColonne("B.nom"), is(true));
+        assertThat(relation.hasColonne("B.ville"), is(true));
     }
 
     @Test
@@ -462,15 +459,12 @@ public class TestRelation {
     }
 
     @Test
-    public void test_alias_colonnesPrefixees() {
+    public void test_equals() {
+        Relation relation1 = new Relation("bases", TestRelation.colonnesBases, TestRelation.tuplesBases);
+        Relation relation2 = new Relation("bases", TestRelation.colonnesBases, TestRelation.tuplesBases);
 
-        Relation relation = relationBases.alias("B");
-
-        assertThat(relation.getIdentifiant(), equalTo("B"));
-
-        assertThat(relation.hasColonne("B.id"), is(true));
-        assertThat(relation.hasColonne("B.nom"), is(true));
-        assertThat(relation.hasColonne("B.ville"), is(true));
+        assertThat(relation1, equalTo(relation2));
+        assertThat(relation1.hashCode(), is(relation2.hashCode()));
     }
 
 }

@@ -238,15 +238,6 @@ public class Relation implements Serializable {
         String identifiant = this.concatenerIdentifiants(this.identifiant, relation.identifiant);
         return new Relation(identifiant, colonnes, tuples);
     }
-    
-    // public Relation produitCartesien(Collection<Relation> relations) {
-    //     Relation produit = this;
-
-    //     for (Relation relation : relations) {
-    //         produit = produit.produitCartesien(relation);
-    //     }
-    //     return produit;
-    // }
 
     /**
      * Renvoie une collection d'colonne contenant la concaténation des deux

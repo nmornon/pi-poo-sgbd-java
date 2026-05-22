@@ -4,12 +4,13 @@ import org.junit.Test;
 
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
-
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 
@@ -97,13 +98,15 @@ public class TestTuple {
     }
 
     @Test
-    public void test_toString() {
-
-        Tuple tuple = new Tuple();
-
-        tuple.setValeur("age", new Entier(40));
-
-        assertThat(tuple.toString().contains("40"), is(true));
+    public void test_equals() {
+        Tuple tuple = new Tuple().setValeur("id", new Cle(15))
+                                .setValeur("nom", new Chaine("Batarang"))
+                                .setValeur("puissance", new Entier(50));
+        Tuple tuple2 = new Tuple().setValeur("id", new Cle(15))
+                                .setValeur("nom", new Chaine("Batarang"))
+                                .setValeur("puissance", new Entier(50));
+        assertThat(tuple, equalTo(tuple2));
+        assertThat(tuple.hashCode(), is(tuple2.hashCode()));
     }
 
 }

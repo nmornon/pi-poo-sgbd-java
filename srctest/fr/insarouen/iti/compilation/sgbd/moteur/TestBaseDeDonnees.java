@@ -10,7 +10,9 @@ import org.junit.Test;
 
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableDejaExistanteException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
 
 public class TestBaseDeDonnees {
     private BaseDeDonnees bdd;
@@ -56,11 +58,6 @@ public class TestBaseDeDonnees {
     }
 
     @Test
-    public void test_equals() {
-        assertThat(bdd, equalTo(new BaseDeDonnees("base")));
-    }
-
-    @Test
     public void test_getIdentifiant() {
         assertThat(bdd.getIdentifiant(), is("base"));
     }
@@ -98,5 +95,22 @@ public class TestBaseDeDonnees {
             is("table")
         );
     }
+
+    @Test
+    public void test_equals() {
+        BaseDeDonnees bdd1 = new BaseDeDonnees("base");
+        BaseDeDonnees bdd2 = new BaseDeDonnees("base");
+        Table table1 = bdd1.creerTable("table", colonnes);
+        Table table2 = bdd2.creerTable("table", colonnes);
+
+        table1.inserer(new Tuple().setValeur("age",new Entier(20))
+                                    .setValeur("nom",new Chaine("nomTest")));
+        table2.inserer(new Tuple().setValeur("age",new Entier(20))
+                                    .setValeur("nom",new Chaine("nomTest")));
+        assertThat(bdd1, equalTo(bdd2));
+        assertThat(bdd1.hashCode(), is(bdd2.hashCode()));
+    }
+
+
 
 }

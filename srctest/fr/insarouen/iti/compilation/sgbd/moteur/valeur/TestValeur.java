@@ -4,11 +4,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
-import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
-import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
-import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Valeur;
 
 import org.junit.Test;
 

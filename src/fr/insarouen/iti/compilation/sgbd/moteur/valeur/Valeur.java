@@ -57,6 +57,14 @@ public abstract class Valeur implements Comparable<Valeur>, Serializable {
             && this.valeur.equals(valeur.valeur);
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        hash = hash * 13 + this.type.hashCode();
+        hash = hash * 17 + this.valeur.hashCode();
+        return hash;
+    }
+
     /** Méthode toString() */
     @Override
     public String toString(){

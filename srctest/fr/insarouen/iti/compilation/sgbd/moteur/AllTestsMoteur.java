@@ -13,6 +13,7 @@ import fr.insarouen.iti.compilation.sgbd.moteur.valeur.TestValeur;
     TestBaseDeDonnees.class,
     TestRelation.class,
     TestTable.class,
+    TestColonne.class,
 })
 
 public class AllTestsMoteur {}

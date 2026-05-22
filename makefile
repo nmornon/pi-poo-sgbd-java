@@ -7,8 +7,8 @@ DOC_DIR=doc
 DIR_ANALYSEUR=src/fr/insarouen/iti/compilation/sgbd/analyseurs
 PATH_ANALYSEUR=$(DIR_ANALYSEUR)/Interpreteur.jj
 
-JUNIT_JAR=/usr/share/java/junit4.jar
-HAMCREST_JAR=/usr/share/java/hamcrest-all.jar
+JUNIT_JAR=lib/junit4.jar
+HAMCREST_JAR=lib/hamcrest-all.jar
 
 MAIN=fr.insarouen.iti.compilation.sgbd.Main
 TEST_FILE=fr.insarouen.iti.compilation.sgbd.AllTests

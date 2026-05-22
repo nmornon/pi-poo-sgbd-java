@@ -29,8 +29,8 @@ public class Entier extends Valeur {
                 this.getValeur(), valeur.getValeur(),
                 this.getType(), valeur.getType()));
         }
-        Integer valeur1 = Integer.valueOf((Integer) this.getValeur());
-        Integer valeur2 = Integer.valueOf((Integer) valeur.getValeur());
+        Integer valeur1 = (Integer) this.getValeur();
+        Integer valeur2 = (Integer) valeur.getValeur();
         return valeur1.compareTo(valeur2);
     }
 }
