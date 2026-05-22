@@ -17,4 +17,32 @@ public record Colonne(String identifiant, Type type) implements Serializable {
         }
         return new Colonne(this.identifiant, this.type);
     }
+
+    /** Compare deux colonnes à l'aide de leur identifiant
+     * 
+     * @param object objet à comparer avec la colonne
+     * @return true si les identifiants sont les mêmes, false sinon
+     */
+    @Override
+    public boolean equals(Object object){
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof Colonne colonne)){
+            return false;
+        } 
+        return this.identifiant.equals(colonne.identifiant);
+    }
+
+    /**
+     * Renvoie le hashcode de la colonne
+     * @return le code de hashage de la colonne
+     */
+    @Override
+    public int hashCode() {
+        return this.identifiant.hashCode();
+    }
 }

@@ -93,21 +93,4 @@ public class Table extends Relation {
         }
         return nbTuplesSupprimes;
     }
-
-    @Override
-    public boolean equals(Object object) {
-        if (object == null) {
-            return false;
-        }
-        if (object == this) {
-            return true;
-        }
-        if (!(object instanceof Table table)) {
-            return false;
-        }
-        return this.baseDeDonnees == table.baseDeDonnees
-            && this.getIdentifiant().equals(table.getIdentifiant())
-            && this.getColonnes().equals(table.getColonnes())
-            && this.getTuples().equals(table.getTuples());
-    }
 }

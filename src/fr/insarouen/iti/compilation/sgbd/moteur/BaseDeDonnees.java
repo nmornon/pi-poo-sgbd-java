@@ -204,11 +204,13 @@ public class BaseDeDonnees implements Serializable {
      */
     public String toString() {
         StringBuilder texte = new StringBuilder();
-        for (Table o : this.tables) {
-            texte.append(String.format("Identifiant de la base : %s \n", this.identifiant));
-            texte.append(String.format("Table %s \n", o.getIdentifiant()));
-            texte.append(String.format("\n", o.toString()));
-            texte.append(String.format("--------------------- \n"));
+        texte.append(String.format("Identifiant de la base : %s \n", this.identifiant));
+        if (!this.tables.isEmpty()) {
+            for (Table o : this.tables) {
+                texte.append(String.format(" - %s \n", o.getIdentifiant()));
+            }
+        } else {
+            texte.append("Il n'y a pas de table dans la base");
         }
         return texte.toString();
     }
@@ -229,6 +231,19 @@ public class BaseDeDonnees implements Serializable {
         if (!(object instanceof BaseDeDonnees baseDeDonnees)){
             return false;
         } 
-        return this.identifiant.equals(baseDeDonnees.identifiant);
+        return this.identifiant.equals(baseDeDonnees.identifiant)
+            && this.tables.equals(baseDeDonnees.tables);
+    }
+
+    /**
+     * Renvoie le hashcode de la base
+     * @return le code de hashage de la base
+     */
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        hash = hash * 13 + this.identifiant.hashCode();
+        hash = hash * 17 + this.tables.hashCode();
+        return hash;
     }
 }

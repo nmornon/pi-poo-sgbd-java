@@ -31,3 +31,4 @@ replay_pid*
 
 src/fr/insarouen/iti/compilation/sgbd/analyseurs/*.java
 *.bdd
+doc/

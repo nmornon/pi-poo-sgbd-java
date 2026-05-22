@@ -105,4 +105,32 @@ public class Tuple implements Serializable {
     public String toString() {
         return this.valeurs.toString();
     }
+
+    /** Compare deux tuples à l'aide de leurs valeurs
+     * 
+     * @param object objet à comparer avec le tuple
+     * @return true si les map des valeurs sont identiques, false sinon
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof Tuple tuple)) {
+            return false;
+        }
+        return this.valeurs.equals(tuple.valeurs);
+    }
+
+    /**
+     * Renvoie le hashcode du tuple
+     * @return le code de hashage du tuple
+     */
+    @Override
+    public int hashCode() {
+        return this.valeurs.hashCode();
+    }
 }

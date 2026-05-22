@@ -193,11 +193,11 @@ public class TestRelation {
         assertThat(produit.hasColonne("heroes.base_id"), is(true));
     }
 
-    @Test
+     @Test
     public void test_produitCartesien_avecTroisRelations() {
-        Relation produit = relationBases.produitCartesien(List.of(relationHeroes, relationGadgets));
+        Relation produit = relationBases.produitCartesien(relationHeroes);
         
-        assertThat(produit.getIdentifiant(), equalTo("bases_heroes_gadgets"));
+        assertThat(produit.getIdentifiant(), equalTo("bases_heroes"));
         assertThat(produit.hasColonne("bases.id"), is(true));
         assertThat(produit.hasColonne("bases.nom"), is(true));
         assertThat(produit.hasColonne("bases.ville"), is(true));
@@ -207,6 +207,8 @@ public class TestRelation {
         assertThat(produit.hasColonne("heroes.alias"), is(true));
         assertThat(produit.hasColonne("heroes.base_id"), is(true));
 
+        produit = produit.produitCartesien(relationGadgets);
+        assertThat(produit.getIdentifiant(), equalTo("bases_heroes_gadgets"));
         assertThat(produit.hasColonne("gadgets.id"), is(true));
         assertThat(produit.hasColonne("gadgets.nom"), is(true));
         assertThat(produit.hasColonne("gadgets.hero_id"), is(true));
@@ -281,7 +283,8 @@ public class TestRelation {
 
     @Test
     public void test_produitCartesien_troisRelations_nombreTuples() {
-        Relation produit = relationBases.produitCartesien(List.of(relationHeroes, relationGadgets));
+        Relation produit = relationBases.produitCartesien(relationHeroes)
+                                        .produitCartesien(relationGadgets);
 
         assertThat(produit.getTuples().size(), is(810));
     }
@@ -350,7 +353,9 @@ public class TestRelation {
 
     @Test
     public void test_troisTables_projeter_selectionner() {
-        Relation produit = relationBases.produitCartesien(List.of(relationHeroes, relationGadgets));
+        Relation produit = relationBases.produitCartesien(relationHeroes)
+                                        .produitCartesien(relationGadgets);
+
 
         ExpressionLogique condition = new ExpressionLogique();
 

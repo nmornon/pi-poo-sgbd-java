@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import fr.insarouen.iti.compilation.sgbd.conditions.ExpressionLogique;
@@ -236,15 +238,15 @@ public class Relation implements Serializable {
         String identifiant = this.concatenerIdentifiants(this.identifiant, relation.identifiant);
         return new Relation(identifiant, colonnes, tuples);
     }
+    
+    // public Relation produitCartesien(Collection<Relation> relations) {
+    //     Relation produit = this;
 
-    public Relation produitCartesien(Collection<Relation> relations) {
-        Relation produit = this;
-
-        for (Relation relation : relations) {
-            produit = produit.produitCartesien(relation);
-        }
-        return produit;
-    }
+    //     for (Relation relation : relations) {
+    //         produit = produit.produitCartesien(relation);
+    //     }
+    //     return produit;
+    // }
 
     /**
      * Renvoie une collection d'colonne contenant la concaténation des deux
@@ -274,6 +276,23 @@ public class Relation implements Serializable {
      */
     @Override
     public String toString() {
+        Map<String,Integer> laMap = new HashMap<>();
+        for (Colonne colonne : this.getColonnes()) {
+            laMap.put(colonne.identifiant(),colonne.identifiant().length());
+        }
+        for (Tuple tuple : this.getTuples()) {
+
+            for (Colonne colonne : this.getColonnes()) {
+                int longueurVal = tuple.getValeur(colonne.identifiant()).toString().length();
+
+                if (longueurVal > laMap.get(colonne.identifiant())) {
+                    laMap.put(colonne.identifiant(),longueurVal);
+                }
+            }
+        }
+        System.out.println(laMap);
+
+
         StringBuilder builder = new StringBuilder();
         builder.append(this.getClass().getSimpleName());
         builder.append(": ");
@@ -281,12 +300,12 @@ public class Relation implements Serializable {
         builder.append("\n|");
 
         for (Colonne colonne : this.getColonnes()) {
-            builder.append(String.format(" %-20s |", colonne.identifiant()));
+            builder.append(String.format(String.format(" %%-%ds |",laMap.get(colonne.identifiant())),colonne.identifiant()));
         }
         builder.append("\n|");
 
-        for (int i = 0; i < this.getColonnes().size(); i++) {
-            builder.append(String.format(" %s ", "-".repeat(20)));
+        for (Colonne colonne : this.getColonnes()) {
+            builder.append(String.format(" %s ", "-".repeat(laMap.get(colonne.identifiant()))));
             builder.append(String.format("|"));
         }
         builder.append("\n");
@@ -295,7 +314,7 @@ public class Relation implements Serializable {
             builder.append("|");
 
             for (Colonne colonne : this.getColonnes()) {
-                builder.append(String.format(" %-20s |", tuple.getValeur(colonne.identifiant())));
+                builder.append(String.format(String.format(" %%-%ds |",laMap.get(colonne.identifiant())),tuple.getValeur(colonne.identifiant())));
             }
             builder.append("\n");
         }
@@ -305,5 +324,39 @@ public class Relation implements Serializable {
 
     private String concatenerIdentifiants(String identifiant1, String identifiant2) {
         return String.format("%s_%s", identifiant1, identifiant2);
+    }
+
+    /** Compare deux relations à l'aide de leur identfiant, colonnes et tuples
+     * 
+     * @param object objet à comparer avec la relation
+     * @return true si ces conditions sont respectees
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof Relation relation)) {
+            return false;
+        }
+        return this.identifiant.equals(relation.identifiant)
+            && this.colonnes.equals(relation.colonnes)
+            && this.tuples.equals(relation.tuples);
+    }
+
+    /**
+     * Renvoie le hashcode de la colonne
+     * @return le code de hashage de la colonne
+     */
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        hash = hash * 13 + this.identifiant.hashCode();
+        hash = hash * 17 + this.colonnes.hashCode();
+        hash = hash * 19 + this.tuples.hashCode();
+        return hash;
     }
 }
