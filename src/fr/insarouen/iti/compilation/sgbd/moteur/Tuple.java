@@ -72,10 +72,10 @@ public class Tuple implements Serializable {
         Tuple tuple = new Tuple();
         
         for (Map.Entry<String, Valeur> entry : this.valeurs.entrySet()) {
-            String identifiant=entry.getKey();
+            String identifiant = entry.getKey();
             
             if (!identifiant.contains(".")) {
-                identifiant=prefix+"."+identifiant;
+                identifiant = prefix + "." + identifiant;
             }
             tuple.setValeur(identifiant, entry.getValue());
         }

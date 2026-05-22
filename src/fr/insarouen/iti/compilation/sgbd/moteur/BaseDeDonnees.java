@@ -206,6 +206,7 @@ public class BaseDeDonnees implements Serializable {
         StringBuilder texte = new StringBuilder();
         texte.append(String.format("Identifiant de la base : %s \n", this.identifiant));
         if (!this.tables.isEmpty()) {
+            texte.append("Tables disponibles : \n");
             for (Table o : this.tables) {
                 texte.append(String.format(" - %s \n", o.getIdentifiant()));
             }
