@@ -1,52 +1,88 @@
 package fr.insarouen.iti.compilation.sgbd.moteur.valeur;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
+import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Valeur;
+
 import org.junit.Test;
 
-import fr.insarouen.iti.compilation.sgbd.moteur.Type;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
-public class TestValeur {
+public class TestValeur{
 
     @Test
-    public void testChaine() {
-        Valeur uneChaine = new Chaine("UneChaine");
-        Valeur uneAutreChaine = new Chaine("UneAutreChaine");
-        Valeur encoreUneAutreChaine = new Chaine("UneChaine");
-        assertEquals("UneChaine", uneChaine.getValeur());
-        assertNotEquals("AutreChose", uneChaine.getValeur());
-        assertEquals(Type.VARCHAR, uneChaine.getType());
-        assertNotEquals(Type.INT, uneChaine.getType());
-        assertFalse(uneChaine.equals(uneAutreChaine));
-        assertTrue(uneChaine.equals(encoreUneAutreChaine));
+    public void test_chaine_equals(){
+        Chaine chaine1 = new Chaine("Batman");
+        Chaine chaine2 = new Chaine("Batman");
+
+        assertThat(chaine1,equalTo(chaine2));
     }
 
     @Test
-    public void testNombre() {
-        Valeur nb = new Entier(11);
-        Valeur memeNb = new Entier(11);
-        Valeur autreNb = new Entier(12);
-        assertEquals(11, nb.getValeur());
-        assertNotEquals(12, nb.getValeur());
-        assertEquals(Type.INT, nb.getType());
-        assertNotEquals(Type.SERIAL, nb.getType());
-        assertTrue(nb.equals(memeNb));
-        assertFalse(nb.equals(autreNb));
+    public void test_equals(){
+        Chaine chaine1 = new Chaine("Batman");
+        Entier entier1 = new Entier(2);
+
+        assertThat(chaine1.equals(entier1),is(false));
     }
 
     @Test
-    public void testCle() {
-        Valeur cle = new Cle(12);
-        Valeur memeCle = new Cle(12);
-        Valeur autreCle = new Cle(11);
-        assertEquals(12, cle.getValeur());
-        assertNotEquals(11, cle.getValeur());
-        assertEquals(Type.SERIAL, cle.getType());
-        assertNotEquals(Type.VARCHAR, cle.getType());
-        assertTrue(cle.equals(memeCle));
-        assertFalse(cle.equals(autreCle));
+    public void testCompareToEntier() {
+
+        Valeur petit = new Entier(5);
+        Valeur grand = new Entier(10);
+        Valeur meme = new Entier(5);
+
+        assertThat(grand.compareTo(petit) > 0, is(true));
+        assertThat(petit.compareTo(grand) < 0, is(true));
+        assertThat(petit.compareTo(meme), is(0));
     }
+
+    @Test
+    public void testCompareToChaine() {
+
+        Valeur a = new Chaine("Batman");
+        Valeur b = new Chaine("Joker");
+        Valeur meme = new Chaine("Batman");
+
+        assertThat(a.compareTo(b) < 0, is(true));
+        assertThat(b.compareTo(a) > 0, is(true));
+        assertThat(a.compareTo(meme), is(0));
+    }
+
+    @Test
+    public void testCompareToCle() {
+
+        Valeur petiteCle = new Cle(1);
+        Valeur grandeCle = new Cle(5);
+        Valeur memeCle = new Cle(1);
+
+        assertThat(grandeCle.compareTo(petiteCle) > 0, is(true));
+        assertThat(petiteCle.compareTo(grandeCle) < 0, is(true));
+        assertThat(petiteCle.compareTo(memeCle), is(0));
+    }
+
+    @Test
+    public void testCompareToEntierEtCle() {
+
+        Valeur entier = new Entier(10);
+        Valeur cle = new Cle(10);
+
+        assertThat(entier.compareTo(cle), is(0));
+        assertThat(cle.compareTo(entier), is(0));
+    }
+
+    @Test(expected = TypeInvalideException.class)
+    public void testComparaisonInvalideEntierChaine() {
+
+        Valeur entier = new Entier(10);
+        Valeur chaine = new Chaine("abc");
+
+        entier.compareTo(chaine);
+    }
+
 }

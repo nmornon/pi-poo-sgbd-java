@@ -5,9 +5,10 @@ import static org.hamcrest.CoreMatchers.is;
 
 import org.junit.Test;
 
-import fr.insarouen.iti.compilation.sgbd.moteur.*;
+import fr.insarouen.iti.compilation.sgbd.moteur.Tuple;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
+import fr.insarouen.iti.compilation.sgbd.exceptions.ColonneInexistantException;
 
 public class TestConditionSimple{
 
@@ -103,6 +104,63 @@ public class TestConditionSimple{
         );
         
         assertThat(condition.evaluer(tuple),is(false));
+    }
+
+    @Test
+    public void testEgaliteEntierVraie(){
+
+        Tuple tuple = tupleHero();
+
+        ConditionSimple condition= new ConditionSimple(
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(40)),
+            Comparateur.EGAL
+        );
+        
+        assertThat(condition.evaluer(tuple),is(true));
+    }
+
+    @Test
+    public void testEgaliteEntierFausse(){
+
+        Tuple tuple = tupleHero();
+
+        ConditionSimple condition= new ConditionSimple(
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(41)),
+            Comparateur.EGAL
+        );
+        
+        assertThat(condition.evaluer(tuple),is(false));
+    }
+
+    @Test
+    public void testComparaisonColonneColonneVraie(){
+
+        Tuple tuple = tupleHero();
+        tuple.setValeur("Hero.ageBis", new Entier(40));
+
+        ConditionSimple condition= new ConditionSimple(
+            new OperandeColonne("Hero","age"),
+            new OperandeColonne("Hero","ageBis"),
+            Comparateur.EGAL
+        );
+        
+        assertThat(condition.evaluer(tuple),is(true));
+    }
+
+    @Test(expected = ColonneInexistantException.class)
+    public void testColonneInexistante(){
+
+        Tuple tuple = tupleHero();
+
+        ConditionSimple condition= new ConditionSimple(
+            new OperandeColonne("Hero","taille"),
+            new OperandeValeur(new Entier(180)),
+            Comparateur.EGAL
+        );
+        
+        condition.evaluer(tuple);
     }
 
 }
