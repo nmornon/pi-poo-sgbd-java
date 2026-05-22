@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableDejaExistanteException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.TableInexistanteException;
+import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
 
 public class TestBaseDeDonnees {
     private BaseDeDonnees bdd;
@@ -58,4 +59,44 @@ public class TestBaseDeDonnees {
     public void test_equals() {
         assertThat(bdd, equalTo(new BaseDeDonnees("base")));
     }
+
+    @Test
+    public void test_getIdentifiant() {
+        assertThat(bdd.getIdentifiant(), is("base"));
+    }
+
+    @Test
+    public void test_estOuverte() {
+
+        bdd.setEstOuverte(false);
+
+        assertThat(bdd.getEstOuverte(), is(false));
+    }
+
+    @Test
+    public void test_getProchaineCle() {
+
+        assertThat(bdd.getProchaineCle(), is(new Cle(1)));
+        assertThat(bdd.getProchaineCle(), is(new Cle(2)));
+    }
+
+    @Test
+    public void test_getTables() {
+
+        bdd.creerTable("table", colonnes);
+
+        assertThat(bdd.getTables().size(), is(1));
+    }
+
+    @Test
+    public void test_getTable() {
+
+        bdd.creerTable("table", colonnes);
+
+        assertThat(
+            bdd.getTable("table").getIdentifiant(),
+            is("table")
+        );
+    }
+
 }

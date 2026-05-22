@@ -5,7 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 
 import org.junit.Test;
 
-import fr.insarouen.iti.compilation.sgbd.moteur.*;
+import fr.insarouen.iti.compilation.sgbd.moteur.Tuple;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
@@ -265,6 +265,91 @@ public class TestExpressionLogique {
         expression.ajouterCondition(c2);
         expression.ajouterConnecteur(OperateurLogique.AND);
         expression.ajouterCondition(c3);
+
+        assertThat(expression.evaluer(tuple),is(false));
+    }
+
+    @Test
+    public void testExpressionAvecUneSeuleConditionVraie(){
+
+        Tuple tuple = tupleHero();
+
+        ConditionSimple c1= new ConditionSimple(
+            new OperandeColonne("Hero","nom"),
+            new OperandeValeur(new Chaine("Batman")),
+            Comparateur.EGAL
+        );
+
+        ExpressionLogique expression= new ExpressionLogique();
+        expression.ajouterCondition(c1);
+
+        assertThat(expression.evaluer(tuple),is(true));
+    }
+
+    @Test
+    public void testExpressionAvecUneSeuleConditionFausse(){
+
+        Tuple tuple = tupleHero();
+
+        ConditionSimple c1= new ConditionSimple(
+            new OperandeColonne("Hero","nom"),
+            new OperandeValeur(new Chaine("Joker")),
+            Comparateur.EGAL
+        );
+
+        ExpressionLogique expression= new ExpressionLogique();
+        expression.ajouterCondition(c1);
+
+        assertThat(expression.evaluer(tuple),is(false));
+    }
+
+    @Test
+    public void testExpressionAvecConnecteurEnTropIgnore(){
+
+        Tuple tuple = tupleHero();
+
+        ConditionSimple c1= new ConditionSimple(
+            new OperandeColonne("Hero","nom"),
+            new OperandeValeur(new Chaine("Batman")),
+            Comparateur.EGAL
+        );
+
+        ExpressionLogique expression= new ExpressionLogique();
+        expression.ajouterCondition(c1);
+        expression.ajouterConnecteur(OperateurLogique.AND);
+
+        assertThat(expression.evaluer(tuple),is(true));
+    }
+
+    @Test
+    public void testEvaluationDeGaucheADroiteSansPrioriteAnd(){
+
+        Tuple tuple = tupleHero();
+
+        ConditionSimple vrai= new ConditionSimple(
+            new OperandeColonne("Hero","nom"),
+            new OperandeValeur(new Chaine("Batman")),
+            Comparateur.EGAL
+        );
+
+        ConditionSimple faux1= new ConditionSimple(
+            new OperandeColonne("Hero","age"),
+            new OperandeValeur(new Entier(10)),
+            Comparateur.INFERIEUR
+        );
+
+        ConditionSimple faux2= new ConditionSimple(
+            new OperandeColonne("Hero","puissance"),
+            new OperandeValeur(new Entier(200)),
+            Comparateur.SUPERIEUR
+        );
+
+        ExpressionLogique expression= new ExpressionLogique();
+        expression.ajouterCondition(vrai);
+        expression.ajouterConnecteur(OperateurLogique.OR);
+        expression.ajouterCondition(faux1);
+        expression.ajouterConnecteur(OperateurLogique.AND);
+        expression.ajouterCondition(faux2);
 
         assertThat(expression.evaluer(tuple),is(false));
     }

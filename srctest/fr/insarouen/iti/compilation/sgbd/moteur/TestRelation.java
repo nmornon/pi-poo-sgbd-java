@@ -25,6 +25,7 @@ import fr.insarouen.iti.compilation.sgbd.exceptions.ColonneInexistantException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.ProduitCartesienException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansColonneException;
 import fr.insarouen.iti.compilation.sgbd.exceptions.SelectionException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
@@ -160,9 +161,13 @@ public class TestRelation {
 
     @Test
     public void test_getColonnes() {
+         assertThat(relationBases.getColonnes(), containsInAnyOrder(colonnesBases.toArray()));
+         assertThat(relationHeroes.getColonnes(), containsInAnyOrder(colonnesHeroes.toArray()));
+         assertThat(relationGadgets.getColonnes(), containsInAnyOrder(colonnesGadgets.toArray()));
         assertThat(relationBases.getColonnes(), containsInAnyOrder(colonnesBases.toArray()));
         assertThat(relationHeroes.getColonnes(), containsInAnyOrder(colonnesHeroes.toArray()));
         assertThat(relationGadgets.getColonnes(), containsInAnyOrder(colonnesGadgets.toArray()));
+
     }
 
     @Test
@@ -394,7 +399,78 @@ public class TestRelation {
         assertThat(resultat.hasColonne("gadgets.id"), is(false));
     }
 
+    @Test(expected = RelationSansColonneException.class)
+    public void test_relation_sansColonne() {
+        new Relation("relation", List.of());
+    }
 
+    @Test(expected = ColonneDejaExistantException.class)
+    public void test_relation_colonneDoublon() {
+        new Relation("relation", List.of(
+            new Colonne("nom", Type.VARCHAR),
+            new Colonne("nom", Type.INT)
+        ));
+    }
 
+    @Test (expected=ColonneInexistantException.class)
+    public void test_relation_tupleAvecColonneManquante(){
+
+        Collection<Colonne> colonnes = List.of(
+            new Colonne ("id",Type.SERIAL),
+            new Colonne ("nom",Type.VARCHAR),
+            new Colonne ("age",Type.INT)
+        );
+        
+        Tuple tuple = new Tuple();
+        tuple.setValeur("id", new Cle(1));
+        tuple.setValeur("nom", new Chaine("Batman"));
+        new Relation("relation",colonnes,List.of(tuple));
+    }
+
+    @Test(expected = TypeInvalideException.class)
+    public void test_relation_tupleAvecTypeInvalide() {
+        Collection<Colonne> colonnes = List.of(
+            new Colonne ("id",Type.SERIAL),
+            new Colonne ("nom",Type.VARCHAR),
+            new Colonne ("age",Type.INT)
+        );
+
+        Tuple tuple = new Tuple();
+        tuple.setValeur("id", new Cle(1));
+        tuple.setValeur("nom", new Chaine("Batman"));
+        tuple.setValeur("age", new Chaine("quarante"));
+        new Relation("relation", colonnes, List.of(tuple));
+    }
+
+    @Test(expected = SelectionException.class)
+    public void test_selectionner_colonneInexistante() {
+
+        Collection<Colonne> colonnes = List.of(
+            new Colonne ("id",Type.SERIAL),
+            new Colonne ("nom",Type.VARCHAR),
+            new Colonne ("age",Type.INT)
+        );
+
+        Tuple tuple = new Tuple();
+        tuple.setValeur("id", new Cle(1));
+        tuple.setValeur("nom", new Chaine("Batman"));
+        tuple.setValeur("age", new Entier(40));
+
+        Relation relation = new Relation("relation", colonnes, List.of(tuple));
+
+        relation.selectionner(Set.of("colonne_inexistante"));
+    }
+
+    @Test
+    public void test_alias_colonnesPrefixees() {
+
+        Relation relation = relationBases.alias("B");
+
+        assertThat(relation.getIdentifiant(), equalTo("B"));
+
+        assertThat(relation.hasColonne("B.id"), is(true));
+        assertThat(relation.hasColonne("B.nom"), is(true));
+        assertThat(relation.hasColonne("B.ville"), is(true));
+    }
 
 }

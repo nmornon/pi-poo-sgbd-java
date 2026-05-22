@@ -23,6 +23,8 @@ import fr.insarouen.iti.compilation.sgbd.exceptions.RelationSansColonneException
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Chaine;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Cle;
 import fr.insarouen.iti.compilation.sgbd.moteur.valeur.Entier;
+import fr.insarouen.iti.compilation.sgbd.exceptions.InsertionException;
+import fr.insarouen.iti.compilation.sgbd.exceptions.TypeInvalideException;
 
 public class TestTable {
     public static BaseDeDonnees baseDeDonnees;
@@ -131,4 +133,85 @@ public class TestTable {
         assertThat(table.supprimer(condition), is(1));
         assertThat(table.getTuples().size(), is(2));
     }
+
+
+    @Test
+    public void test_tuple_concatener() {
+        Tuple t1 = new Tuple();
+        t1.setValeur("nom", new Chaine("Batman"));
+
+        Tuple t2 = new Tuple();
+        t2.setValeur("age", new Entier(40));
+
+        Tuple resultat = t1.concatener(t2);
+
+        assertThat(resultat.hasIdentifiant("nom"), is(true));
+        assertThat(resultat.hasIdentifiant("age"), is(true));
+    }
+
+    @Test
+    public void test_tuple_prefixer() {
+        Tuple tuple = new Tuple();
+        tuple.setValeur("nom", new Chaine("Batman"));
+
+        Tuple resultat = tuple.prefixer("heroes");
+
+        assertThat(resultat.hasIdentifiant("heroes.nom"), is(true));
+        assertThat(resultat.hasIdentifiant("nom"), is(false));
+    }
+
+    @Test(expected = InsertionException.class)
+    public void test_inserer_avecValeurSerial() {
+        
+        
+        Tuple tuple = new Tuple();
+        tuple.setValeur("id", new Cle(99));
+        tuple.setValeur("nom", new Chaine("Batman"));
+        tuple.setValeur("age", new Entier(40));
+
+        table.inserer(tuple);
+    }
+
+    @Test(expected = TypeInvalideException.class)
+    public void test_inserer_typeInvalide() {
+
+        Tuple tuple = new Tuple();
+        tuple.setValeur("nom", new Chaine("Batman"));
+        tuple.setValeur("age", new Chaine("quarante"));
+
+        table.inserer(tuple);
+    }
+
+    @Test
+    public void test_equals() {
+
+        Table autreTable = baseDeDonnees.creerTable("autre",List.of(new Colonne("id", Type.SERIAL)));
+
+        assertThat(table.equals(table), is(true));
+        assertThat(table.equals(autreTable), is(false));
+    }
+
+    @Test
+    public void test_supprimer_aucunTuple() {
+
+        ExpressionLogique condition = new ExpressionLogique();
+
+        condition.ajouterCondition(new ConditionSimple(
+            new OperandeColonne("age"),
+            new OperandeValeur(new Entier(100)),
+            Comparateur.SUPERIEUR
+        ));
+
+        assertThat(table.supprimer(condition), is(0));
+        assertThat(table.getTuples().size(), is(3));
+    }
+
+    @Test
+    public void test_supprimer_tableVide() {
+
+        table.supprimer();
+
+        assertThat(table.supprimer(), is(0));
+    }
+
 }
