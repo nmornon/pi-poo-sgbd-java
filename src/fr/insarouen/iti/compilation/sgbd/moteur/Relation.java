@@ -39,6 +39,7 @@ public class Relation implements Serializable {
      * Construit une relation à partir de la liste d'colonnes spécifiée et de
      * la liste de tuples spécifiée.
      * 
+     * @param identifiant l'identifiant de la relation
      * @param colonnes la liste des colonnes
      * @param tuples    la liste des tuple
      * 
@@ -72,8 +73,8 @@ public class Relation implements Serializable {
     /**
      * Détermine si la relation a un colonne avec l'identifiant spécifié.
      * 
-     * @param identifiant l'identifiant de l'colonne à vérifier
-     * @return true si l'colonne est dans la relation, false sinon
+     * @param identifiant l'identifiant de la colonne à vérifier
+     * @return true si la colonne est dans la relation, false sinon
      */
     public boolean hasColonne(String identifiant) {
         for (Colonne colonne : this.getColonnes()) {
@@ -85,25 +86,31 @@ public class Relation implements Serializable {
     }
 
     /**
-     * Renvoie l'colonne avec l'identiant spécifié, s'il n'existe pas, renvoie
+     * Renvoie la colonne avec l'identiant spécifié, s'il n'existe pas, renvoie
      * null.
      * 
-     * @param identifiant l'identifiant de l'colonne à recherché
-     * @return l'colonne recherché ou null
+     * @param identifiant l'identifiant de la colonne à recherché
+     * @return la colonne recherché ou null
      */
-    public Colonne getColonne(String identiant) {
+    public Colonne getColonne(String identifiant) {
         for (Colonne colonne : this.getColonnes()) {
-            if (colonne.identifiant().equals(identiant)) {
+            if (colonne.identifiant().equals(identifiant)) {
                 return colonne;
             }
         }
         return null;
     }
 
+    /**
+     * Renvoie une collection des colonnes de la relation
+     */
     public Collection<Colonne> getColonnes() {
         return this.colonnes;
     }
 
+    /**
+     * Renvoie une collection des tuples de la relation
+     */
     public Collection<Tuple> getTuples() {
         return this.tuples;
     }
@@ -123,7 +130,7 @@ public class Relation implements Serializable {
 
                 if (colonne.type() != valeur.getType()) {
                     throw new TypeInvalideException(String.format(
-                        "Type de valeur invalide pour l'colonne '%s', type attendu : '%s'",
+                        "Type de valeur invalide pour la colonne '%s', type attendu : '%s'",
                         colonne.identifiant(), colonne.type().name()));
                 }
             } else {

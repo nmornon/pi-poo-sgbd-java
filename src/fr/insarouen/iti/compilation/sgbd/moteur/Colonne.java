@@ -5,10 +5,10 @@ import java.io.Serializable;
 public record Colonne(String identifiant, Type type) implements Serializable {
 
     /**
-     * Préfixe l'colonne avec le préfixe spécifié s'il n'est pas déjà préfixé.
+     * Préfixe la colonne avec le préfixe spécifié s'il n'est pas déjà préfixé.
      * 
      * @param prefix le préfix
-     * @return l'colonne préfixé
+     * @return la colonne préfixé
      */
     public Colonne prefixer(String prefix) {
         if (!this.identifiant.contains(".")) {

@@ -11,7 +11,7 @@ public class OperandeValeur extends Operande {
     /**
      * Construit un opérande à partir d'une valeur
      *
-     * @param prefix valeur
+     * @param valeur valeur
      */
     public OperandeValeur(Valeur valeur){
         this.valeur=valeur;

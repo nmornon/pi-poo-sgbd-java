@@ -85,8 +85,7 @@ public class Tuple implements Serializable {
     /**
      * Renvoie un tuple contenant la concaténation des deux tuples spécifiés.
      * 
-     * @param tuple1 le premier tuple à concaténer
-     * @param tuple2 le second tuple à concaténer
+     * @param tuple le tuple à concaténer avec l'objet instancié
      * @return le tuple concaténé
      */
     public Tuple concatener(Tuple tuple) {

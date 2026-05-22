@@ -25,8 +25,6 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Vous êtes connectés à...");
         figlet(bdd.getIdentifiant());
-        // System.out.printf("Base de données : %s\n", bdd.getIdentifiant());
-
         while (bdd.getEstOuverte()) {
             System.out.print("> ");
             String commande = scanner.nextLine();
@@ -49,10 +47,9 @@ public class Main {
                 }
             }
 
-            }
-            gestionnaire.sauvegarder(bdd);
-            scanner.close();
         }
+        gestionnaire.sauvegarder(bdd);
+        scanner.close();
     }
 
     private static void initialiserInterpreteur(String commande) {
