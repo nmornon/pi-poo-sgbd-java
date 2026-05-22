@@ -18,14 +18,14 @@ BASE?=base
 
 all: run
 
-compile: clean
+compile: clean javacc
 	mkdir -p $(BIN_DIR)
 	javac -d $(BIN_DIR) -classpath $(BIN_DIR) -sourcepath $(SRC_DIR) $(SOURCES)
 
 print: compile
 	javap -classpath $(BIN_DIR) $(shell find $(CLASSES_DIR) -name "*.class")
 
-run: javacc compile
+run: compile
 	java -classpath $(BIN_DIR) $(MAIN) $(BASE).bdd
 
 test: compile
@@ -37,12 +37,9 @@ test: compile
 javacc:
 	javacc -OUTPUT_DIRECTORY=$(DIR_ANALYSEUR) $(PATH_ANALYSEUR) > /dev/null
 
-javacc_clean:
-	rm $(DIR_ANALYSEUR)/*.java
-
 doc: compile
 	mkdir -p $(DOC_DIR)
 	javadoc -d $(DOC_DIR) -sourcepath $(SRC_DIR) -subpackages fr.insarouen.iti.compilation.sgbd
 
 clean:
-	rm -rf $(BIN_DIR) $(DOC_DIR) $(BIN_TEST_DIR)
+	rm -rf $(BIN_DIR) $(DOC_DIR) $(BIN_TEST_DIR) $(DIR_ANALYSEUR)/*.java
