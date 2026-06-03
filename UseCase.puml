@@ -38,10 +38,10 @@ tb --> UC3
 tb --> UC4
 tb --> UC5
 tb --> UC6
-UC6 .> UC7 : extends
-UC6 .> UC8 : extends
+UC6 <. UC7 : <<extend>>
+UC6 <. UC8 : <<extend>>
 tb --> UC9
 tb --> UC10
-UC10 .> UC11 : include
+UC10 .> UC11 : <<include>>
 
 @enduml
