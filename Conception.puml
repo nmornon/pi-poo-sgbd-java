@@ -5,18 +5,21 @@ title SGBD - Conception
 package sgbd {
 class Main {
     + {static} main(args : String[])
+    - {static} initialiserInterpreteur(String commande)
+    - {static} figlet(String cmdline)
 }
 
 package persistance {
   class GestionnairePersistance {
-    + charger(): BaseDeDonnees
+    + GestionnairePersistance()
+    + charger(String nomFichier): BaseDeDonnees
     + sauvegarder(BaseDeDonnees)
   }
 }
 
-package interpreteur {
+package analyseurs {
   class Interpreteur {
-    + interpreter(String): Commande
+    + commande(bdd : BaseDeDonnees) : void
   }
 }
 
@@ -25,6 +28,7 @@ package exception {
   class ColonneDejaExistantException{}
   class ColonneException{}
   class ColonneInexistanteException{}
+  class InsertionException{}
   class SGBDException {}
   class ProduitCartesienException{}
   class RelationException{}
@@ -40,40 +44,56 @@ package exception {
 package moteur {
   class BaseDeDonnees {
     - identifiant: String
-    - nbLignes: Long
+    - prochainSerial : int
     - estOuvert : Boolean
     - tables : Collection<Table>
+    + BaseDeDonnees (String identifiant)
+    + BaseDeDonnees(String identifiant, int dernierSerial)
+    + BaseDeDonnees(String identifiant, Collection<Table> tables)
+    + BaseDeDonnees(String identifiant, Collection<Table> tables, int dernierSerial)
     + getEstOuverte() : Boolean
     + setEstOuverte(bool : Boolean)
     + getIdentifiant() : String
-    + getNbLignes() : Long
+    + getProchaineCle() : Cle
     + getTables() : Collection<Table>
-    + creerTable(identifiant : String, donnees : Collection<Attribut>): Table
-    + creerTable(identifiant : String, tuples : Collection<Tuple>): Table
-    + supprimerTable(id : String)
+    + hasTable(String identifiant) : Boolean
+    + getTable(String identifiant) : Table
+    + creerTable(String identifiant, Collection<Colonne> donnees): Table
+    + creerTable(String identifiant, Collection<Colonne> donnees, Collection<Tuple> tuples): Table
+    + supprimerTable(String identifiant)
     + toString () : String
+    + equals(Object object) : Boolean
   }
 
   class Table {
-    - identifiant : String
-    + inserer(Tuple)
-    + inserer(Tuple[])
-    + supprimer(ExpressionLogique)
+    - baseDeDonnees : BaseDeDonnees 
+    + Table( BaseDeDonnees baseDeDonnees, String identifiant,Collection<Colonne> colonnes)
+    + Table( BaseDeDonnees baseDeDonnees, String identifiant,Collection<Colonne> colonnes,Collection<Tuple> tuples)
+    + inserer(Tuple tuple)
+    + supprimer() : int
+    + supprimer(ExpressionLogique condition) : int
   }
 
   class Relation {
     - identifiant : String
     - tuples: Collection<Tuple>
-    - attributs: Set<Attribut>
+    - colonnes: Set<Colonne>
+    + Relation(String identifiant, Collection<Colonne> colonnes)
+    + Relation(String identifiant, Collection<Colonne> colonnes, Collection<Tuple> tuples)
     + getIdentifiant() : String
-    + hasAttribut(identifiant : String) : Boolean
-    + getAttribut(String identifiant) : Attribut
-    + getAttributs() : Collection<Attribut>
+    + hasColonne(String identifiant) : Boolean
+    + getColonne(String identifiant) : Colonne
+    + getColonnes() : Collection<Colonne>
     + getTuples() : Collection<Tuple>
-    + selectionner(attributs : Collection<Attribut>): Relation
-    + projeter(ExpressionLogique): Relation
-    + joindre(Relation, Attribut, Attribut): Relation
-    + produitCartesien(Relation): Relation
+    # verifierTuple(Tuple tuple)
+    + alias(String alias) : Relation
+    + selectionner(Set<String> colonnes): Relation
+    + projeter(ExpressionLogique expression): Relation
+    + produitCartesien(Relation relation): Relation
+    - concatenerColonnes(String identifiant1, Collection<Colonne> colonnes1, String identifiant2, Collection<Colonne> colonnes2) : Collection<Colonne>
+    + toString() : String
+    - concatenerIdentifiants(String identifiant1, String identifiant2): String
+    + equals(Object object) : boolean
   }
 
   enum Type {
@@ -82,43 +102,49 @@ package moteur {
     VARCHAR
   }
 
-  record Attribut {
+  record Colonne {
     - identifiant: String
     - type: Type
+    + prefixer(String prefix) : Colonne
+    + equals(Object object) : Boolean
   }
 
   class Tuple {
-    - valeurs: HashMap<String, Valeur>
+    - valeurs: Map<String, Valeur>
     + Tuple()
-    + hasIdentifiant() : Identifiant
-    + getValeur(Identifiant): Valeur
-    + getValeurs(): Valeur[]
-    + set(Identifiant, Valeur): Tuple
+    + hasIdentifiant(String identifiant) : Boolean
+    + getValeur(String Identifiant): Valeur
+    + getValeurs(): Map<String, Valeur> 
+    + setValeur(String identifiant, Valeur valeur) : Tuple
+    + prefixer(String prefix):Tuple
+    + concatener(Tuple tuple) :Tuple
+    + toString() : String
+    + equals(Object object) : boolean
   }
 
-  class Valeur {
+   abstract class Valeur {
+    - type : Type
+    - valeur : Object
     + getValeur(): Object
     + getType(): Type
     + equals(valeur : Object) : Boolean
+    + toString() : String
     
   }
 
   class Cle {
-    - valeur: Number
-    - type: Type
-    + Cle(Number)
+    + Cle( int valeur)
+    + compareTo(Valeur valeur) : int
   }
 
   class Chaine {
-    - valeur: String
-    - type: Type
-    + Chaine(String)
+    + Chaine(String valeur)
+    + compareTo(Valeur valeur) : int
   }
 
-  class Nombre {
-    - valeur: Number
-    - type: Type
-    + Nombre(Number)
+  class Entier {
+    + Entier(int valeur)
+    + compareTo(Valeur valeur) : int
   }
 }
 
@@ -129,32 +155,34 @@ package conditions {
     - connecteurs : List<OperateurLogique>
     
     + ExpressionLogique()
-    + ajouterCondition(condition : ConditionSimple) : void 
-    + ajouterConnecteur(connecteur : OperateurLogique) : void 
-    + evaluer(tuple : Tuple) : boolean
+    + ajouterCondition(ConditionSimple condition) : void 
+    + ajouterConnecteur(OperateurLogique connecteur) : void 
+    + evaluer(Tuple tuple) : boolean
   }
 
   class ConditionSimple {
     - gauche : Operande
     - droite : Operande
     - comparateur : Comparateur
-
-    + evaluer(contexte : Map<String, Tuple>) : boolean
+    + ConditionSimple(Operande gauche, Operande droite, Comparateur comparateur) 
+    + evaluer(Tuple tuple) : boolean
   }
 
   abstract Operande {
-    + {abstract} evaluer(contexte : Map<String, Tuple>) : Valeur
+    + {abstract} evaluer(Tuple tuple) : Valeur
   }
 
-  class OperandeAttribut {
-    - nomTableOuAlias : String
-    - nomAttribut : String
-    + evaluer(contexte : Map<String, Tuple>) : Valeur
+  class OperandeColonne {
+    - identifiant : String
+    + OperandeColonne(String prefix, String attribut)
+    + OperandeColonne(String identifiant)
+    + evaluer(Tuple tuple) : Valeur
   }
 
   class OperandeValeur {
-    - contenu : Object
-    + evaluer(contexte : Map<String, Tuple>) : Valeur
+    - valeur : Valeur
+    + OperandeValeur(Valeur valeur)
+    + evaluer(Tuple tuple) : Valeur
   }
 
   enum OperateurLogique {
@@ -171,7 +199,7 @@ package conditions {
 
 }
 
-Operande <|-- OperandeAttribut
+Operande <|-- OperandeColonne
 Operande <|-- OperandeValeur
 
 Main --> GestionnairePersistance
@@ -181,14 +209,11 @@ GestionnairePersistance --> BaseDeDonnees
 
 BaseDeDonnees "1" *-- "*" Table
 Relation <|-- Table
-Relation "1"  o-- "*" Tuple
-Relation "1" *-- "*" Attribut
 
-Attribut *-- Valeur
 
 Valeur <|-- Cle
 Valeur <|-- Chaine
-Valeur <|-- Nombre
+Valeur <|-- Entier
 
 ColonneException <|-- ColonneDejaExistantException
 ColonneException <|-- ColonneInexistanteException 
@@ -201,11 +226,12 @@ TableException <|-- TableInexistanteException
 SGBDException <|-- TypeInvalideException 
 SGBDException <|-- ColonneException
 SGBDException <|-- RelationException
+TableException <|-- InsertionException
 
-
-
-
-
+Valeur -->Type
+Relation "1" *-- "*" Tuple
+Tuple "1" *-- "*"  Valeur
+Relation "1" *-- "*" Colonne
 ExpressionLogique "1" *-- "*" ConditionSimple
 ExpressionLogique --> OperateurLogique
 
