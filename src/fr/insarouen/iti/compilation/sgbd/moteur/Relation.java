@@ -281,8 +281,6 @@ public class Relation implements Serializable {
                 }
             }
         }
-        System.out.println(laMap);
-
 
         StringBuilder builder = new StringBuilder();
         builder.append(this.getClass().getSimpleName());

@@ -54,7 +54,7 @@ TABLES;
 ### Manipulation de données 
 
 ```sql
-INSERT INTO Heros
+INSERT INTO Heros (nom,age)
 VALUES ("Bruce Wayne", 35);
 
 DELETE FROM Heros
