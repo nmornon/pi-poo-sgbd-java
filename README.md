@@ -153,3 +153,11 @@ La base de données est automatiquement :
 - sauvegardée lors de sa fermeture.
 
 Les données sont stockées à l'aide de la sérialisation Java.
+
+## Equipe 
+Projet réalisé par :
+- Gabriel Dejean
+- Léandre Lacroix
+- Tom Le Blais
+- Noémie Mornon
+- Merlin Renoux
